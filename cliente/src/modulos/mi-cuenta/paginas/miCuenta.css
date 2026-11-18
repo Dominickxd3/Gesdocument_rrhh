@@ -1,0 +1,79 @@
+.pagina-mi-cuenta {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 720px;
+}
+
+.pagina-mi-cuenta h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.pagina-mi-cuenta header p {
+  margin: 4px 0 0;
+  color: #6b7280;
+}
+
+.tarjeta-mi-cuenta {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.tarjeta-mi-cuenta__perfil {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tarjeta-mi-cuenta__perfil div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tarjeta-mi-cuenta__perfil strong { font-size: 17px; }
+.tarjeta-mi-cuenta__perfil span { color: #6b7280; }
+
+.tarjeta-mi-cuenta__avatar.p-avatar {
+  background: var(--color-activo);
+  color: var(--color-sobre-activo);
+  font-weight: 600;
+}
+
+.tarjeta-mi-cuenta__datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.tarjeta-mi-cuenta__datos dt {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.tarjeta-mi-cuenta__datos dd {
+  margin: 4px 0 0;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.tarjeta-mi-cuenta__nota {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+}

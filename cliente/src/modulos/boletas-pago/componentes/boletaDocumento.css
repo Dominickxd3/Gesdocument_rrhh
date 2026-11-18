@@ -1,0 +1,288 @@
+/* Ventana centrada */
+.ventana-boleta.p-dialog {
+  max-height: 92vh;
+  border-radius: 12px;
+  font-family: var(--fuente);
+}
+
+.ventana-boleta .p-dialog-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gris-200);
+  border-radius: 12px 12px 0 0;
+}
+
+.ventana-boleta .p-dialog-content {
+  padding: 20px;
+  background: var(--gris-100);
+}
+
+.ventana-boleta .p-dialog-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--gris-200);
+  border-radius: 0 0 12px 12px;
+}
+
+.ventana-boleta__encabezado {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.ventana-boleta__titulo {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ventana-boleta__insignias {
+  display: flex;
+  gap: 6px;
+}
+
+.ventana-boleta__pie {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ventana-boleta__pie .p-button { margin: 0; }
+
+/* Hoja escalable: tamaño A4 real que se reduce si no entra */
+.hoja-escalable {
+  position: relative;
+  width: 100%;
+  max-width: 794px;
+  margin: 0 auto;
+}
+
+.hoja-escalable__hoja {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 794px;
+  transform-origin: top left;
+}
+
+/*
+ * Réplica de la boleta PDF (backend/src/pdf/pdf.service.ts). El PDF mide 595 pt de ancho
+ * con márgenes de 40 pt; aquí la hoja mide 794 px, así que 1 pt ≈ 1.334 px.
+ */
+.boleta-pdf {
+  --linea: 1px solid #000000;
+  --gris-grupo: #dedede;
+  --mono: 'Courier New', Courier, monospace;
+
+  display: flex;
+  flex-direction: column;
+  width: 794px;
+  height: 1123px;
+  padding: 16px 53px 30px;
+  background: #ffffff;
+  box-shadow: var(--sombra-tarjeta);
+  color: #000000;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 10.7px;
+  line-height: 1.2;
+}
+
+.boleta-pdf__encabezado {
+  display: flex;
+  align-items: flex-start;
+  gap: 19px;
+}
+
+.boleta-pdf__logo {
+  height: 56px;
+  width: auto;
+}
+
+.boleta-pdf__empresa {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 8px;
+}
+
+.boleta-pdf__empresa strong { font-size: 14.7px; }
+
+.boleta-pdf__numero {
+  padding-top: 8px;
+  font-size: 13.3px;
+}
+
+.boleta-pdf__titulo {
+  margin: 10px 0 18px;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cuadro {
+  width: 100%;
+  margin-bottom: 5px;
+  border: var(--linea);
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.cuadro th,
+.cuadro td {
+  height: 20px;
+  padding: 2px 6px;
+  border: var(--linea);
+  overflow: hidden;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Igual que el PDF: los títulos reducen la letra para entrar en una línea. */
+.cuadro th {
+  padding: 2px 3px;
+  font-size: 9.3px;
+  font-weight: 700;
+  text-overflow: clip;
+}
+.cuadro td { height: 23px; }
+
+.cuadro .a-la-izquierda { text-align: left; }
+.cuadro .negrita,
+.boleta-pdf .negrita { font-weight: 700; }
+.boleta-pdf .mono { font-family: var(--mono); }
+.cuadro .pequeno { font-size: 9.6px; }
+.cuadro .texto { font-family: Helvetica, Arial, sans-serif; }
+
+/* Tabla de conceptos: solo líneas verticales dentro de cada grupo */
+.conceptos td {
+  border-top: 0;
+  border-bottom: 0;
+  height: 19px;
+  font-size: 10px;
+}
+
+.conceptos .conceptos__grupo td {
+  border: var(--linea);
+  background: var(--gris-grupo);
+  font-size: 10.7px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.conceptos .conceptos__nombre {
+  padding-left: 16px;
+  text-align: left;
+}
+
+.cuadro .importe { text-align: right; }
+
+/* Totales: una sola caja sin divisiones internas */
+.totales td {
+  border-right: 0;
+  border-left: 0;
+  font-size: 12px;
+}
+
+.importe-neto {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 54%;
+  height: 28px;
+  margin: 0 0 8px auto;
+  padding: 0 10px;
+  border: var(--linea);
+  font-weight: 700;
+}
+
+.importe-neto span { font-size: 13.3px; }
+.importe-neto strong { font-size: 14.7px; }
+
+.aportes-empleador {
+  min-height: 87px;
+  border: var(--linea);
+}
+
+.aportes-empleador h3 {
+  height: 21px;
+  margin: 0;
+  padding: 0 8px;
+  border-bottom: var(--linea);
+  background: var(--gris-grupo);
+  font-size: 13.3px;
+  line-height: 21px;
+}
+
+.aportes-empleador p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 3px 11px;
+}
+
+.boleta-pdf__firmas {
+  display: grid;
+  grid-template-columns: 307px 280px;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.firma-pdf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+}
+
+.firma-pdf__imagen {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 72px;
+  margin-bottom: 6px;
+  border-bottom: 1.33px solid #000000;
+}
+
+.trazo-firma {
+  width: 190px;
+  height: 58px;
+  margin-bottom: 4px;
+}
+
+.firma-pdf strong { font-size: 10.7px; }
+.firma-pdf span { font-size: 9.3px; }
+
+.firma-pdf__pendiente {
+  margin-bottom: 8px;
+  color: #b45309;
+  font-style: italic;
+}
+
+.firma-pdf .firma-pdf__fecha {
+  margin-top: 2px;
+  color: #525252;
+  font-size: 8.7px;
+}
+
+.boleta-pdf__pagina {
+  margin: 14px 0 0;
+  color: #333333;
+  font-size: 8.7px;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .ventana-boleta.p-dialog { max-height: 100vh; border-radius: 0; }
+  .ventana-boleta .p-dialog-content { padding: 8px; }
+  .ventana-boleta__pie .p-button { flex: 1; }
+}
+
+.firma-pdf__imagen-empleador {
+  max-width: 260px;
+  max-height: 80px;
+  margin-bottom: 4px;
+  object-fit: contain;
+}

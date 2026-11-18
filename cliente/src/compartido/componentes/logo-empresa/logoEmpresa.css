@@ -1,0 +1,38 @@
+.logo-empresa {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.logo-empresa__isotipo {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.logo-empresa.es-compacto .logo-empresa__isotipo {
+  width: 40px;
+  height: 40px;
+}
+
+.logo-empresa__textos {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.logo-empresa__nombre {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-texto);
+  white-space: nowrap;
+}
+
+.logo-empresa__empresa {
+  font-size: 12px;
+  color: var(--color-texto-secundario);
+}
+

@@ -1,0 +1,43 @@
+:root {
+  --color-fondo: #ffffff;
+  --color-fondo-suave: #f5f5f5;
+  --color-texto: #111111;
+  --color-texto-secundario: #5f5f5f;
+  --color-borde: #e6e6e6;
+  --color-activo: #111111;
+  --color-sobre-activo: #ffffff;
+  --ancho-barra: 264px;
+  --ancho-barra-compacta: 76px;
+  --fuente: 'Geist', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #raiz { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--fuente);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Los componentes de PrimeReact usan la misma tipografía que el resto de la aplicación. */
+.p-component,
+.p-inputtext,
+.p-link {
+  font-family: var(--fuente);
+}
+
+.encabezado-pagina h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.encabezado-pagina p {
+  margin: 0;
+  color: var(--color-texto-secundario);
+}

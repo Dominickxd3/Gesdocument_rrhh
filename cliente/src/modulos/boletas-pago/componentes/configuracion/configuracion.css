@@ -1,0 +1,196 @@
+/* Mismos tonos que la web de boletas existente (valores de Tailwind). */
+.pagina-configuracion {
+  --gris-100: #f3f4f6;
+  --gris-200: #e5e7eb;
+  --gris-300: #d1d5db;
+  --gris-400: #9ca3af;
+  --gris-500: #6b7280;
+  --rojo-50: #fef2f2;
+  --rojo-200: #fecaca;
+  --rojo-600: #dc2626;
+  --sombra-tarjeta: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pagina-configuracion h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.pagina-configuracion header p {
+  margin: 4px 0 0;
+  color: var(--gris-500);
+}
+
+.pagina-configuracion__grilla {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.tarjeta-configuracion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid var(--gris-200);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--sombra-tarjeta);
+}
+
+.tarjeta-configuracion--ancha { grid-column: 1 / -1; }
+
+.tarjeta-configuracion h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.tarjeta-configuracion__titulo-icono {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tarjeta-configuracion__texto,
+.tarjeta-configuracion__ayuda {
+  margin: 0;
+  color: var(--gris-500);
+  line-height: 1.55;
+}
+
+.tarjeta-configuracion__ayuda { margin-top: -8px; font-size: 13px; }
+
+/* Imagen actual */
+.vista-firma {
+  display: grid;
+  place-items: center;
+  align-self: center;
+  width: min(100%, 280px);
+  height: 170px;
+  padding: 10px;
+  border: 1px solid var(--gris-200);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.vista-firma img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.vista-firma.es-vacia {
+  border-style: dashed;
+  color: var(--gris-400);
+  font-size: 13px;
+  text-align: center;
+}
+
+.pagina-configuracion .boton-eliminar.p-button,
+.p-confirm-dialog .boton-eliminar.p-button {
+  align-self: flex-start;
+  height: 38px;
+  border: 1px solid var(--rojo-200);
+  border-radius: 8px;
+  background: var(--rojo-50);
+  color: var(--rojo-600);
+  font-weight: 500;
+}
+
+.pagina-configuracion .boton-eliminar.p-button:enabled:hover,
+.p-confirm-dialog .boton-eliminar.p-button:enabled:hover {
+  background: #fee2e2;
+}
+
+/* Zona de carga */
+.zona-carga {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 150px;
+  border: 1.5px dashed var(--gris-300);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--color-texto);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.zona-carga .pi {
+  margin-bottom: 4px;
+  color: var(--gris-400);
+  font-size: 26px;
+}
+
+.zona-carga strong { font-weight: 500; }
+.zona-carga span { color: var(--gris-400); font-size: 12px; }
+
+.zona-carga:hover,
+.zona-carga.es-activa {
+  border-color: var(--color-activo);
+  background: #fafafa;
+}
+
+.zona-carga:focus-visible {
+  outline: 2px solid var(--color-activo);
+  outline-offset: 2px;
+}
+
+/* Datos de la empresa */
+.formulario-empresa {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+.formulario-empresa__direccion { grid-column: 1 / -1; }
+
+.formulario-empresa .campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formulario-empresa .campo label { font-weight: 500; }
+
+.formulario-empresa .p-inputtext {
+  height: 40px;
+  border-color: var(--gris-300);
+  border-radius: 8px;
+}
+
+.formulario-empresa .p-inputtext:enabled:focus {
+  border-color: var(--color-activo);
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.12);
+}
+
+.formulario-empresa .campo__error { color: var(--rojo-600); }
+
+.tarjeta-configuracion__acciones {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pagina-configuracion .boton-guardar.p-button {
+  height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--color-activo);
+  font-weight: 600;
+}
+
+.p-confirm-dialog .boton-texto.p-button { color: var(--color-texto); }
+
+@media (max-width: 767px) {
+  .pagina-configuracion__grilla,
+  .formulario-empresa { grid-template-columns: 1fr; }
+}
