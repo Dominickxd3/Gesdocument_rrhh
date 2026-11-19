@@ -1,0 +1,185 @@
+/* Descansos médicos: usa la base visual de papeletas (papeletas.css) y agrega solo lo propio. */
+
+.dm-filtro-estado { flex: 0 1 240px; }
+.dm-col-tipo { color: var(--pp-gris-500); white-space: nowrap; }
+
+/* Estados: gris (espera al trabajador), ámbar (por revisar), azul (observado), verde, rojo. */
+.dm-insignia {
+  display: inline-flex;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.dm-insignia.es-aviso { background: var(--pp-gris-100); color: var(--pp-gris-700); }
+.dm-insignia.es-pendiente_revision { background: var(--pp-ambar-fondo); color: var(--pp-ambar-texto); }
+.dm-insignia.es-observado { background: var(--pp-azul-fondo); color: var(--pp-azul-texto); }
+.dm-insignia.es-aprobado { background: var(--pp-verde-fondo); color: var(--pp-verde-texto); }
+.dm-insignia.es-rechazado { background: var(--pp-rojo-fondo); color: var(--pp-rojo-texto); }
+
+/* Las que esperan revisión de RR. HH. se marcan con una franja. */
+.pp-tabla .p-datatable-tbody > tr.dm-fila.es-pendiente_revision > td:first-child { box-shadow: inset 3px 0 0 #f59e0b; }
+
+.dm-periodo { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.dm-periodo__dias { color: var(--pp-gris-500); font-size: 12px; }
+
+.dm-plazo { color: var(--pp-gris-700); font-size: 13px; white-space: nowrap; }
+.dm-plazo.es-hoy { color: var(--pp-ambar-texto); font-weight: 600; }
+.dm-plazo.es-vencido { color: var(--pp-rojo-texto); font-weight: 600; }
+.dm-plazo.es-ninguno { color: var(--pp-gris-400); }
+
+/* Ventana de detalle */
+.dm-reconocido { display: block; margin-top: 4px; color: var(--pp-verde-texto); font-size: 12px; }
+
+.dm-confidencial {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--pp-gris-100);
+  color: var(--pp-gris-500);
+  font-size: 11px;
+  font-weight: 500;
+}
+.dm-confidencial .pi { font-size: 10px; }
+
+.dm-sustentos { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.dm-sustentos li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--pp-gris-200);
+  border-radius: 10px;
+}
+.dm-sustentos li > .pi { color: var(--pp-gris-300); font-size: 18px; }
+.dm-sustentos li.es-recibido > .pi { color: var(--pp-verde-solido); }
+.dm-sustentos li > div { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.dm-sustentos strong { font-size: 13px; }
+.dm-sustentos small { overflow: hidden; color: var(--pp-gris-500); text-overflow: ellipsis; white-space: nowrap; }
+.dm-sustentos .p-button { color: var(--pp-gris-700); }
+.dm-obligatorio { color: var(--pp-gris-400); font-weight: 400; }
+
+.dm-revision { display: flex; flex-direction: column; gap: 14px; padding: 14px; border-radius: 10px; background: var(--pp-gris-50); }
+.dm-verificacion { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.dm-verificacion > span { display: flex; flex-direction: column; }
+.dm-verificacion small { color: var(--pp-gris-500); }
+.dm-verificacion .p-checkbox.p-highlight .p-checkbox-box { border-color: var(--pp-verde-solido); background: var(--pp-verde-solido); }
+
+.dm-periodo-reconocido { display: flex; flex-direction: column; gap: 6px; }
+.dm-periodo-reconocido > div { display: flex; align-items: center; gap: 8px; }
+.dm-periodo-reconocido .p-inputtext { height: 38px; }
+.dm-periodo-reconocido .pi { color: var(--pp-gris-400); font-size: 11px; }
+.dm-periodo-reconocido__dias { color: var(--pp-gris-500); font-size: 13px; white-space: nowrap; }
+
+.dm-decision { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 8px; }
+.dm-decision .p-button { height: 42px; justify-content: center; }
+.dm-boton-ancho.p-button { width: 100%; height: 42px; justify-content: center; }
+
+/* Formulario de registro */
+.dm-rejilla-fechas { display: grid; grid-template-columns: 1fr 1fr 110px; gap: 10px; align-items: end; }
+.dm-rejilla-fechas .p-inputtext { height: 40px; }
+
+.dm-aviso-plazo {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--pp-ambar-fondo);
+  color: var(--pp-ambar-texto);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.dm-aviso-plazo .pi { margin-top: 2px; }
+
+@media (max-width: 767px) {
+  .dm-rejilla-fechas { grid-template-columns: 1fr 1fr; }
+  .dm-decision { grid-template-columns: 1fr 1fr; }
+  .dm-decision .pp-boton-aprobar { grid-column: 1 / -1; }
+  .dm-col-tipo { display: none; }
+}
+
+/* ---------- Vista del trabajador ---------- */
+.dm-pendiente-trabajador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border: 1px solid #93c5fd;
+  border-radius: 10px;
+  background: var(--pp-azul-fondo, #dbeafe);
+  color: #1e3a8a;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.dm-pendiente-trabajador > span:first-of-type { flex: 1; font-weight: 600; }
+
+.dm-mensaje {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--pp-gris-50);
+  color: var(--pp-gris-700);
+}
+.dm-mensaje > .pi { margin-top: 2px; }
+.dm-mensaje > div { display: flex; flex-direction: column; gap: 2px; }
+.dm-mensaje p { margin: 2px 0; font-style: italic; }
+.dm-mensaje small { color: var(--pp-gris-500); }
+.dm-mensaje.es-observado { background: var(--pp-azul-fondo); color: #1e3a8a; }
+.dm-mensaje.es-aprobado { background: var(--pp-verde-fondo); color: var(--pp-verde-texto); }
+.dm-mensaje.es-rechazado { background: var(--pp-rojo-fondo); color: var(--pp-rojo-texto); }
+
+/* RR. HH. esperando al trabajador */
+.dm-esperando { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--pp-gris-500); font-size: 13px; }
+.dm-esperando .dm-plazo { margin-left: auto; }
+
+/* Quién resolvió el caso */
+.dm-resolucion { display: flex; gap: 10px; padding: 12px 14px; border-radius: 10px; }
+.dm-resolucion > .pi { margin-top: 2px; }
+.dm-resolucion > div { display: flex; flex-direction: column; gap: 2px; }
+.dm-resolucion small { opacity: 0.8; }
+.dm-resolucion p { margin: 4px 0 0; font-style: italic; }
+.dm-resolucion.es-aprobado { background: var(--pp-verde-fondo); color: var(--pp-verde-texto); }
+.dm-resolucion.es-rechazado { background: var(--pp-rojo-fondo); color: var(--pp-rojo-texto); }
+.dm-resolucion.es-observado { background: var(--pp-azul-fondo); color: #1e3a8a; }
+
+/* Visor de documentos */
+.dm-ventana-documento .p-dialog-content { padding: 0; }
+.dm-visor { display: flex; justify-content: center; min-height: 60vh; padding: 20px; background: var(--pp-gris-100); }
+.dm-visor iframe { width: 100%; min-height: 70vh; border: 0; background: #fff; }
+.dm-visor img { max-width: 100%; max-height: 70vh; object-fit: contain; }
+
+.dm-documento {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  padding: 40px 44px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+  color: #111;
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.7;
+}
+.dm-documento header { margin-bottom: 20px; text-align: center; }
+.dm-documento header strong { display: block; color: var(--pp-gris-500); font-family: var(--fuente); font-size: 13px; }
+.dm-documento h3 { margin: 10px 0 0; letter-spacing: 0.08em; }
+.dm-documento__firma { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 56px; font-size: 13px; }
+.dm-documento__firma span { width: 220px; border-top: 1px solid #111; }
+.dm-documento__firma small { color: var(--pp-gris-500); }
+.dm-documento__marca {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 2px 8px;
+  border: 1px dashed var(--pp-gris-300);
+  border-radius: 999px;
+  color: var(--pp-gris-500);
+  font-family: var(--fuente);
+  font-size: 11px;
+}

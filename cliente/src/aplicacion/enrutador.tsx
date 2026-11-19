@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { DisenoPrincipal } from '@/compartido/diseno/DisenoPrincipal';
 import { RutaProtegida } from '@/compartido/sesion/RutaProtegida';
+import { RutaSoloGestores } from '@/compartido/sesion/RutaSoloGestores';
 import { PaginaInicio } from '@/modulos/inicio/paginas/PaginaInicio';
 import { PaginaDocumentos } from '@/modulos/documentos/paginas/PaginaDocumentos';
 import { PaginaBoletasPago } from '@/modulos/boletas-pago/paginas/PaginaBoletasPago';
@@ -28,13 +29,13 @@ export const enrutador = createBrowserRouter([
       { path: 'inicio', element: <PaginaInicio /> },
       { path: 'documentos', element: <PaginaDocumentos /> },
       { path: 'boletas-pago', element: <PaginaBoletasPago /> },
-      { path: 'boletas-pago/configuracion', element: <PaginaConfiguracionBoletas /> },
+      { path: 'boletas-pago/configuracion', element: <RutaSoloGestores><PaginaConfiguracionBoletas /></RutaSoloGestores> },
       { path: 'papeletas-permiso', element: <PaginaPapeletasPermiso /> },
       { path: 'descansos-medicos', element: <PaginaDescansosMedicos /> },
       { path: 'incidencias', element: <PaginaIncidencias /> },
-      { path: 'trabajadores', element: <PaginaTrabajadores /> },
-      { path: 'plantillas', element: <PaginaPlantillas /> },
-      { path: 'reportes', element: <PaginaReportes /> },
+      { path: 'trabajadores', element: <RutaSoloGestores><PaginaTrabajadores /></RutaSoloGestores> },
+      { path: 'plantillas', element: <RutaSoloGestores><PaginaPlantillas /></RutaSoloGestores> },
+      { path: 'reportes', element: <RutaSoloGestores><PaginaReportes /></RutaSoloGestores> },
       { path: 'mi-cuenta', element: <PaginaMiCuenta /> },
       { path: '*', element: <Navigate to="/inicio" replace /> },
     ],

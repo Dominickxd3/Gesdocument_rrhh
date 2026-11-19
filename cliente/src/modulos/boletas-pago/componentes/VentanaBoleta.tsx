@@ -2,7 +2,6 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { nombrePeriodo, type Boleta, type ConfiguracionBoletas, type Periodo } from '../dominio/boleta';
 import { BoletaDocumento } from './BoletaDocumento';
-import { InsigniaEnvio, InsigniaEstado } from './EstadoBoleta';
 
 interface PropiedadesVentanaBoleta {
   boleta: Boleta | null;
@@ -29,10 +28,6 @@ export function VentanaBoleta({
   const encabezado = boleta && (
     <div className="ventana-boleta__encabezado">
       <span className="ventana-boleta__titulo">Boleta de pago · {nombrePeriodo(periodo)}</span>
-      <span className="ventana-boleta__insignias">
-        <InsigniaEstado boleta={boleta} />
-        <InsigniaEnvio boleta={boleta} />
-      </span>
     </div>
   );
 

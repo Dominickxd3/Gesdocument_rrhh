@@ -19,6 +19,12 @@ interface PropiedadesTablaBoletas {
 
 const FILAS_POR_PAGINA = 15;
 
+/**
+ * Solo se seleccionan las boletas sin firmar: las que no se enviaron
+ * y las enviadas sin firmar (p. ej. porque venció el enlace de firma).
+ */
+const esSeleccionable = (boleta: Boleta) => boleta.firma !== 'firmada';
+
 interface PropiedadesBotonAccion {
   icono: string;
   etiqueta: string;
@@ -104,7 +110,8 @@ export function TablaBoletas({
         loading={cargando}
         selectionMode="checkbox"
         selection={seleccion}
-        onSelectionChange={(e) => alSeleccionar(e.value as Boleta[])}
+        onSelectionChange={(e) => alSeleccionar((e.value as Boleta[]).filter(esSeleccionable))}
+        isDataSelectable={(e) => esSeleccionable(e.data as Boleta)}
         onRowClick={(e) => alAbrir(e.data as Boleta)}
         rowClassName={() => 'fila-boleta'}
         first={primera}

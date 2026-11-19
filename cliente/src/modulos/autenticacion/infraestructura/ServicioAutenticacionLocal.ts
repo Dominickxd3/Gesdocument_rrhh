@@ -20,7 +20,7 @@ export class ServicioAutenticacionLocal implements ServicioAutenticacion {
     );
     if (!encontrado) throw new ErrorCredenciales();
 
-    const { id, nombre, correo, cargo } = encontrado;
-    return { id, nombre, correo, cargo };
+    const { id, nombre, correo, cargo, rol, dni } = encontrado;
+    return { id, nombre, correo, cargo, rol, dni };
   }
 }

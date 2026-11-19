@@ -316,3 +316,31 @@
 .menu-desplegable.active .menu-desplegable__flecha {
   color: var(--color-sobre-activo);
 }
+
+/* Menú con subopciones: la etiqueta navega y la flecha (botón aparte) despliega. */
+.menu-desplegable { position: relative; display: block; padding: 0; cursor: default; }
+.menu-desplegable__enlace { width: 100%; padding-right: 40px; }
+.menu-desplegable__boton {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-texto-secundario);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+.menu-desplegable__boton:hover { background: rgba(0, 0, 0, 0.06); }
+.menu-desplegable__boton:focus-visible { outline: 2px solid var(--color-activo); outline-offset: 1px; }
+.menu-desplegable__enlace.active + .menu-desplegable__boton { color: var(--color-sobre-activo); }
+.menu-desplegable__enlace.active + .menu-desplegable__boton:hover { background: rgba(255, 255, 255, 0.15); }
+.menu-desplegable__boton .menu-desplegable__flecha { margin: 0; color: inherit; }
+.menu-desplegable__boton[aria-expanded='false'] .menu-desplegable__flecha { transform: rotate(-90deg); }
+.menu-desplegable.es-actual .menu-desplegable__enlace { font-weight: 600; }
+.es-compacta .menu-desplegable__enlace { padding-right: 0; }
+.es-compacta .menu-desplegable__boton { right: 0; width: 18px; height: 18px; top: auto; bottom: 0; transform: none; }

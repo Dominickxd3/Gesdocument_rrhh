@@ -1,0 +1,13 @@
+.insignia {
+  display: inline-flex;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.insignia.tono-gris { background: #f3f4f6; color: #374151; }
+.insignia.tono-ambar { background: #fef3c7; color: #b45309; }
+.insignia.tono-azul { background: #dbeafe; color: #1d4ed8; }
+.insignia.tono-verde { background: #dcfce7; color: #15803d; }
+.insignia.tono-rojo { background: #fee2e2; color: #b91c1c; }

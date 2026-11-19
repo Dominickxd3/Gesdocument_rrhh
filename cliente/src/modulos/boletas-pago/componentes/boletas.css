@@ -465,3 +465,7 @@
   .paginacion { flex-direction: column; }
   .barra-seleccion { right: 16px; left: 16px; transform: none; }
 }
+
+/* Las boletas firmadas no se pueden seleccionar: la casilla se ve, pero atenuada y sin acción. */
+.tabla-boletas .p-selection-column .p-checkbox.p-disabled { opacity: 1; cursor: not-allowed; }
+.tabla-boletas .p-selection-column .p-checkbox.p-disabled .p-checkbox-box { border-color: var(--gris-200); background: var(--gris-100); }

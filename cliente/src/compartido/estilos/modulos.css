@@ -1,0 +1,59 @@
+/* Detalles propios de trabajadores, documentos, incidencias, plantillas, reportes e inicio. */
+
+.tr-sincronizado, .pp-encabezado p.tr-sincronizado { margin: 4px 0 0; color: var(--color-texto-secundario); font-size: 13px; }
+.tr-col-dni, .tr-col-telefono { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tr-col-gris { color: #6b7280; font-size: 13px !important; }
+.tr-nombre { font-size: 20px !important; }
+.tr-nota { margin: 0; padding: 10px 12px; border-radius: 8px; background: #f9fafb; color: #6b7280; font-size: 13px; }
+
+@media (max-width: 1279px) {
+  .tr-col-correo { display: none; }
+}
+
+/* Documento simulado (vista previa de contratos, memorándums, etc.) */
+.doc-hoja {
+  width: 100%;
+  max-width: 600px;
+  padding: 44px 48px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+  color: #111;
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.7;
+}
+.doc-hoja header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; font-family: var(--fuente); }
+.doc-hoja header img { width: 44px; }
+.doc-hoja header small { color: #6b7280; }
+.doc-hoja h3 { margin: 0 0 18px; text-align: center; letter-spacing: 0.06em; }
+.doc-hoja p { margin: 0 0 12px; }
+.doc-hoja__firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 56px; font-family: var(--fuente); font-size: 12px; text-align: center; }
+.doc-hoja__firmas > div { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.doc-hoja__firmas span { width: 100%; border-top: 1px solid #111; }
+.doc-hoja__firmado { color: #15803d; font-weight: 700; }
+
+/* Inicio */
+.inicio { display: flex; flex-direction: column; gap: 24px; max-width: 980px; }
+.inicio h1 { margin: 0; font-size: 26px; }
+.inicio__saludo { margin: 4px 0 0; color: var(--color-texto-secundario); }
+.inicio__seccion h2 { margin: 0 0 10px; color: #6b7280; font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; }
+.inicio__lista { display: flex; flex-direction: column; overflow: hidden; margin: 0; padding: 0; border-radius: 12px; background: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / 0.1); list-style: none; }
+.inicio__item { display: flex; align-items: center; gap: 14px; width: 100%; padding: 14px 18px; border: 0; border-bottom: 1px solid #f3f4f6; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.inicio__item:hover { background: #f9fafb; }
+.inicio__item > .pi:first-child { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: #f3f4f6; font-size: 15px; }
+.inicio__item > div { flex: 1; display: flex; flex-direction: column; }
+.inicio__item small { color: #6b7280; }
+.inicio__numero { min-width: 28px; padding: 2px 9px; border-radius: 999px; background: #fef3c7; color: #b45309; font-weight: 700; text-align: center; font-variant-numeric: tabular-nums; }
+.inicio__numero.es-cero { background: #f3f4f6; color: #9ca3af; }
+.inicio__vacio { padding: 18px; color: #6b7280; }
+
+/* Plantillas */
+.pl-campos { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.pl-campos li { padding: 3px 9px; border-radius: 6px; background: #f3f4f6; color: #374151; font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
+
+/* Reportes */
+.rp-accesos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.rp-acceso { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.rp-acceso:hover { border-color: #9ca3af; }
+.rp-acceso > div { display: flex; flex: 1; flex-direction: column; }
+.rp-acceso small { color: #6b7280; }
+@media (max-width: 1023px) { .rp-accesos { grid-template-columns: 1fr; } }

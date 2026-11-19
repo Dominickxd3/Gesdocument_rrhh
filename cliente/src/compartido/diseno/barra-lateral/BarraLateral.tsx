@@ -2,7 +2,9 @@ import { Tooltip } from 'primereact/tooltip';
 import { LogoEmpresa } from '@/compartido/componentes/logo-empresa/LogoEmpresa';
 import { GrupoEnlaces } from './GrupoEnlaces';
 import { PerfilUsuario } from './PerfilUsuario';
-import { gruposNavegacion } from '@/compartido/navegacion/elementosNavegacion';
+import { navegacionPara } from '@/compartido/navegacion/elementosNavegacion';
+import { useUsuarioActual } from '@/compartido/sesion/ContextoSesion';
+import { rolDe } from '@/compartido/sesion/tipos';
 import './barraLateral.css';
 
 interface PropiedadesBarraLateral {
@@ -14,6 +16,7 @@ interface PropiedadesBarraLateral {
 
 export function BarraLateral({ compacta = false, alAlternarCompacta }: PropiedadesBarraLateral) {
   const textoAlternar = compacta ? 'Expandir menú' : 'Contraer menú';
+  const usuario = useUsuarioActual();
 
   return (
     <div className={`barra-lateral${compacta ? ' es-compacta' : ''}`}>
@@ -35,7 +38,7 @@ export function BarraLateral({ compacta = false, alAlternarCompacta }: Propiedad
       </div>
 
       <nav className="barra-lateral__navegacion" aria-label="Navegación principal">
-        {gruposNavegacion.map((grupo) => (
+        {navegacionPara(rolDe(usuario)).map((grupo) => (
           <GrupoEnlaces key={grupo.titulo} grupo={grupo} compacta={compacta} />
         ))}
       </nav>

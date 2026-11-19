@@ -1,6 +1,9 @@
 import { NavLink } from 'react-router-dom';
 import { Badge } from 'primereact/badge';
 import type { ElementoNavegacion } from '@/compartido/navegacion/elementosNavegacion';
+import { useContador } from '@/compartido/navegacion/contadores';
+import { useUsuarioActual } from '@/compartido/sesion/ContextoSesion';
+import { rolDe } from '@/compartido/sesion/tipos';
 
 interface PropiedadesEnlaceNavegacion {
   elemento: ElementoNavegacion;
@@ -10,7 +13,11 @@ interface PropiedadesEnlaceNavegacion {
 }
 
 export function EnlaceNavegacion({ elemento, compacta, esHijo = false }: PropiedadesEnlaceNavegacion) {
-  const { etiqueta, ruta, icono, pendientes } = elemento;
+  const usuario = useUsuarioActual();
+  const { ruta, icono } = elemento;
+  const etiqueta = (rolDe(usuario) === 'trabajador' && elemento.etiquetaTrabajador) || elemento.etiqueta;
+  // Pendientes reales del usuario (lo que debe atender en ese módulo).
+  const pendientes = useContador(ruta, usuario);
   return (
     <NavLink
       to={ruta}
