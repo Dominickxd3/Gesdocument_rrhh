@@ -1,3 +1,5 @@
+import { SIN_RANGO, enRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
+import { ordenarPorTrabajador } from '@/compartido/formato/orden';
 import { useCallback, useMemo, useState } from 'react';
 import type {
   DatosPapeleta,
@@ -14,8 +16,8 @@ export interface FiltrosPapeletas {
   area: string | null;
   tipo: TipoPermiso | null;
   estado: FiltroEstado;
-  /** 'hoy' | 'semana' | 'todo' */
-  rango: 'hoy' | 'semana' | 'todo';
+  /** Rango de fechas del permiso. */
+  fechas: RangoFechas;
   verAnuladas: boolean;
 }
 
@@ -24,15 +26,11 @@ const FILTROS_INICIALES: FiltrosPapeletas = {
   area: null,
   tipo: null,
   estado: 'todas',
-  rango: 'todo',
+  fechas: SIN_RANGO,
   verAnuladas: false,
 };
 
 const USUARIO_ACTUAL = 'Usted (RRHH)';
-
-function diasDesde(fecha: string) {
-  return Math.round((new Date(`${HOY}T12:00:00`).getTime() - new Date(`${fecha}T12:00:00`).getTime()) / 86400000);
-}
 
 /**
  * Estado del prototipo de papeletas. Todo vive en memoria: los cambios
@@ -58,9 +56,7 @@ export function usePapeletas() {
       if (filtros.verAnuladas !== (p.estado === 'anulada')) return false;
       if (filtros.area && p.trabajador.area !== filtros.area) return false;
       if (filtros.tipo && p.tipo !== filtros.tipo) return false;
-      const dias = diasDesde(p.fecha);
-      if (filtros.rango === 'hoy' && dias !== 0) return false;
-      if (filtros.rango === 'semana' && dias > 6) return false;
+      if (!enRango(p.fecha, filtros.fechas)) return false;
       if (q) {
         const texto = `${p.numero} ${p.trabajador.nombre} ${p.trabajador.dni} ${p.trabajador.cargo} ${p.motivo}`.toLowerCase();
         if (!texto.includes(q)) return false;
@@ -72,9 +68,11 @@ export function usePapeletas() {
   const visibles = useMemo(
     // Con "Ver anuladas" el filtro de estado no aplica: todas son anuladas.
     () =>
-      filtros.estado === 'todas' || filtros.verAnuladas
-        ? sinFiltroEstado
-        : sinFiltroEstado.filter((p) => p.estado === filtros.estado),
+      ordenarPorTrabajador(
+        filtros.estado === 'todas' || filtros.verAnuladas ? sinFiltroEstado : sinFiltroEstado.filter((p) => p.estado === filtros.estado),
+        (p) => p.trabajador.nombre,
+        (p) => p.numero,
+      ),
     [sinFiltroEstado, filtros.estado, filtros.verAnuladas],
   );
 

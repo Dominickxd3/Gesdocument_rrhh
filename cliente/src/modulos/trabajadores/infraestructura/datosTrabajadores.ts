@@ -25,6 +25,30 @@ export const JEFES = ['PAREDES RÍOS, CARLOS', 'MEDINA SALAS, ROCÍO', 'VARGAS L
 
 const sinTildes = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
+const CALLES = ['Jr. Los Lirios', 'Av. Próceres', 'Calle Las Gardenias', 'Jr. Los Tulipanes', 'Av. Wiesse', 'Calle Los Cedros'];
+const DISTRITOS = ['San Juan de Lurigancho', 'Lurín', 'Ate', 'Santa Anita', 'El Agustino'];
+
+/**
+ * Domicilio y contrato vigente ficticios. Usan su propio generador para no cambiar
+ * los nombres ya generados del resto de la ficha.
+ */
+const contratoAzar = crearAleatorio(1717);
+function datosContrato(fechaIngreso: string, cargo: string): Pick<Trabajador, 'domicilio' | 'contrato'> {
+  const { azar, elegir } = contratoAzar;
+  const r = azar();
+  return {
+    domicilio: `${elegir(CALLES)} Mz. ${'ABCDEFGHJK'[Math.floor(azar() * 10)]} Lt. ${1 + Math.floor(azar() * 30)}, distrito de ${elegir(DISTRITOS)}, de la ciudad de Lima`,
+    contrato: {
+      // Reparto parecido al real: la mayoría por incremento de actividad.
+      modalidad: r < 0.78 ? 'incremento_actividad' : r < 0.92 ? 'indeterminado' : 'plazo_fijo',
+      fecha: fechaIngreso,
+      cargo: cargo.toUpperCase(),
+      remuneracion: elegir([1025, 1130, 1300, 1500, 1800, 2200, 2800]),
+      clausulaRemuneracion: azar() < 0.7 ? 'sexta' : 'cuarta',
+    },
+  };
+}
+
 export function crearTrabajadores(): Trabajador[] {
   const { azar, elegir } = crearAleatorio(4242);
   const lista: Trabajador[] = Array.from({ length: 48 }, () => {
@@ -44,7 +68,7 @@ export function crearTrabajadores(): Trabajador[] {
       jefe,
       historialJefes: [{ jefe, desde: `${anio}-01-01` }],
     };
-  });
+  }).map((t) => ({ ...t, ...datosContrato(t.fechaIngreso, t.cargo) }));
 
   // Ficha del usuario de prueba "jose.quispe" (rol trabajador); se vincula por DNI.
   lista.push({
@@ -61,6 +85,14 @@ export function crearTrabajadores(): Trabajador[] {
       { jefe: 'VARGAS LEÓN, MARTÍN', desde: '2021-03-15' },
       { jefe: 'PAREDES RÍOS, CARLOS', desde: '2024-07-01' },
     ],
+    domicilio: 'Jr. Las Begonias Mz. B Lt. 12, distrito de San Juan de Lurigancho, de la ciudad de Lima',
+    contrato: {
+      modalidad: 'incremento_actividad',
+      fecha: '2021-03-15',
+      cargo: 'OPERARIO DE PRODUCCIÓN',
+      remuneracion: 1300,
+      clausulaRemuneracion: 'sexta',
+    },
   });
 
   return lista.sort((a, b) => a.nombre.localeCompare(b.nombre));

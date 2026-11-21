@@ -1,3 +1,5 @@
+import { FiltroFechas, SIN_RANGO, enRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
+import { ordenarPorTrabajador } from '@/compartido/formato/orden';
 import { useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
@@ -16,6 +18,7 @@ import { fechaCorta } from '@/compartido/almacen/crearAlmacen';
 import '@/compartido/estilos/listados';
 import { nombreLegible } from '@/modulos/trabajadores/dominio/trabajador';
 import { buscarTrabajador } from '@/modulos/trabajadores/aplicacion/almacenTrabajadores';
+import { AREAS } from '@/modulos/trabajadores/infraestructura/datosTrabajadores';
 import {
   corregirDocumento,
   crearDocumento,
@@ -44,6 +47,8 @@ function DocumentosRrhh() {
   const dniExpediente = params.get('dni');
   const aviso = useRef<Toast>(null);
   const [busqueda, setBusqueda] = useState('');
+  const [area, setArea] = useState<string | null>(null);
+  const [fechas, setFechas] = useState<RangoFechas>(SIN_RANGO);
   const [tipo, setTipo] = useState<TipoDocumento | null>(null);
   const [estado, setEstado] = useState<EstadoDocumento | null>(null);
   const [idDetalle, setIdDetalle] = useState<string | null>(null);
@@ -52,21 +57,26 @@ function DocumentosRrhh() {
   const expediente = dniExpediente ? buscarTrabajador(dniExpediente) : undefined;
   const visibles = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
-    return documentos.filter(
+    const filtrados = documentos.filter(
       (d) =>
         (!dniExpediente || d.dni === dniExpediente) &&
+        (!area || buscarTrabajador(d.dni)?.area === area) &&
         (!tipo || d.tipo === tipo) &&
+        enRango(fechaDe(d), fechas) &&
         (!estado || d.estado === estado) &&
         (!q || `${d.numero} ${d.trabajador} ${d.dni}`.toLowerCase().includes(q)),
     );
-  }, [documentos, busqueda, tipo, estado, dniExpediente]);
+    return ordenarPorTrabajador(filtrados, (d) => d.trabajador, (d) => d.numero);
+  }, [documentos, busqueda, area, tipo, estado, fechas, dniExpediente]);
 
   const detalle = documentos.find((d) => d.id === idDetalle) ?? null;
   const avisar = (summary: string, detail?: string) => aviso.current?.show({ severity: 'success', summary, detail, life: 3000 });
   const limpiar = () => {
     setBusqueda('');
+    setArea(null);
     setTipo(null);
     setEstado(null);
+    setFechas(SIN_RANGO);
     setParams({});
   };
 
@@ -93,8 +103,10 @@ function DocumentosRrhh() {
           <InputIcon className="pi pi-search" />
           <InputText value={busqueda} onChange={(e) => setBusqueda(e.target.value)} placeholder="Buscar por N°, nombre o DNI" aria-label="Buscar" />
         </IconField>
+        <Dropdown value={area} options={AREAS} onChange={(e) => setArea(e.value ?? null)} placeholder="Todas las áreas" filter showClear className="pp-filtros__area" />
         <Dropdown value={tipo} options={TIPOS_DOCUMENTO} optionLabel="etiqueta" optionValue="valor" onChange={(e) => setTipo(e.value ?? null)} placeholder="Todos los tipos" showClear className="pp-filtros__area" />
         <Dropdown value={estado} options={ESTADOS_DOCUMENTO} optionLabel="etiqueta" optionValue="valor" onChange={(e) => setEstado(e.value ?? null)} placeholder="Todos los estados" showClear className="dm-filtro-estado" />
+        <FiltroFechas valor={fechas} alCambiar={setFechas} />
       </div>
 
       <TablaListado
@@ -108,6 +120,7 @@ function DocumentosRrhh() {
       >
         <Column header="N°" body={(d: Documento) => <strong>{d.numero}</strong>} className="pp-col-fecha" />
         <Column header="Trabajador" body={(d: Documento) => <CeldaPersona nombre={d.trabajador} detalle={`DNI ${d.dni}`} />} />
+        <Column header="Área" body={(d: Documento) => buscarTrabajador(d.dni)?.area ?? '—'} className="col-area" headerClassName="col-area" />
         <Column header="Documento" body={tituloDocumento} />
         <Column header="Fecha" body={(d: Documento) => fechaCorta(fechaDe(d))} className="tr-col-gris" />
         <Column header="Estado" body={(d: Documento) => <Insignia tono={infoEstado(d.estado).tono}>{infoEstado(d.estado).etiqueta}</Insignia>} className="pp-col-estado" />
@@ -181,8 +194,8 @@ function MisDocumentos() {
         documento={observando ? null : detalle}
         modo="trabajador"
         alCerrar={() => setIdDetalle(null)}
-        alFirmar={(d) => {
-          firmarDocumento(d, usuario.nombre);
+        alFirmar={(d, imagen) => {
+          firmarDocumento(d, usuario.nombre, imagen);
           aviso.current?.show({ severity: 'success', summary: 'Documento firmado', life: 2500 });
         }}
         alObservar={(d) => setObservando(d)}

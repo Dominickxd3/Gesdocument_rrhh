@@ -1,3 +1,4 @@
+import { FiltroFechas } from '@/compartido/componentes/FiltroFechas';
 import { InputText } from 'primereact/inputtext';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
@@ -71,6 +72,7 @@ export function BarraFiltros({ filtros, areas, conteo, alCambiar }: Propiedades)
         disabled={filtros.verAnuladas}
         className="pp-filtros__estado"
       />
+      <FiltroFechas valor={filtros.fechas} alCambiar={(fechas) => alCambiar({ fechas })} />
       <label className="pp-filtros__anuladas">
         <InputSwitch checked={filtros.verAnuladas} onChange={(e) => alCambiar({ verAnuladas: !!e.value })} />
         Ver anuladas

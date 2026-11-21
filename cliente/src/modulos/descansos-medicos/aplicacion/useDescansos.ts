@@ -1,3 +1,5 @@
+import { SIN_RANGO, periodoEnRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
+import { ordenarPorTrabajador } from '@/compartido/formato/orden';
 import { useCallback, useMemo, useState } from 'react';
 import type { EstadoDescanso } from '../dominio/descanso';
 import { useListaDescansos } from './almacenDescansos';
@@ -6,10 +8,12 @@ export interface FiltrosDescansos {
   busqueda: string;
   area: string | null;
   estado: EstadoDescanso | 'todos';
+  /** Periodos que se cruzan con este rango. */
+  fechas: RangoFechas;
 }
 
 /** Al entrar se ven todos; las pendientes de revisión se distinguen por su franja ámbar. */
-const FILTROS_INICIALES: FiltrosDescansos = { busqueda: '', area: null, estado: 'todos' };
+const FILTROS_INICIALES: FiltrosDescansos = { busqueda: '', area: null, estado: 'todos', fechas: SIN_RANGO };
 
 /** Lista y filtros de la vista de RR. HH. Los datos vienen del almacén compartido. */
 export function useDescansos() {
@@ -23,13 +27,19 @@ export function useDescansos() {
     const q = filtros.busqueda.trim().toLowerCase();
     return descansos.filter((d) => {
       if (filtros.area && d.trabajador.area !== filtros.area) return false;
+      if (!periodoEnRango(d.inicio, d.fin, filtros.fechas)) return false;
       if (q && !`${d.numero} ${d.trabajador.nombre} ${d.trabajador.dni}`.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [descansos, filtros.area, filtros.busqueda]);
+  }, [descansos, filtros.area, filtros.busqueda, filtros.fechas]);
 
   const visibles = useMemo(
-    () => (filtros.estado === 'todos' ? sinFiltroEstado : sinFiltroEstado.filter((d) => d.estado === filtros.estado)),
+    () =>
+      ordenarPorTrabajador(
+        filtros.estado === 'todos' ? sinFiltroEstado : sinFiltroEstado.filter((d) => d.estado === filtros.estado),
+        (d) => d.trabajador.nombre,
+        (d) => d.numero,
+      ),
     [sinFiltroEstado, filtros.estado],
   );
 

@@ -6,6 +6,7 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Checkbox } from 'primereact/checkbox';
 import { Insignia } from '@/compartido/componentes/Insignia';
+import { SelectorTrabajador } from '@/compartido/componentes/SelectorTrabajador';
 import { BotonArchivo, archivoSubido } from '@/compartido/componentes/BotonArchivo';
 import { fechaLarga, hoyIso, momento } from '@/compartido/almacen/crearAlmacen';
 import { useTrabajadores } from '@/modulos/trabajadores/aplicacion/almacenTrabajadores';
@@ -286,12 +287,9 @@ export function VentanaRegistroIncidencia({
       }
     >
       <div className="pp-formulario">
-        <label className="pp-campo">
-          <span className="pp-campo__etiqueta">Trabajador *</span>
-          <Dropdown value={dni} options={trabajadores} optionLabel="nombre" optionValue="dni" filter filterBy="nombre,dni" placeholder="Buscar por nombre o DNI" onChange={(e) => setDni(e.value)} />
-        </label>
-        <div className="dm-rejilla-fechas">
-          <label className="pp-campo" style={{ gridColumn: 'span 2' }}>
+        <SelectorTrabajador opciones={trabajadores.map((t) => ({ dni: t.dni, nombre: t.nombre, detalle: `${t.cargo} · ${t.area}` }))} valor={dni} alCambiar={setDni} />
+        <div className="inc-asunto-fecha">
+          <label className="pp-campo">
             <span className="pp-campo__etiqueta">Asunto *</span>
             <InputText value={asunto} onChange={(e) => setAsunto(e.target.value)} placeholder="Ej.: Tardanzas reiteradas" />
           </label>

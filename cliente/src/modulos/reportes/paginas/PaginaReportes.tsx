@@ -1,3 +1,4 @@
+import { FiltroFechas, SIN_RANGO, enRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
 import { useMemo, useRef, useState } from 'react';
 import { Toast } from 'primereact/toast';
 import { Column } from 'primereact/column';
@@ -42,6 +43,7 @@ export function PaginaReportes() {
   const aviso = useRef<Toast>(null);
   const [busqueda, setBusqueda] = useState('');
   const [modulo, setModulo] = useState<Evento['modulo'] | null>(null);
+  const [fechas, setFechas] = useState<RangoFechas>(SIN_RANGO);
 
   const eventos = useMemo<Evento[]>(() => {
     const lista: Evento[] = [
@@ -60,8 +62,8 @@ export function PaginaReportes() {
 
   const visibles = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
-    return eventos.filter((e) => (!modulo || e.modulo === modulo) && (!q || `${e.usuario} ${e.registro} ${e.accion}`.toLowerCase().includes(q)));
-  }, [eventos, busqueda, modulo]);
+    return eventos.filter((e) => (!modulo || e.modulo === modulo) && enRango(e.fecha, fechas) && (!q || `${e.usuario} ${e.registro} ${e.accion}`.toLowerCase().includes(q)));
+  }, [eventos, busqueda, modulo, fechas]);
 
   return (
     <div className="pagina-papeletas">
@@ -95,6 +97,7 @@ export function PaginaReportes() {
           <InputText value={busqueda} onChange={(e) => setBusqueda(e.target.value)} placeholder="Buscar por usuario, registro o acción" aria-label="Buscar" />
         </IconField>
         <Dropdown value={modulo} options={MODULOS} onChange={(e) => setModulo(e.value ?? null)} placeholder="Todos los módulos" showClear className="pp-filtros__area" />
+        <FiltroFechas valor={fechas} alCambiar={setFechas} />
       </div>
 
       <TablaListado
@@ -105,6 +108,7 @@ export function PaginaReportes() {
         alLimpiarFiltros={() => {
           setBusqueda('');
           setModulo(null);
+          setFechas(SIN_RANGO);
         }}
       >
         <Column header="Fecha" body={(e: Evento) => momento(e.fecha)} className="tr-col-dni" />

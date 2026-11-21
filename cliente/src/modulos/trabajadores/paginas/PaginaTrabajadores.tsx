@@ -1,3 +1,4 @@
+import { FiltroFechas, SIN_RANGO, enRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
 import { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
@@ -13,7 +14,7 @@ import { fechaLarga, momento } from '@/compartido/almacen/crearAlmacen';
 import '@/compartido/estilos/listados';
 import { almacenTrabajadores, editarTrabajador, sincronizarConErp, useTrabajadores } from '../aplicacion/almacenTrabajadores';
 import { AREAS, JEFES } from '../infraestructura/datosTrabajadores';
-import { nombreLegible, type Trabajador } from '../dominio/trabajador';
+import { TEXTO_MODALIDAD, nombreLegible, type Trabajador } from '../dominio/trabajador';
 
 /** Trabajadores (RF01, RF02, RF03): lista sincronizada con el ERP, ficha y edición de contacto y jefatura. */
 export function PaginaTrabajadores() {
@@ -22,6 +23,7 @@ export function PaginaTrabajadores() {
   const aviso = useRef<Toast>(null);
   const [busqueda, setBusqueda] = useState('');
   const [area, setArea] = useState<string | null>(null);
+  const [fechas, setFechas] = useState<RangoFechas>(SIN_RANGO);
   const [sincronizando, setSincronizando] = useState(false);
   const [verDni, setVerDni] = useState<string | null>(null);
   const [editarDni, setEditarDni] = useState<string | null>(null);
@@ -29,9 +31,9 @@ export function PaginaTrabajadores() {
   const visibles = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
     return trabajadores.filter(
-      (t) => (!area || t.area === area) && (!q || `${t.nombre} ${t.dni}`.toLowerCase().includes(q)),
+      (t) => (!area || t.area === area) && enRango(t.fechaIngreso, fechas) && (!q || `${t.nombre} ${t.dni}`.toLowerCase().includes(q)),
     );
-  }, [trabajadores, busqueda, area]);
+  }, [trabajadores, busqueda, area, fechas]);
 
   const sincronizar = async () => {
     setSincronizando(true);
@@ -76,6 +78,7 @@ export function PaginaTrabajadores() {
           <InputText value={busqueda} onChange={(e) => setBusqueda(e.target.value)} placeholder="Buscar por nombre o DNI" aria-label="Buscar" />
         </IconField>
         <Dropdown value={area} options={AREAS} onChange={(e) => setArea(e.value ?? null)} placeholder="Todas las áreas" aria-label="Área" filter showClear className="pp-filtros__area" />
+        <FiltroFechas valor={fechas} alCambiar={setFechas} etiqueta="Ingreso: desde – hasta" />
       </div>
 
       <TablaListado
@@ -87,6 +90,7 @@ export function PaginaTrabajadores() {
         alLimpiarFiltros={() => {
           setBusqueda('');
           setArea(null);
+          setFechas(SIN_RANGO);
         }}
       >
         <Column header="DNI" field="dni" className="tr-col-dni" />
@@ -94,6 +98,7 @@ export function PaginaTrabajadores() {
         <Column header="Área" field="area" className="tr-col-gris" />
         <Column header="Correo" field="correo" className="tr-col-gris tr-col-correo" headerClassName="tr-col-correo" />
         <Column header="Teléfono" field="telefono" className="tr-col-telefono" />
+        <Column header="Ingreso" body={(t: Trabajador) => fechaLarga(t.fechaIngreso)} className="tr-col-dni" />
         <Column
           header="Acciones"
           body={(t: Trabajador) => (
@@ -150,7 +155,17 @@ function VentanaFicha({ trabajador: t, alCerrar, alEditar }: { trabajador: Traba
             <div><dt>Teléfono</dt><dd>{t.telefono}</dd></div>
             <div className="ancho-completo"><dt>Correo</dt><dd>{t.correo}</dd></div>
             <div className="ancho-completo"><dt>Jefe inmediato</dt><dd>{t.jefe}</dd></div>
+            <div className="ancho-completo"><dt>Domicilio</dt><dd>{t.domicilio}</dd></div>
           </dl>
+          <section>
+            <h3 className="pp-panel__subtitulo">Contrato vigente</h3>
+            <dl className="doc-contrato">
+              <div className="ancho-completo"><dt>Modalidad</dt><dd>{TEXTO_MODALIDAD[t.contrato.modalidad].replace('Contrato de Trabajo a ', '')}</dd></div>
+              <div><dt>Suscrito el</dt><dd>{fechaLarga(t.contrato.fecha)}</dd></div>
+              <div><dt>Cargo del contrato</dt><dd>{t.contrato.cargo}</dd></div>
+              <div><dt>Remuneración</dt><dd>S/ {t.contrato.remuneracion.toLocaleString('en-US', { minimumFractionDigits: 2 })}</dd></div>
+            </dl>
+          </section>
           <section>
             <h3 className="pp-panel__subtitulo">Historial de jefaturas</h3>
             <ol className="pp-linea-tiempo">

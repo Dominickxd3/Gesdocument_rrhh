@@ -20,7 +20,7 @@ function Trabajador({ d }: { d: Descanso }) {
       <div>
         <strong>{d.trabajador.nombre}</strong>
         <small>
-          DNI {d.trabajador.dni} · {d.trabajador.area}
+          DNI {d.trabajador.dni}
         </small>
       </div>
     </div>
@@ -68,6 +68,7 @@ export function TablaDescansos({ descansos, alAbrir, alLimpiarFiltros }: Propied
       >
         <Column header="N°" body={(d: Descanso) => <strong>{d.numero}</strong>} className="pp-col-fecha" headerClassName="pp-col-fecha" />
         <Column header="Trabajador" body={(d: Descanso) => <Trabajador d={d} />} />
+        <Column header="Área" body={(d: Descanso) => d.trabajador.area} className="col-area" headerClassName="col-area" />
         <Column header="Periodo" body={(d: Descanso) => <Periodo d={d} />} className="pp-col-horario" headerClassName="pp-col-horario" />
         <Column header="Tipo" body={(d: Descanso) => etiquetaTipo(d.tipo)} className="dm-col-tipo" headerClassName="dm-col-tipo" />
         <Column header="Plazo" body={(d: Descanso) => <Plazo descanso={d} />} className="pp-col-estado" headerClassName="pp-col-estado" />

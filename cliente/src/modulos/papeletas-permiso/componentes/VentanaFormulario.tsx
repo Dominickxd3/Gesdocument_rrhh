@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import { AutoComplete } from 'primereact/autocomplete';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { InputSwitch } from 'primereact/inputswitch';
 import {
@@ -13,10 +12,9 @@ import {
   validarPapeleta,
   type DatosPapeleta,
   type Papeleta,
-  type Trabajador,
 } from '../dominio/papeleta';
 import { HOY, TRABAJADORES } from '../infraestructura/datosPrueba';
-import { Avatar } from './Insignias';
+import { SelectorTrabajador } from '@/compartido/componentes/SelectorTrabajador';
 
 interface Propiedades {
   visible: boolean;
@@ -46,14 +44,11 @@ function horaActual() {
 
 export function VentanaFormulario({ visible, papeleta, siguienteNumero, alCerrar, alGuardar }: Propiedades) {
   const [datos, setDatos] = useState<DatosPapeleta>(VACIO);
-  const [busqueda, setBusqueda] = useState<string | Trabajador>('');
-  const [sugerencias, setSugerencias] = useState<Trabajador[]>([]);
   const [intentado, setIntentado] = useState(false);
 
   useEffect(() => {
     if (!visible) return;
     setDatos(papeleta ? { ...papeleta } : { ...VACIO, salida: horaActual() });
-    setBusqueda('');
     setIntentado(false);
   }, [visible, papeleta]);
 
@@ -63,17 +58,17 @@ export function VentanaFormulario({ visible, papeleta, siguienteNumero, alCerrar
   const sinRetorno = datos.retorno === null;
   const duracion = duracionMinutos(datos.salida, datos.retorno);
 
-  const buscar = (texto: string) => {
-    const q = texto.trim().toLowerCase();
-    setSugerencias(TRABAJADORES.filter((t) => t.nombre.toLowerCase().includes(q) || t.dni.includes(q)).slice(0, 8));
-  };
-
   const guardar = () => {
     setIntentado(true);
     if (Object.keys(errores).length === 0) alGuardar(datos);
   };
 
-  const elegido = datos.trabajador.dni ? datos.trabajador : null;
+  // Incluye al trabajador de la papeleta que se edita aunque no esté en la lista.
+  const opcionesTrabajador = [...TRABAJADORES, ...(datos.trabajador.dni && !TRABAJADORES.some((t) => t.dni === datos.trabajador.dni) ? [datos.trabajador] : [])].map((t) => ({
+    dni: t.dni,
+    nombre: t.nombre,
+    detalle: `${t.cargo} · ${t.area}`,
+  }));
 
   return (
     <Dialog
@@ -102,49 +97,14 @@ export function VentanaFormulario({ visible, papeleta, siguienteNumero, alCerrar
           <h3 className="pp-seccion__titulo">
             <span>1</span> Trabajador
           </h3>
-          {elegido ? (
-            <div className="pp-trabajador-elegido">
-              <Avatar nombre={elegido.nombre} />
-              <div>
-                <strong>{elegido.nombre}</strong>
-                <small>
-                  DNI {elegido.dni} · {elegido.cargo} · {elegido.area}
-                </small>
-              </div>
-              {!papeleta && (
-                <Button label="Cambiar" text size="small" onClick={() => cambiar({ trabajador: VACIO.trabajador })} />
-              )}
-            </div>
-          ) : (
-            <label className="pp-campo">
-              <span className="pp-campo__etiqueta">Buscar por nombre o DNI *</span>
-              <AutoComplete
-                value={busqueda}
-                suggestions={sugerencias}
-                completeMethod={(e) => buscar(e.query)}
-                field="nombre"
-                onChange={(e) => setBusqueda(e.value)}
-                onSelect={(e) => cambiar({ trabajador: e.value as Trabajador })}
-                itemTemplate={(t: Trabajador) => (
-                  <div className="pp-sugerencia">
-                    <Avatar nombre={t.nombre} />
-                    <div>
-                      <strong>{t.nombre}</strong>
-                      <small>
-                        {t.dni} · {t.cargo}
-                      </small>
-                    </div>
-                  </div>
-                )}
-                placeholder="Ej.: Quispe o 45678912"
-                className={error('trabajador') ? 'p-invalid' : ''}
-                inputClassName="pp-ancho-completo"
-                autoFocus
-              />
-              <small className="pp-campo__ayuda">Cargo y área se completan solos desde la ficha del trabajador.</small>
-              {error('trabajador') && <small className="pp-campo__error">{error('trabajador')}</small>}
-            </label>
-          )}
+          <SelectorTrabajador
+            etiqueta="Buscar por nombre o DNI *"
+            opciones={opcionesTrabajador}
+            valor={datos.trabajador.dni || null}
+            alCambiar={(dni) => cambiar({ trabajador: TRABAJADORES.find((t) => t.dni === dni) ?? VACIO.trabajador })}
+            fijo={!!papeleta}
+            error={error('trabajador')}
+          />
         </section>
 
         {/* 2. Permiso */}

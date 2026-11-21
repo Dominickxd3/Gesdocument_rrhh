@@ -7,6 +7,7 @@ import { BotonArchivo } from '@/compartido/componentes/BotonArchivo';
 import { momento } from '@/compartido/almacen/crearAlmacen';
 import { infoEstado, etiquetaTipo, ultimoEvento, type Documento, type EventoDocumento } from '../dominio/documento';
 import { VistaDocumento } from './VistaDocumento';
+import { PadFirma } from '@/compartido/componentes/PadFirma';
 
 const ACCIONES: Record<EventoDocumento['accion'], { texto: string; icono: string }> = {
   creado: { texto: 'preparó el documento', icono: 'pi pi-file' },
@@ -23,7 +24,7 @@ interface Propiedades {
   alCerrar: () => void;
   alEnviar?: (d: Documento) => void;
   alCorregir?: (d: Documento, archivo?: string) => void;
-  alFirmar?: (d: Documento) => void;
+  alFirmar?: (d: Documento, imagen: string) => void;
   alObservar?: (d: Documento) => void;
 }
 
@@ -31,6 +32,7 @@ interface Propiedades {
 export function VentanaDocumento({ documento: d, modo, alCerrar, ...acciones }: Propiedades) {
   const [viendo, setViendo] = useState(false);
   const [acepto, setAcepto] = useState(false);
+  const [firmando, setFirmando] = useState(false);
   if (!d) return null;
 
   const estado = infoEstado(d.estado);
@@ -150,12 +152,20 @@ export function VentanaDocumento({ documento: d, modo, alCerrar, ...acciones }: 
             </label>
             <div className="pp-panel__decision">
               <Button label="Observar" icon="pi pi-exclamation-circle" outlined className="pp-boton-secundario" onClick={() => acciones.alObservar?.(d)} />
-              <Button label="Firmar" icon="pi pi-pencil" className="pp-boton-aprobar" disabled={!acepto} onClick={() => acciones.alFirmar?.(d)} />
+              <Button label="Firmar" icon="pi pi-pencil" className="pp-boton-aprobar" disabled={!acepto} onClick={() => setFirmando(true)} />
             </div>
           </footer>
         )}
       </div>
       <VistaDocumento documento={d} visible={viendo} alCerrar={() => setViendo(false)} />
+      <PadFirma
+        visible={firmando}
+        alCerrar={() => setFirmando(false)}
+        alFirmar={(imagen) => {
+          setFirmando(false);
+          acciones.alFirmar?.(d, imagen);
+        }}
+      />
     </Dialog>
   );
 }

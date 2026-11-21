@@ -25,7 +25,13 @@ const CAMPOS_BASE = ['{{nombre}}', '{{dni}}', '{{cargo}}', '{{area}}', '{{fecha_
 
 const almacenPlantillas = crearAlmacen<Plantilla[]>(() => [
   { id: 'pl-1', nombre: 'Contrato de trabajo a plazo fijo', tipo: 'Contrato', campos: [...CAMPOS_BASE, '{{fecha_fin}}', '{{sueldo}}'], versiones: [{ version: 1, archivo: 'contrato_plazo_fijo_v1.docx', usuario: 'Carlos Ramírez', fecha: haceDias(120) }, { version: 2, archivo: 'contrato_plazo_fijo_v2.docx', usuario: 'Carlos Ramírez', fecha: haceDias(30) }] },
-  { id: 'pl-2', nombre: 'Adenda de prórroga', tipo: 'Adenda', campos: [...CAMPOS_BASE, '{{fecha_fin}}'], versiones: [{ version: 1, archivo: 'adenda_prorroga.docx', usuario: 'María Torres', fecha: haceDias(60) }] },
+  {
+    id: 'pl-2',
+    nombre: 'Adenda al contrato de trabajo (cambio de cargo o remuneración)',
+    tipo: 'Adenda',
+    campos: ['{{nombre}}', '{{dni}}', '{{domicilio}}', '{{modalidad_contrato}}', '{{fecha_contrato}}', '{{cargo_anterior}}', '{{clausula_remuneracion}}', '{{remuneracion_anterior}}', '{{cargo_nuevo}}', '{{remuneracion_nueva}}', '{{clausulas_especiales}}', '{{fecha_firma}}'],
+    versiones: [{ version: 1, archivo: 'ADENDA CONTRATO DE TRABAJO.docx', usuario: 'María Torres', fecha: haceDias(2) }],
+  },
   { id: 'pl-3', nombre: 'Constancia de trabajo', tipo: 'Constancia', campos: CAMPOS_BASE, versiones: [{ version: 1, archivo: 'constancia.docx', usuario: 'María Torres', fecha: haceDias(200) }] },
   { id: 'pl-4', nombre: 'Cargo de Reglamento Interno', tipo: 'Cargo de recepción', campos: ['{{nombre}}', '{{dni}}'], versiones: [{ version: 1, archivo: 'cargo_rit.docx', usuario: 'María Torres', fecha: haceDias(90) }] },
   { id: 'pl-5', nombre: 'Cargo de entrega de EPP', tipo: 'Cargo de recepción', campos: ['{{nombre}}', '{{dni}}', '{{equipos}}'], versiones: [{ version: 1, archivo: 'cargo_epp.docx', usuario: 'Carlos Ramírez', fecha: haceDias(45) }] },

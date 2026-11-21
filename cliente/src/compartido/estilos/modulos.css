@@ -57,3 +57,166 @@
 .rp-acceso > div { display: flex; flex: 1; flex-direction: column; }
 .rp-acceso small { color: #6b7280; }
 @media (max-width: 1023px) { .rp-accesos { grid-template-columns: 1fr; } }
+
+/* Documentos legales (adenda): texto justificado y compacto, como el Word de Gestión Humana. */
+.doc-legal { max-width: 680px; font-size: 13.5px; line-height: 1.6; text-align: justify; }
+.doc-legal h3 { margin-bottom: 14px; text-decoration: underline; }
+.doc-legal h4 { margin: 14px 0 6px; font-size: 13.5px; }
+.doc-legal p { margin: 0 0 8px; }
+.doc-legal__items { margin: 0 0 8px; padding-left: 22px; }
+.doc-legal__items li { margin-bottom: 4px; }
+.doc-hoja__firmas small { display: block; color: #6b7280; }
+
+/* Resumen del contrato vigente en el formulario de adenda */
+.doc-contrato { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin: 0; padding: 12px 14px; border-radius: 10px; background: #f9fafb; }
+.doc-contrato dt { color: #6b7280; font-size: 12px; }
+.doc-contrato dd { margin: 2px 0 0; font-weight: 600; font-size: 13px; }
+
+/* Membrete con el logo de la empresa (contratos y adendas) */
+.doc-membrete { display: flex; align-items: center; gap: 12px; margin: -8px 0 18px; padding-bottom: 10px; border-bottom: 2px solid #b91c1c; font-family: var(--fuente); }
+.doc-membrete img { width: 64px; height: auto; }
+.doc-membrete div { display: flex; flex-direction: column; }
+.doc-membrete strong { font-size: 14px; letter-spacing: 0.02em; }
+.doc-membrete small { color: #6b7280; font-size: 11px; }
+
+/* Contrato: estilo del Word (Arial, justificado, títulos de cláusula en negrita) */
+.doc-legal { font-family: Arial, Helvetica, sans-serif; }
+.doc-legal h3 { text-align: center; }
+.doc-legal h4 { font-weight: 700; }
+.doc-legal__items[type='a'] { list-style: lower-alpha; }
+.doc-legal__items[type='1'] { list-style: decimal; }
+.doc-firmas-contrato { grid-template-columns: 1fr 1fr 70px !important; align-items: end; }
+.doc-firmas-contrato strong { display: block; margin-top: 4px; }
+.doc-huella { display: grid; place-items: end center; height: 84px; padding-bottom: 4px; border: 1px solid #111; color: #6b7280; font-size: 10px; }
+@media print {
+  .doc-membrete { border-bottom-color: #b91c1c; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* Firmas de contratos y adendas (como en el Word de Gestión Humana) */
+.doc-firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 40px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; text-align: center; }
+.doc-firmas__parte { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.doc-firmas__espacio { display: flex; align-items: flex-end; justify-content: center; width: 100%; height: 86px; }
+.doc-firmas__espacio img { max-width: 210px; max-height: 84px; object-fit: contain; }
+.doc-firmas__espacio small { color: #9ca3af; font-size: 10px; }
+.doc-firmas__linea { width: 90%; margin-bottom: 4px; border-top: 1px solid #111; }
+.doc-firmas strong { font-size: 12px; }
+
+/* Membrete formal: solo el logo, sin texto ni línea de color. */
+.doc-membrete { justify-content: flex-start !important; margin: -8px 0 14px; padding-bottom: 0; border-bottom: 0; }
+.doc-membrete img { width: 72px; }
+.doc-hoja .doc-membrete img { width: 72px; }
+
+/* Varias hojas en un mismo documento (contrato + adenda del vendedor) */
+.doc-paginas { display: flex; flex-direction: column; align-items: center; gap: 24px; width: 100%; }
+
+.doc-pagina { display: block; margin-top: 20px; color: #6b7280; font-size: 11px; text-align: right; }
+
+@media print {
+  .doc-paginas { display: block; }
+  .doc-paginas > .doc-hoja { page-break-after: always; break-after: page; box-shadow: none; }
+  .doc-paginas > .doc-hoja:last-child { page-break-after: auto; break-after: auto; }
+}
+
+
+/* Marca de agua: una sola, centrada.
+   Pantalla: capa "pegajosa" de alto cero que se queda en el centro del visor al desplazarse.
+   Impresión: posición fija, que el navegador repite centrada en cada hoja. */
+.doc-hoja.doc-legal { position: relative; isolation: isolate; }
+.doc-marca-agua {
+  position: sticky;
+  top: calc(50% - 190px);
+  z-index: -1;
+  height: 0;
+  pointer-events: none;
+  user-select: none;
+}
+.doc-marca-agua img {
+  display: block;
+  width: 380px;
+  max-width: 80%;
+  margin: 0 auto;
+  opacity: 0.35;
+}
+
+@media print {
+  .doc-marca-agua { position: fixed; top: 50%; left: 50%; height: auto; transform: translate(-50%, -50%); }
+  .doc-marca-agua img { width: 420px; max-width: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* Numeración de hojas al imprimir: "Página 1 de 3". */
+  @page {
+    size: A4;
+    margin: 18mm 18mm 20mm;
+    @bottom-right {
+      content: 'Página ' counter(page) ' de ' counter(pages);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 9pt;
+      color: #6b7280;
+    }
+  }
+}
+
+/* Firma dibujada por el trabajador, sobre su línea */
+.doc-firma-trabajador { display: block; max-width: 220px; max-height: 84px; margin: 0 auto; object-fit: contain; }
+span.doc-firma-trabajador { width: 200px; }
+span.doc-firma-trabajador svg { display: block; width: 100%; height: auto; }
+
+/* Logo de la empresa como marca de agua: muy tenue. La imagen propia (marca-agua.png) ya viene clara. */
+.doc-marca-agua img { opacity: 0.12; }
+.doc-marca-agua.es-propia img { opacity: 1; }
+
+/* Formulario de incidencia: asunto amplio y fecha con ancho suficiente para "21/11/2026". */
+.inc-asunto-fecha { display: grid; grid-template-columns: 1fr 170px; gap: 10px; align-items: end; }
+.inc-asunto-fecha .p-inputtext { height: 40px; }
+@media (max-width: 560px) { .inc-asunto-fecha { grid-template-columns: 1fr; } }
+
+/* Botones de archivo dentro de un campo: del tamaño de su contenido, no a todo el ancho. */
+.pp-campo > .p-button { align-self: flex-start; }
+
+/* Botones de texto dentro de formularios y listas de archivos: mismo tono oscuro de la app (no el morado del tema). */
+.pp-ventana .pp-campo > .p-button.p-button-text,
+.pp-ventana .dm-sustentos .p-button.p-button-text,
+.pp-panel .dm-sustentos .p-button.p-button-text { color: var(--color-texto); font-weight: 600; }
+.pp-ventana .pp-campo > .p-button.p-button-text:enabled:hover,
+.pp-ventana .dm-sustentos .p-button.p-button-text:enabled:hover,
+.pp-panel .dm-sustentos .p-button.p-button-text:enabled:hover { background: #f3f4f6; }
+
+/* Ningún botón de texto en ventanas usa el morado del tema: todos en el tono oscuro de la app. */
+.pp-panel .p-button.p-button-text:not(.pp-boton-peligro):not(.pp-boton-rechazar),
+.pp-ventana .p-button.p-button-text:not(.pp-boton-peligro):not(.pp-boton-rechazar) { color: var(--color-texto); }
+.pp-panel .p-button.p-button-text:enabled:hover,
+.pp-ventana .p-button.p-button-text:enabled:hover { background: #f3f4f6; }
+
+/* Celular: los botones del pie de las ventanas no se aprietan hasta cortar el texto. */
+@media (max-width: 560px) {
+  .pp-ventana__pie { flex-wrap: wrap; }
+  .pp-ventana__pie > .p-button,
+  .pp-ventana__pie > .p-selectbutton { flex: 1 1 auto; justify-content: center; }
+  .pp-ventana__pie > .pp-espaciador { display: none; }
+  .pp-panel__decision,
+  .dm-decision { grid-template-columns: 1fr; }
+  .pp-panel__decision .p-button,
+  .dm-decision .p-button { width: 100%; }
+}
+
+/* Columna Área en todas las listas (como en Boletas): texto gris y en una o dos líneas. */
+.pp-tabla .col-area { color: #6b7280; font-size: 13px; min-width: 150px; max-width: 220px; }
+@media (max-width: 767px) { .pp-tabla .col-area { display: none; } }
+
+/* Filtro de fechas "Desde – Hasta" (mismo alto que los demás filtros) */
+.filtro-fechas { flex: 0 1 240px; }
+.filtro-fechas .p-inputtext { height: 40px; border-color: #d1d5db; border-radius: 8px 0 0 8px; font-size: 14px; }
+.filtro-fechas .p-datepicker-trigger.p-button { height: 40px; border: 1px solid #d1d5db; border-left: 0; border-radius: 0 8px 8px 0; background: #fff; color: #374151; }
+.filtro-fechas .p-datepicker-trigger.p-button:enabled:hover { background: #f3f4f6; }
+.p-datepicker table td > span.p-highlight { background: #111; color: #fff; }
+.p-datepicker table td.p-datepicker-today > span { background: #f3f4f6; color: #111; }
+.p-datepicker .p-datepicker-buttonbar .p-button { color: #111; }
+@media (max-width: 767px) { .filtro-fechas { flex: 1 1 100%; } }
+
+/* Con el filtro de fechas, los filtros deben caber en una sola fila a 1366 px. */
+.pp-filtros__fila .pp-filtros__busqueda { flex: 1 1 200px; min-width: 180px; }
+.pp-filtros__fila .pp-filtros__area { flex: 0 1 200px; }
+.pp-filtros__fila .dm-filtro-estado,
+.pp-filtros__fila .pp-filtros__estado { flex: 0 1 190px; }
+.pp-filtros__fila .filtro-fechas { flex: 0 1 230px; }
+.pp-filtros__fila .pp-filtros__busqueda { flex: 1 1 160px; min-width: 160px; }
+.pp-filtros__fila .filtro-fechas { flex: 0 1 220px; }

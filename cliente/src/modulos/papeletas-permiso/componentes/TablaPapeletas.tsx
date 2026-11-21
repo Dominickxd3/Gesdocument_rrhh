@@ -38,7 +38,7 @@ function Trabajador({ p }: { p: Papeleta }) {
       <div>
         <strong>{p.trabajador.nombre}</strong>
         <small>
-          DNI {p.trabajador.dni} · {p.trabajador.area}
+          DNI {p.trabajador.dni}
         </small>
       </div>
     </div>
@@ -122,6 +122,7 @@ export function TablaPapeletas({
         <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
         <Column field="numero" header="N° · Fecha" sortable body={(p: Papeleta) => <NumeroFecha p={p} />} className="pp-col-fecha" headerClassName="pp-col-fecha" />
         <Column header="Trabajador" body={(p: Papeleta) => <Trabajador p={p} />} />
+        <Column header="Área" body={(p: Papeleta) => p.trabajador.area} className="col-area" headerClassName="col-area" />
         <Column header="Motivo" body={(p: Papeleta) => <Motivo p={p} />} className="pp-col-motivo" headerClassName="pp-col-motivo" />
         <Column header="Horario" body={(p: Papeleta) => <Horario papeleta={p} />} className="pp-col-horario" headerClassName="pp-col-horario" />
         <Column header="Estado" body={estadoOAcciones} className="pp-col-estado" headerClassName="pp-col-estado" />

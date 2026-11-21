@@ -1,3 +1,5 @@
+import { FiltroFechas, SIN_RANGO, enRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
+import { ordenarPorTrabajador } from '@/compartido/formato/orden';
 import { useMemo, useRef, useState } from 'react';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
@@ -13,6 +15,8 @@ import { Insignia } from '@/compartido/componentes/Insignia';
 import { VentanaMotivo } from '@/compartido/componentes/VentanaMotivo';
 import { fechaCorta } from '@/compartido/almacen/crearAlmacen';
 import '@/compartido/estilos/listados';
+import { buscarTrabajador } from '@/modulos/trabajadores/aplicacion/almacenTrabajadores';
+import { AREAS } from '@/modulos/trabajadores/infraestructura/datosTrabajadores';
 import {
   cerrarSinMemorandum,
   emitirMemorandum,
@@ -38,6 +42,8 @@ function IncidenciasRrhh() {
   const incidencias = useIncidencias();
   const aviso = useRef<Toast>(null);
   const [busqueda, setBusqueda] = useState('');
+  const [area, setArea] = useState<string | null>(null);
+  const [fechas, setFechas] = useState<RangoFechas>(SIN_RANGO);
   const [estado, setEstado] = useState<EstadoIncidencia | null>(null);
   const [idDetalle, setIdDetalle] = useState<string | null>(null);
   const [registrando, setRegistrando] = useState(false);
@@ -45,10 +51,11 @@ function IncidenciasRrhh() {
 
   const visibles = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
-    return incidencias.filter(
-      (i) => (!estado || i.estado === estado) && (!q || `${i.numero} ${i.trabajador} ${i.dni} ${i.asunto}`.toLowerCase().includes(q)),
+    const filtradas = incidencias.filter(
+      (i) => (!area || buscarTrabajador(i.dni)?.area === area) && (!estado || i.estado === estado) && enRango(i.fecha, fechas) && (!q || `${i.numero} ${i.trabajador} ${i.dni} ${i.asunto}`.toLowerCase().includes(q)),
     );
-  }, [incidencias, busqueda, estado]);
+    return ordenarPorTrabajador(filtradas, (i) => i.trabajador, (i) => i.numero);
+  }, [incidencias, busqueda, area, estado, fechas]);
 
   const detalle = incidencias.find((i) => i.id === idDetalle) ?? null;
   const avisar = (summary: string, detail?: string) => aviso.current?.show({ severity: 'success', summary, detail, life: 3000 });
@@ -68,7 +75,9 @@ function IncidenciasRrhh() {
           <InputIcon className="pi pi-search" />
           <InputText value={busqueda} onChange={(e) => setBusqueda(e.target.value)} placeholder="Buscar por N°, trabajador o asunto" aria-label="Buscar" />
         </IconField>
+        <Dropdown value={area} options={AREAS} onChange={(e) => setArea(e.value ?? null)} placeholder="Todas las áreas" filter showClear className="pp-filtros__area" />
         <Dropdown value={estado} options={ESTADOS_INCIDENCIA} optionLabel="etiqueta" optionValue="valor" onChange={(e) => setEstado(e.value ?? null)} placeholder="Todos los estados" showClear className="dm-filtro-estado" />
+        <FiltroFechas valor={fechas} alCambiar={setFechas} />
       </div>
 
       <TablaListado
@@ -80,11 +89,14 @@ function IncidenciasRrhh() {
         claseFila={(i) => `dm-fila es-${i.estado === 'registrada' ? 'pendiente_revision' : i.estado}`}
         alLimpiarFiltros={() => {
           setBusqueda('');
+          setArea(null);
           setEstado(null);
+          setFechas(SIN_RANGO);
         }}
       >
         <Column header="N°" body={(i: Incidencia) => <strong>{i.numero}</strong>} className="pp-col-fecha" />
         <Column header="Trabajador" body={(i: Incidencia) => <CeldaPersona nombre={i.trabajador} detalle={`DNI ${i.dni}`} />} />
+        <Column header="Área" body={(i: Incidencia) => buscarTrabajador(i.dni)?.area ?? '—'} className="col-area" headerClassName="col-area" />
         <Column header="Asunto" field="asunto" />
         <Column header="Fecha" body={(i: Incidencia) => fechaCorta(i.fecha)} className="tr-col-gris" />
         <Column header="Estado" body={estadoCelda} className="pp-col-estado" />

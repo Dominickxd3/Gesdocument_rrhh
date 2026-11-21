@@ -1,3 +1,4 @@
+import { FiltroFechas } from '@/compartido/componentes/FiltroFechas';
 import { InputText } from 'primereact/inputtext';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
@@ -66,6 +67,7 @@ export function BarraFiltros({ filtros, areas, conteo, alCambiar }: Propiedades)
         aria-label="Estado"
         className="dm-filtro-estado"
       />
+      <FiltroFechas valor={filtros.fechas} alCambiar={(fechas) => alCambiar({ fechas })} />
     </div>
   );
 }

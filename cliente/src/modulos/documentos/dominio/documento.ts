@@ -4,6 +4,8 @@
  * el trabajador lo firma u observa; si lo observa, RR. HH. lo corrige con una nueva versión.
  */
 import type { TonoInsignia } from '@/compartido/componentes/Insignia';
+import type { DatosAdenda } from './plantillaAdenda';
+import type { DatosContrato } from './plantillaContrato';
 
 export type EstadoDocumento = 'preparacion' | 'pendiente_firma' | 'observado' | 'firmado';
 
@@ -19,8 +21,8 @@ export const infoEstado = (e: EstadoDocumento) => ESTADOS_DOCUMENTO.find((x) => 
 export type TipoDocumento = 'contrato' | 'adenda' | 'constancia' | 'reglamento' | 'epp' | 'domicilio';
 
 export const TIPOS_DOCUMENTO: { valor: TipoDocumento; etiqueta: string }[] = [
-  { valor: 'contrato', etiqueta: 'Contrato de trabajo' },
-  { valor: 'adenda', etiqueta: 'Adenda de contrato' },
+  { valor: 'contrato', etiqueta: 'Contrato por incremento de actividad' },
+  { valor: 'adenda', etiqueta: 'Adenda al contrato de trabajo' },
   { valor: 'constancia', etiqueta: 'Constancia de trabajo' },
   { valor: 'reglamento', etiqueta: 'Cargo de Reglamento Interno' },
   { valor: 'epp', etiqueta: 'Cargo de entrega de EPP' },
@@ -34,6 +36,8 @@ export interface EventoDocumento {
   usuario: string;
   fecha: string;
   nota?: string;
+  /** Firma dibujada por el trabajador (PNG en data URL); solo en el evento "firmado". */
+  firmaImagen?: string;
 }
 
 export interface Documento {
@@ -47,6 +51,10 @@ export interface Documento {
   origen: { tipo: 'plantilla' } | { tipo: 'archivo'; nombre: string };
   estado: EstadoDocumento;
   historial: EventoDocumento[];
+  /** Solo en adendas generadas desde plantilla: lo que cambia y la copia de los datos del trabajador. */
+  adenda?: DatosAdenda;
+  /** Solo en contratos generados desde plantilla. */
+  contrato?: DatosContrato;
 }
 
 /** El trabajador solo ve los documentos ya enviados (CUS45: documentos propios habilitados). */

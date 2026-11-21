@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import { AutoComplete } from 'primereact/autocomplete';
 import { InputText } from 'primereact/inputtext';
 import {
   PLAZO_PRESENTAR,
@@ -16,7 +15,7 @@ import {
   type Trabajador,
 } from '../dominio/descanso';
 import { HOY, TRABAJADORES } from '../infraestructura/datosPrueba';
-import { Avatar } from './Insignias';
+import { SelectorTrabajador } from '@/compartido/componentes/SelectorTrabajador';
 import { guardarArchivo } from '../aplicacion/almacenDescansos';
 
 interface Propiedades {
@@ -82,15 +81,12 @@ function Adjunto({ etiqueta, obligatorio, archivo, alElegir, alQuitar }: {
 /** CUS19 + CUS20: registrar el aviso de ausencia y, si ya los tiene, los sustentos. */
 export function VentanaRegistro({ visible, modo, trabajadorFijo, alCerrar, alGuardar }: Propiedades) {
   const [datos, setDatos] = useState<DatosAviso>(VACIO);
-  const [busqueda, setBusqueda] = useState<string | Trabajador>('');
-  const [sugerencias, setSugerencias] = useState<Trabajador[]>([]);
   const [intentado, setIntentado] = useState(false);
   const esTrabajador = modo === 'trabajador';
 
   useEffect(() => {
     if (!visible) return;
     setDatos({ ...VACIO, trabajador: trabajadorFijo ?? VACIO.trabajador });
-    setBusqueda('');
     setIntentado(false);
   }, [visible, trabajadorFijo]);
 
@@ -99,7 +95,6 @@ export function VentanaRegistro({ visible, modo, trabajadorFijo, alCerrar, alGua
   const error = (campo: keyof DatosAviso) => (intentado ? errores[campo] : undefined);
   const dias = diasPeriodo(datos.inicio, datos.fin);
   const conCertificado = !!datos.sustentos.certificado;
-  const elegido = datos.trabajador.dni ? datos.trabajador : null;
 
   const ponerSustento = (tipo: TipoSustento, nombre?: string) =>
     setDatos((d) => {
@@ -141,49 +136,13 @@ export function VentanaRegistro({ visible, modo, trabajadorFijo, alCerrar, alGua
           <h3 className="pp-seccion__titulo">
             <span>1</span> Trabajador que avisó
           </h3>
-          {elegido ? (
-            <div className="pp-trabajador-elegido">
-              <Avatar nombre={elegido.nombre} />
-              <div>
-                <strong>{elegido.nombre}</strong>
-                <small>
-                  DNI {elegido.dni} · {elegido.cargo} · {elegido.area}
-                </small>
-              </div>
-              <Button label="Cambiar" text size="small" onClick={() => cambiar({ trabajador: VACIO.trabajador })} />
-            </div>
-          ) : (
-            <label className="pp-campo">
-              <span className="pp-campo__etiqueta">Buscar por nombre o DNI *</span>
-              <AutoComplete
-                value={busqueda}
-                suggestions={sugerencias}
-                completeMethod={(e) => {
-                  const q = e.query.trim().toLowerCase();
-                  setSugerencias(TRABAJADORES.filter((t) => t.nombre.toLowerCase().includes(q) || t.dni.includes(q)).slice(0, 8));
-                }}
-                field="nombre"
-                onChange={(e) => setBusqueda(e.value)}
-                onSelect={(e) => cambiar({ trabajador: e.value as Trabajador })}
-                itemTemplate={(t: Trabajador) => (
-                  <div className="pp-sugerencia">
-                    <Avatar nombre={t.nombre} />
-                    <div>
-                      <strong>{t.nombre}</strong>
-                      <small>
-                        {t.dni} · {t.area}
-                      </small>
-                    </div>
-                  </div>
-                )}
-                placeholder="Ej.: Quispe o 45678912"
-                className={error('trabajador') ? 'p-invalid' : ''}
-                inputClassName="pp-ancho-completo"
-                autoFocus
-              />
-              {error('trabajador') && <small className="pp-campo__error">{error('trabajador')}</small>}
-            </label>
-          )}
+          <SelectorTrabajador
+            etiqueta="Buscar por nombre o DNI *"
+            opciones={TRABAJADORES.map((t) => ({ dni: t.dni, nombre: t.nombre, detalle: `${t.cargo} · ${t.area}` }))}
+            valor={datos.trabajador.dni || null}
+            alCambiar={(dni) => cambiar({ trabajador: TRABAJADORES.find((t) => t.dni === dni) ?? VACIO.trabajador })}
+            error={error('trabajador')}
+          />
         </section>
         )}
 

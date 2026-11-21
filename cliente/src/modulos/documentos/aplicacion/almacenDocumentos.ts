@@ -1,6 +1,8 @@
 import { ahoraIso, crearAleatorio, crearAlmacen, haceDias } from '@/compartido/almacen/crearAlmacen';
 import { almacenTrabajadores } from '@/modulos/trabajadores/aplicacion/almacenTrabajadores';
-import { nombreLegible } from '@/modulos/trabajadores/dominio/trabajador';
+import { nombreLegible, type Trabajador } from '@/modulos/trabajadores/dominio/trabajador';
+import { clausulasSugeridas, esCargoVentas, type DatosAdenda } from '../dominio/plantillaAdenda';
+import { calcularHasta, esCargoConfianza, funcionesSugeridas, type DatosContrato } from '../dominio/plantillaContrato';
 import { TIPOS_DOCUMENTO, type Documento, type EstadoDocumento, type EventoDocumento } from '../dominio/documento';
 
 const RRHH = ['María Torres', 'Carlos Ramírez'];
@@ -15,7 +17,8 @@ function crearDocumentos(): Documento[] {
   return Array.from({ length: 40 }, (_, i) => {
     const t = i < 3 ? demo : elegir(trabajadores);
     const estado: EstadoDocumento = i === 0 ? 'pendiente_firma' : i === 1 ? 'firmado' : i === 2 ? 'pendiente_firma' : elegir(estados);
-    const tipo = i === 0 ? 'adenda' : i === 1 ? 'contrato' : i === 2 ? 'reglamento' : elegir(TIPOS_DOCUMENTO).valor;
+    // N° 497 es un contrato de vendedor de ejemplo: lleva la adenda de obligaciones como segunda página.
+    const tipo = i === 0 ? 'adenda' : i === 1 || i === 3 ? 'contrato' : i === 2 ? 'reglamento' : elegir(TIPOS_DOCUMENTO).valor;
     const dias = Math.floor(i * 0.9) + 1;
     const rrhh = elegir(RRHH);
     const historial: EventoDocumento[] = [{ accion: 'creado', usuario: rrhh, fecha: haceDias(dias, '09:15') }];
@@ -40,8 +43,45 @@ function crearDocumentos(): Documento[] {
       origen: { tipo: 'plantilla' },
       estado,
       historial,
+      // Las adendas ficticias se arman como las reales: cambio de cargo y de remuneración.
+      adenda: tipo === 'adenda' ? adendaEjemplo(t, haceDias(dias).slice(0, 10), i) : undefined,
+      contrato: tipo === 'contrato' ? contratoEjemplo(t, haceDias(dias).slice(0, 10), i === 3 ? 'VENDEDOR DE CAMPO' : undefined) : undefined,
     };
   });
+}
+
+const CARGOS_NUEVOS = ['AUXILIAR DE COBRANZAS', 'VENDEDOR MULTIFUNCIONAL', 'SUPERVISOR DE PRODUCCIÓN', 'ASISTENTE DE ALMACÉN'];
+
+function adendaEjemplo(t: Trabajador, fechaFirma: string, i: number): DatosAdenda {
+  const cargoNuevo = CARGOS_NUEVOS[i % CARGOS_NUEVOS.length];
+  return datosAdenda(t, { cargoNuevo, remuneracionNueva: t.contrato.remuneracion + 200, especiales: clausulasSugeridas(cargoNuevo), fechaFirma });
+}
+
+function contratoEjemplo(t: Trabajador, desde: string, cargoForzado?: string): DatosContrato {
+  const cargo = cargoForzado ?? t.contrato.cargo;
+  return datosContrato(t, {
+    cargo,
+    confianza: esCargoConfianza(cargo),
+    meses: 3,
+    desde,
+    hasta: calcularHasta(desde, 3),
+    remuneracion: t.contrato.remuneracion,
+    asignacionFamiliar: true,
+    horario1: 'de Lunes a Viernes de 7:00 a.m. a 4:00 p.m.',
+    horario2: 'Sábados de 7:00 a.m. a 4:00 p.m.',
+    funciones: funcionesSugeridas(cargo),
+    adendaVendedor: esCargoVentas(cargo),
+  });
+}
+
+/** Completa el contrato con la copia de los datos del trabajador (nombre, DNI, domicilio). */
+export function datosContrato(t: Trabajador, datos: Omit<DatosContrato, 'trabajador'>): DatosContrato {
+  return { ...datos, trabajador: { nombre: t.nombre, dni: t.dni, domicilio: t.domicilio } };
+}
+
+/** Completa la adenda con la copia de la ficha y del contrato vigente del trabajador. */
+export function datosAdenda(t: Trabajador, cambios: Pick<DatosAdenda, 'cargoNuevo' | 'remuneracionNueva' | 'especiales' | 'fechaFirma'>): DatosAdenda {
+  return { ...cambios, trabajador: { nombre: t.nombre, dni: t.dni, domicilio: t.domicilio }, contrato: { ...t.contrato } };
 }
 
 export const almacenDocumentos = crearAlmacen(crearDocumentos);
@@ -54,7 +94,7 @@ function actualizar(id: string, evento: Omit<EventoDocumento, 'fecha'>, cambios:
 }
 
 /** CUS42/CUS43: generar desde plantilla o cargar un archivo. Queda en preparación. */
-export function crearDocumento(datos: Pick<Documento, 'dni' | 'trabajador' | 'tipo' | 'origen'>, usuario: string, enviar: boolean): number {
+export function crearDocumento(datos: Pick<Documento, 'dni' | 'trabajador' | 'tipo' | 'origen' | 'adenda' | 'contrato'>, usuario: string, enviar: boolean): number {
   const lista = almacenDocumentos.leer();
   const numero = Math.max(0, ...lista.map((d) => d.numero)) + 1;
   const historial: EventoDocumento[] = [{ accion: 'creado', usuario, fecha: ahoraIso() }];
@@ -79,4 +119,5 @@ export const corregirDocumento = (d: Documento, usuario: string, archivo?: strin
   }));
 
 /** CUS48: firma electrónica del trabajador. */
-export const firmarDocumento = (d: Documento, usuario: string) => actualizar(d.id, { accion: 'firmado', usuario }, () => ({ estado: 'firmado' }));
+export const firmarDocumento = (d: Documento, usuario: string, firmaImagen: string) =>
+  actualizar(d.id, { accion: 'firmado', usuario, firmaImagen }, () => ({ estado: 'firmado' }));
