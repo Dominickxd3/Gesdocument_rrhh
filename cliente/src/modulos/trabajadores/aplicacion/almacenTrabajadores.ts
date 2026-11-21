@@ -29,6 +29,11 @@ export function editarTrabajador(dni: string, cambios: Pick<Trabajador, 'correo'
   }));
 }
 
+/** Mi perfil: el propio trabajador actualiza solo sus datos personales de contacto. */
+export function actualizarContacto(dni: string, cambios: Pick<Trabajador, 'correo' | 'telefono'>) {
+  almacenTrabajadores.escribir((e) => ({ ...e, lista: e.lista.map((t) => (t.dni === dni ? { ...t, ...cambios } : t)) }));
+}
+
 /** Simula la sincronización con el ERP (RF01): en producción trae altas, bajas y cambios. */
 export async function sincronizarConErp(): Promise<number> {
   await new Promise((r) => setTimeout(r, 1200));

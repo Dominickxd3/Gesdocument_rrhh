@@ -6,6 +6,9 @@ interface ValorContextoSesion {
   usuario: UsuarioSesion | null;
   iniciarSesion: (credenciales: Credenciales, recordar: boolean) => Promise<void>;
   cerrarSesion: () => void;
+  /** Recién inició sesión: se muestra una pantalla breve de carga mientras se arma su espacio. */
+  recienIngresado: boolean;
+  terminarIngreso: () => void;
 }
 
 const ContextoSesion = createContext<ValorContextoSesion | null>(null);
@@ -26,10 +29,14 @@ export function ProveedorSesion({ servicio, children }: PropiedadesProveedorSesi
     return vigente;
   });
 
+  const [recienIngresado, setRecienIngresado] = useState(false);
+  const terminarIngreso = useCallback(() => setRecienIngresado(false), []);
+
   const iniciarSesion = useCallback(
     async (credenciales: Credenciales, recordar: boolean) => {
       const usuarioValidado = await servicio.iniciarSesion(credenciales);
       guardarSesion(usuarioValidado, recordar);
+      setRecienIngresado(true);
       setUsuario(usuarioValidado);
     },
     [servicio],
@@ -41,8 +48,8 @@ export function ProveedorSesion({ servicio, children }: PropiedadesProveedorSesi
   }, []);
 
   const valor = useMemo(
-    () => ({ usuario, iniciarSesion, cerrarSesion }),
-    [usuario, iniciarSesion, cerrarSesion],
+    () => ({ usuario, iniciarSesion, cerrarSesion, recienIngresado, terminarIngreso }),
+    [usuario, iniciarSesion, cerrarSesion, recienIngresado, terminarIngreso],
   );
 
   return <ContextoSesion.Provider value={valor}>{children}</ContextoSesion.Provider>;

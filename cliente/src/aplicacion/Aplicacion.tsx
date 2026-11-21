@@ -1,6 +1,7 @@
 import { RouterProvider } from 'react-router-dom';
 import { ProveedorSesion } from '@/compartido/sesion/ContextoSesion';
 import { ServicioAutenticacionLocal } from '@/modulos/autenticacion/infraestructura/ServicioAutenticacionLocal';
+import { ContenedorAvisos } from '@/compartido/notificaciones/notificaciones';
 import { enrutador } from './enrutador';
 // Registra los contadores de pendientes del menú.
 import './pendientes';
@@ -12,6 +13,8 @@ export function Aplicacion() {
   return (
     <ProveedorSesion servicio={servicioAutenticacion}>
       <RouterProvider router={enrutador} />
+      {/* Aviso único de la aplicación: confirma cada acción sin bloquear la pantalla. */}
+      <ContenedorAvisos />
     </ProveedorSesion>
   );
 }

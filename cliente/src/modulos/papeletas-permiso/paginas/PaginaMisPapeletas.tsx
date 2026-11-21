@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from 'react';
-import { Toast } from 'primereact/toast';
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
+import { useMemo, useState } from 'react';
 import { Insignia } from '@/compartido/componentes/Insignia';
 import '@/modulos/descansos-medicos/componentes/descansos.css';
 import { Button } from 'primereact/button';
@@ -25,7 +25,7 @@ const notaDe = (p: Papeleta) => [...p.historial].reverse().find((h) => h.nota)?.
 export function PaginaMisPapeletas() {
   const usuario = useUsuarioActual();
   const papeletas = usePapeletasCompartidas();
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   // Se guarda el id: así la ventana muestra la papeleta actualizada al firmarla.
   const [idAbierta, setIdAbierta] = useState<string | null>(null);
   const setAImprimir = (p: Papeleta | null) => setIdAbierta(p?.id ?? null);
@@ -104,7 +104,6 @@ export function PaginaMisPapeletas() {
         <Column body={accion} className="cs-col-accion" />
       </TablaListado>
 
-      <Toast ref={aviso} position="bottom-right" />
       <VentanaMiPapeleta
         papeleta={abierta}
         alCerrar={() => setIdAbierta(null)}

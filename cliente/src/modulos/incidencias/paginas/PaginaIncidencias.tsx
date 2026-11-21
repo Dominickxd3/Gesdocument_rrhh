@@ -1,7 +1,7 @@
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
 import { FiltroFechas, SIN_RANGO, enRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
 import { ordenarPorTrabajador } from '@/compartido/formato/orden';
-import { useMemo, useRef, useState } from 'react';
-import { Toast } from 'primereact/toast';
+import { useMemo, useState } from 'react';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
@@ -40,7 +40,7 @@ const estadoCelda = (i: Incidencia) => <Insignia tono={infoEstado(i.estado).tono
 function IncidenciasRrhh() {
   const usuario = useUsuarioActual();
   const incidencias = useIncidencias();
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const [busqueda, setBusqueda] = useState('');
   const [area, setArea] = useState<string | null>(null);
   const [fechas, setFechas] = useState<RangoFechas>(SIN_RANGO);
@@ -62,7 +62,6 @@ function IncidenciasRrhh() {
 
   return (
     <div className="pagina-papeletas">
-      <Toast ref={aviso} position="bottom-right" />
       <header className="pp-encabezado">
         <h1>Incidencias y memorándums</h1>
         <div className="pp-encabezado__acciones">
@@ -163,7 +162,7 @@ function IncidenciasRrhh() {
 function MisMemorandums() {
   const usuario = useUsuarioActual();
   const incidencias = useIncidencias();
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const [idDetalle, setIdDetalle] = useState<string | null>(null);
 
   const mios = incidencias.filter((i) => i.dni === usuario.dni && visibleParaTrabajador(i));
@@ -172,7 +171,6 @@ function MisMemorandums() {
 
   return (
     <div className="pagina-papeletas">
-      <Toast ref={aviso} position="bottom-right" />
       <header className="pp-encabezado">
         <h1>Mis memorándums</h1>
       </header>

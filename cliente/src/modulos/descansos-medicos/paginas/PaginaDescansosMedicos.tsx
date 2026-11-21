@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from 'react';
-import { Toast } from 'primereact/toast';
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
+import { useMemo, useState } from 'react';
 import { Button } from 'primereact/button';
 import { useUsuarioActual } from '@/compartido/sesion/ContextoSesion';
 import { esGestor } from '@/compartido/sesion/tipos';
@@ -27,7 +27,7 @@ export function PaginaDescansosMedicos() {
 function RevisionDescansos() {
   const usuario = useUsuarioActual();
   const dm = useDescansos();
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const [idDetalle, setIdDetalle] = useState<string | null>(null);
   const [registrando, setRegistrando] = useState(false);
   const [motivo, setMotivo] = useState<TipoMotivo | null>(null);
@@ -58,7 +58,6 @@ function RevisionDescansos() {
 
   return (
     <div className="pagina-papeletas pagina-descansos">
-      <Toast ref={aviso} position="bottom-right" />
 
       <header className="pp-encabezado">
         <h1>Descansos médicos</h1>
@@ -89,7 +88,10 @@ function RevisionDescansos() {
       <VentanaDetalle
         descanso={motivo ? null : detalle}
         alCerrar={() => setIdDetalle(null)}
-        alVerificar={(d) => marcarVerificado(d, firma)}
+        alVerificar={(d) => {
+          marcarVerificado(d, firma);
+          avisar(`Descanso N° ${d.numero} verificado`, 'Se confirmó la validez del certificado.');
+        }}
         alObservar={() => setMotivo('observar')}
         alRechazar={() => setMotivo('rechazar')}
         alAprobar={(d, reconocido) => {

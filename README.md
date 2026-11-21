@@ -55,7 +55,7 @@ Ubicada en `cliente/src/compartido/diseno/`.
 
 ## Roles y permisos (mockup)
 
-Usuarios de prueba (contraseña `Mockup2026`, salvo `admin`): `admin`, `maria.torres` y `carlos.ramirez` (RR. HH.), `jose.quispe` (trabajador) y `seguridad` (Prevencionista de Seguridad, sede Lima – Canto Bello).
+Usuarios de prueba (contraseña `Mockup2026`, salvo `admin` con `admin123` y `seguridad` con `seguridad123`): `admin`, `maria.torres` y `carlos.ramirez` (RR. HH.), `jose.quispe` (trabajador) y `seguridad` (Prevencionista de Seguridad, sede Lima – Canto Bello).
 
 | Rol | Ve |
 | --- | --- |
@@ -88,6 +88,17 @@ Usuarios de prueba (contraseña `Mockup2026`, salvo `admin`): `admin`, `maria.to
 - Módulo `cliente/src/modulos/control-salidas/`. Muestra las papeletas **aprobadas por RR. HH.** de una sede y fecha (por defecto, la sede del usuario y hoy).
 - Al abrir una papeleta se ve la papeleta impresa ("Copia para Vigilancia", mismo formato oficial) y el detalle del colaborador (DNI, cargo, área, sede, jefe inmediato); ahí se registra la hora de salida observada y una nota opcional. "Imprimir papeleta" abre la vista previa con las dos copias.
 - Las papeletas se comparten entre módulos con `papeletas-permiso/aplicacion/almacenPapeletas.ts`, así lo que RR. HH. aprueba aparece al instante en Control de salidas.
+
+## Sesión y perfil
+
+- **Mi perfil** (menú del usuario → "Mi perfil", ruta `/mi-perfil`): tarjeta centrada con los datos laborales (solo lectura, los registra RR. HH.) y los datos personales que el usuario sí puede cambiar: **correo personal y teléfono celular** (validados). Se guardan en la ficha del trabajador (`actualizarContacto`).
+- **Cerrar sesión** pide confirmación; luego lleva a la pantalla de ingreso y el siguiente usuario empieza en su Inicio.
+- **Al iniciar sesión** aparece una pantalla breve de carga (`compartido/componentes/PantallaCarga.tsx`) mientras se arma el espacio del usuario; desaparece sola.
+
+## Avisos de cada acción
+
+- Toda acción que guarda o cambia algo (firmar, enviar, aprobar, registrar, guardar perfil, descargar PDF, cerrar sesión…) muestra un **aviso flotante no invasivo**: tarjeta blanca con ícono de color, título, detalle y una barra que se vacía; se cierra sola y no bloquea la pantalla (arriba a la derecha en escritorio, arriba a todo el ancho en el celular).
+- Un solo servicio para toda la app: `compartido/notificaciones/notificaciones.tsx` (`notificar.exito / info / aviso / error`, montado una vez en `Aplicacion.tsx`). No se usa SweetAlert2: sus ventanas modales interrumpen en cada acción; las confirmaciones modales quedan solo para lo que no se puede deshacer (eliminar, enviar, cerrar sesión).
 
 ## Uso en celulares
 

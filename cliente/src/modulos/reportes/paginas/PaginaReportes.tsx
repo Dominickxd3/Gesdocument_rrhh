@@ -1,6 +1,6 @@
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
 import { FiltroFechas, SIN_RANGO, enRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
-import { useMemo, useRef, useState } from 'react';
-import { Toast } from 'primereact/toast';
+import { useMemo, useState } from 'react';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
@@ -40,7 +40,7 @@ export function PaginaReportes() {
   const documentos = useDocumentos();
   const incidencias = useIncidencias();
   const descansos = useListaDescansos();
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const [busqueda, setBusqueda] = useState('');
   const [modulo, setModulo] = useState<Evento['modulo'] | null>(null);
   const [fechas, setFechas] = useState<RangoFechas>(SIN_RANGO);
@@ -67,7 +67,6 @@ export function PaginaReportes() {
 
   return (
     <div className="pagina-papeletas">
-      <Toast ref={aviso} position="bottom-right" />
       <header className="pp-encabezado">
         <h1>Reportes</h1>
       </header>

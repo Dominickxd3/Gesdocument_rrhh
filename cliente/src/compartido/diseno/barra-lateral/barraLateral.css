@@ -344,3 +344,8 @@
 .menu-desplegable.es-actual .menu-desplegable__enlace { font-weight: 600; }
 .es-compacta .menu-desplegable__enlace { padding-right: 0; }
 .es-compacta .menu-desplegable__boton { right: 0; width: 18px; height: 18px; top: auto; bottom: 0; transform: none; }
+
+/* Confirmación de cierre de sesión */
+.confirmar-salida.p-dialog { width: min(420px, calc(100vw - 32px)); }
+.confirmar-salida .boton-cerrar-sesion.p-button { border-color: #dc2626; background: #dc2626; color: #ffffff; }
+.confirmar-salida .boton-cerrar-sesion.p-button:enabled:hover { border-color: #b91c1c; background: #b91c1c; }

@@ -1,8 +1,8 @@
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
 import { FiltroFechas, SIN_RANGO, enRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
 import { ordenarPorTrabajador } from '@/compartido/formato/orden';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
-import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
@@ -74,7 +74,7 @@ function DocumentosRrhh() {
   const navegar = useNavigate();
   const documentos = useDocumentos();
   const trabajadores = useTrabajadores();
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const [vista, setVista] = useState<Vista>('expedientes');
   const [busqueda, setBusqueda] = useState('');
   const [area, setArea] = useState<string | null>(null);
@@ -138,7 +138,6 @@ function DocumentosRrhh() {
 
   return (
     <div className="pagina-papeletas">
-      <Toast ref={aviso} position="bottom-right" />
       <header className="pp-encabezado">
         <div>
           <h1>Expedientes digitales</h1>
@@ -238,7 +237,7 @@ function MiExpediente() {
   const usuario = useUsuarioActual();
   const documentos = useDocumentos();
   const ficha = buscarTrabajador(usuario.dni);
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const [idDetalle, setIdDetalle] = useState<string | null>(null);
   const [observando, setObservando] = useState<Documento | null>(null);
 
@@ -248,7 +247,6 @@ function MiExpediente() {
 
   return (
     <div className="pagina-papeletas">
-      <Toast ref={aviso} position="bottom-right" />
       <header className="pp-encabezado">
         <h1>Documentos laborales</h1>
       </header>

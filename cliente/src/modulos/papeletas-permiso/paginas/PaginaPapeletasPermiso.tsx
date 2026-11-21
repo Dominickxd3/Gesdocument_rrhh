@@ -1,9 +1,9 @@
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
 import { numeroPapeleta } from '../dominio/papeleta';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useUsuarioActual } from '@/compartido/sesion/ContextoSesion';
 import { esGestor } from '@/compartido/sesion/tipos';
 import { PaginaMisPapeletas } from './PaginaMisPapeletas';
-import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { usePapeletas } from '../aplicacion/usePapeletas';
@@ -26,7 +26,7 @@ export function PaginaPapeletasPermiso() {
 /** Prototipo de diseño (media fidelidad). Datos ficticios en memoria. */
 function PapeletasRrhh() {
   const pp = usePapeletas();
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
 
   const [idDetalle, setIdDetalle] = useState<string | null>(null);
   const [formulario, setFormulario] = useState<{ visible: boolean; papeleta: Papeleta | null }>({ visible: false, papeleta: null });
@@ -73,7 +73,6 @@ function PapeletasRrhh() {
 
   return (
     <div className="pagina-papeletas">
-      <Toast ref={aviso} position="bottom-right" />
       <ConfirmDialog />
 
       <header className="pp-encabezado">

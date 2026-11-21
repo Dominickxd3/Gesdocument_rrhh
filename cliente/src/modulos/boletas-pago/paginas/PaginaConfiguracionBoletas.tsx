@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { Toast } from 'primereact/toast';
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
+import { useState } from 'react';
 import { BotonVolver } from '@/compartido/componentes/BotonVolver';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { repositorioBoletas } from '../aplicacion/repositorioBoletas';
@@ -23,7 +23,7 @@ function leerComoDataUrl(archivo: File): Promise<string> {
 
 export function PaginaConfiguracionBoletas() {
   const { configuracion, guardar } = useConfiguracionBoletas(repositorioBoletas);
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const [subiendo, setSubiendo] = useState(false);
 
   if (!configuracion) return null;
@@ -71,7 +71,6 @@ export function PaginaConfiguracionBoletas() {
 
   return (
     <div className="pagina-configuracion">
-      <Toast ref={aviso} position="bottom-right" />
       <ConfirmDialog />
       <BotonVolver destino="/boletas-pago" etiqueta="Volver a boletas" />
 

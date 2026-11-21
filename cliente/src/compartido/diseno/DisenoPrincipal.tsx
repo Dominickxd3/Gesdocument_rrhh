@@ -5,6 +5,8 @@ import { BarraLateral } from './barra-lateral/BarraLateral';
 import { BarraSuperiorMovil } from './BarraSuperiorMovil';
 import { useConsultaMedios } from '@/compartido/ganchos/useConsultaMedios';
 import { usePreferenciaGuardada } from '@/compartido/ganchos/usePreferenciaGuardada';
+import { useSesion } from '@/compartido/sesion/ContextoSesion';
+import { PantallaCarga } from '@/compartido/componentes/PantallaCarga';
 import './diseno.css';
 
 /**
@@ -21,6 +23,7 @@ export function DisenoPrincipal() {
   const esCompacta = contraidaGuardada ?? esTableta;
   const [panelAbierto, setPanelAbierto] = useState(false);
   const { pathname } = useLocation();
+  const { recienIngresado, terminarIngreso, usuario } = useSesion();
 
   useEffect(() => setPanelAbierto(false), [pathname, esMovil]);
 
@@ -51,6 +54,9 @@ export function DisenoPrincipal() {
       <main className="contenido-principal">
         <Outlet />
       </main>
+
+      {/* Al iniciar sesión: pantalla breve mientras se carga el contenido (detrás ya se está armando). */}
+      {recienIngresado && <PantallaCarga nombre={usuario?.nombre.split(' ')[0] ?? ''} alTerminar={terminarIngreso} />}
     </div>
   );
 }

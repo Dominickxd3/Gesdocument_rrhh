@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { Toast } from 'primereact/toast';
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
+import { useState } from 'react';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
@@ -44,7 +44,7 @@ const ultima = (p: Plantilla) => p.versiones[p.versiones.length - 1];
 export function PaginaPlantillas() {
   const usuario = useUsuarioActual();
   const plantillas = almacenPlantillas.usar();
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const [idDetalle, setIdDetalle] = useState<string | null>(null);
   const [nueva, setNueva] = useState(false);
   const detalle = plantillas.find((p) => p.id === idDetalle) ?? null;
@@ -58,7 +58,6 @@ export function PaginaPlantillas() {
 
   return (
     <div className="pagina-papeletas">
-      <Toast ref={aviso} position="bottom-right" />
       <header className="pp-encabezado">
         <h1>Plantillas</h1>
         <div className="pp-encabezado__acciones">

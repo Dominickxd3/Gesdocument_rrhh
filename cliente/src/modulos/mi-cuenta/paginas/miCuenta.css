@@ -1,26 +1,18 @@
+/* Mi perfil: tarjeta centrada en la página */
 .pagina-mi-cuenta {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  max-width: 720px;
-}
-
-.pagina-mi-cuenta h1 {
-  margin: 0;
-  font-size: 26px;
-  font-weight: 700;
-}
-
-.pagina-mi-cuenta header p {
-  margin: 4px 0 0;
-  color: #6b7280;
+  gap: 16px;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
 }
 
 .tarjeta-mi-cuenta {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 24px;
+  gap: 24px;
+  padding: 28px 24px;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   background: #ffffff;
@@ -29,32 +21,48 @@
 
 .tarjeta-mi-cuenta__perfil {
   display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.tarjeta-mi-cuenta__perfil div {
-  display: flex;
   flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
 }
 
-.tarjeta-mi-cuenta__perfil strong { font-size: 17px; }
+.tarjeta-mi-cuenta__perfil h1 {
+  margin: 6px 0 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
 .tarjeta-mi-cuenta__perfil span { color: #6b7280; }
 
 .tarjeta-mi-cuenta__avatar.p-avatar {
+  width: 72px;
+  height: 72px;
   background: var(--color-activo);
   color: var(--color-sobre-activo);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.tarjeta-mi-cuenta__bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.tarjeta-mi-cuenta__bloque h2 {
+  margin: 0;
+  font-size: 15px;
   font-weight: 600;
 }
 
 .tarjeta-mi-cuenta__datos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
   margin: 0;
-  padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
 }
 
 .tarjeta-mi-cuenta__datos dt {
@@ -71,9 +79,54 @@
 
 .tarjeta-mi-cuenta__nota {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   margin: 0;
   color: #6b7280;
   font-size: 13px;
+}
+
+.tarjeta-mi-cuenta__nota .pi { margin-top: 2px; }
+
+.tarjeta-mi-cuenta__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tarjeta-mi-cuenta__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tarjeta-mi-cuenta__campo > span {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tarjeta-mi-cuenta__campo .p-inputtext {
+  width: 100%;
+  height: 42px;
+  border-radius: 8px;
+}
+
+.tarjeta-mi-cuenta__error { color: #dc2626; }
+
+.tarjeta-mi-cuenta__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.tarjeta-mi-cuenta__acciones .boton-guardar-perfil.p-button {
+  border-color: var(--color-activo);
+  background: var(--color-activo);
+  color: var(--color-sobre-activo);
+}
+
+@media (max-width: 640px) {
+  .tarjeta-mi-cuenta { padding: 22px 16px; }
+  .tarjeta-mi-cuenta__datos { grid-template-columns: minmax(0, 1fr); }
+  .tarjeta-mi-cuenta__acciones .p-button { flex: 1 1 0; justify-content: center; }
 }

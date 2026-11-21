@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
+import { useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
-import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { useUsuarioActual } from '@/compartido/sesion/ContextoSesion';
 import { BotonVolver } from '@/compartido/componentes/BotonVolver';
@@ -18,7 +18,7 @@ export function PaginaExpediente() {
   const usuario = useUsuarioActual();
   const trabajador = useTrabajadores().find((t) => t.dni === dni);
   const documentos = useDocumentos().filter((d) => d.dni === dni);
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const [idDetalle, setIdDetalle] = useState<string | null>(null);
   const [nuevo, setNuevo] = useState<{ tipo?: TipoDocumento } | null>(null);
 
@@ -29,7 +29,6 @@ export function PaginaExpediente() {
 
   return (
     <div className="pagina-papeletas">
-      <Toast ref={aviso} position="bottom-right" />
       <BotonVolver destino="/documentos" etiqueta="Volver a expedientes" />
       <header className="pp-encabezado">
         <h1>Expediente digital</h1>

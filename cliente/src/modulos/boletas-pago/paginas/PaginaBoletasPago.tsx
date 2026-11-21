@@ -1,8 +1,8 @@
-import { useMemo, useRef, useState } from 'react';
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
+import { useMemo, useState } from 'react';
 import { useUsuarioActual } from '@/compartido/sesion/ContextoSesion';
 import { esGestor } from '@/compartido/sesion/tipos';
 import { PaginaMisBoletas } from './PaginaMisBoletas';
-import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { useBoletas } from '../aplicacion/useBoletas';
 import { repositorioBoletas } from '../aplicacion/repositorioBoletas';
@@ -34,7 +34,7 @@ export function PaginaBoletasPago() {
 function BoletasRrhh() {
   const boletas = useBoletas(repositorioBoletas);
   const { periodo, configuracion, todas, boletasVisibles, seleccion, enviar } = boletas;
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const [idDetalle, setIdDetalle] = useState<string | null>(null);
 
   // La ventana lee la boleta de la lista para reflejar los cambios recién hechos.
@@ -89,7 +89,6 @@ function BoletasRrhh() {
 
   return (
     <div className="pagina-boletas">
-      <Toast ref={aviso} position="bottom-right" />
       <ConfirmDialog />
 
       <EncabezadoBoletas

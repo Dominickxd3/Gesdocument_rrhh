@@ -1,0 +1,62 @@
+/* Pantalla breve de carga al iniciar sesión */
+.pantalla-carga {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  background: #ffffff;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+.pantalla-carga.es-saliendo { opacity: 0; }
+
+.pantalla-carga__logo {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 6px;
+  object-fit: contain;
+  animation: pantalla-carga-latido 1.2s ease-in-out infinite;
+}
+
+.pantalla-carga__titulo { font-size: 18px; }
+.pantalla-carga__texto { color: #6b7280; font-size: 14px; }
+
+.pantalla-carga__barra {
+  width: min(220px, 70vw);
+  height: 4px;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f3f4f6;
+}
+
+.pantalla-carga__barra span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: #111111;
+  transform-origin: left;
+  animation: pantalla-carga-avance 1.3s ease-out forwards;
+}
+
+@keyframes pantalla-carga-avance {
+  from { transform: scaleX(0.05); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes pantalla-carga-latido {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pantalla-carga__logo,
+  .pantalla-carga__barra span { animation: none; }
+}

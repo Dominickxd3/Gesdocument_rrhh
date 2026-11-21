@@ -1,0 +1,87 @@
+/* Avisos: tarjeta blanca compacta, con ícono de color, barra de tiempo y sombra suave. */
+.avisos.p-toast {
+  width: 360px;
+  max-width: calc(100vw - 24px);
+  opacity: 1;
+}
+
+.avisos .p-toast-message.aviso {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 10px;
+  /* !important: el tema de PrimeReact pone fondos semitransparentes por tipo. */
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px;
+  background: #ffffff !important;
+  color: #111827 !important;
+  opacity: 1;
+  backdrop-filter: none;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.12), 0 2px 6px rgb(0 0 0 / 0.06);
+}
+
+.avisos .aviso .p-toast-message-content {
+  align-items: flex-start;
+  gap: 2px;
+  padding: 12px 12px 14px 14px;
+  border: 0 !important;
+}
+
+/* Ícono en un círculo de color según el tipo */
+.avisos .aviso .p-toast-message-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 6px;
+  border-radius: 50%;
+}
+
+.avisos .aviso--success .p-toast-message-icon { background: #dcfce7; color: #15803d; }
+.avisos .aviso--info .p-toast-message-icon { background: #dbeafe; color: #1d4ed8; }
+.avisos .aviso--warn .p-toast-message-icon { background: #fef3c7; color: #b45309; }
+.avisos .aviso--error .p-toast-message-icon { background: #fee2e2; color: #b91c1c; }
+
+.avisos .aviso .p-toast-message-text { margin: 0 0 0 10px; }
+.avisos .aviso .p-toast-summary { font-size: 14px; font-weight: 600; }
+.avisos .aviso .p-toast-detail { margin: 2px 0 0; color: #4b5563; font-size: 13px; line-height: 1.35; }
+
+.avisos .aviso .p-toast-icon-close {
+  width: 26px;
+  height: 26px;
+  color: #9ca3af;
+}
+.avisos .aviso .p-toast-icon-close:hover { background: #f3f4f6; color: #374151; }
+
+/* Barra que se vacía mientras el aviso está visible */
+.avisos .aviso::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+  transform-origin: left;
+  animation: aviso-tiempo 3.2s linear forwards;
+}
+.avisos .aviso--success::after { background: #22c55e; }
+.avisos .aviso--info::after { background: #3b82f6; animation-duration: 3.6s; }
+.avisos .aviso--warn::after { background: #f59e0b; animation-duration: 4.5s; }
+.avisos .aviso--error::after { background: #ef4444; animation-duration: 6s; }
+
+@keyframes aviso-tiempo {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+/* Celular: arriba al centro, a casi todo el ancho, sin tapar los botones de abajo. */
+@media (max-width: 640px) {
+  .avisos.p-toast.p-toast-top-right {
+    top: 10px !important;
+    right: 12px !important;
+    left: 12px;
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avisos .aviso::after { animation: none; }
+}

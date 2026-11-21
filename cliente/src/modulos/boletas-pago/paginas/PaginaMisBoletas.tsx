@@ -1,7 +1,7 @@
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
 import { guardarComoPdf, nombreArchivo } from '@/compartido/documentos/guardarComoPdf';
 import { BarraFirma, useControlFirma } from '@/compartido/componentes/LienzoFirma';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Toast } from 'primereact/toast';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
@@ -29,7 +29,7 @@ type Fila = BoletaDePeriodo & { id: string };
  */
 export function PaginaMisBoletas() {
   const usuario = useUsuarioActual();
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const hoja = useRef<HTMLDivElement>(null);
   const [filas, setFilas] = useState<Fila[]>([]);
   const [configuracion, setConfiguracion] = useState<ConfiguracionBoletas | null>(null);
@@ -89,7 +89,6 @@ export function PaginaMisBoletas() {
 
   return (
     <div className="pagina-papeletas">
-      <Toast ref={aviso} position="bottom-right" />
       <header className="pp-encabezado">
         <div>
           <h1>Mis boletas</h1>

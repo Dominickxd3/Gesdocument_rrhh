@@ -1,3 +1,4 @@
+import { notificar } from '@/compartido/notificaciones/notificaciones';
 /**
  * Descarga un documento en pantalla (boleta, contrato, papeleta, memorándum) como archivo PDF,
  * sin pasar por el diálogo de impresión y sin librerías:
@@ -211,7 +212,13 @@ function armarPdf(paginas: PaginaPdf[]): Blob {
 /** Genera el PDF del elemento y lo descarga con el nombre indicado (sin extensión). */
 export async function guardarComoPdf(elemento: HTMLElement | null, nombre: string): Promise<void> {
   if (!elemento) return;
-  const pdf = armarPdf(await paginar(await dibujar(elemento)));
+  let pdf: Blob;
+  try {
+    pdf = armarPdf(await paginar(await dibujar(elemento)));
+  } catch {
+    notificar.error('No se pudo generar el PDF', 'Vuelve a intentarlo en unos segundos.');
+    return;
+  }
   const enlace = document.createElement('a');
   enlace.href = URL.createObjectURL(pdf);
   enlace.download = `${nombre}.pdf`;
@@ -219,4 +226,5 @@ export async function guardarComoPdf(elemento: HTMLElement | null, nombre: strin
   enlace.click();
   enlace.remove();
   setTimeout(() => URL.revokeObjectURL(enlace.href), 2000);
+  notificar.exito('PDF descargado', `${nombre}.pdf`);
 }

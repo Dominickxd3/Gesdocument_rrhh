@@ -1,7 +1,7 @@
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
 import { FiltroFechas, SIN_RANGO, enRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
@@ -20,7 +20,7 @@ import { TEXTO_MODALIDAD, nombreLegible, type Trabajador } from '../dominio/trab
 export function PaginaTrabajadores() {
   const trabajadores = useTrabajadores();
   const { sincronizado } = almacenTrabajadores.usar();
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const [busqueda, setBusqueda] = useState('');
   const [area, setArea] = useState<string | null>(null);
   const [fechas, setFechas] = useState<RangoFechas>(SIN_RANGO);
@@ -60,7 +60,6 @@ export function PaginaTrabajadores() {
 
   return (
     <div className="pagina-papeletas">
-      <Toast ref={aviso} position="bottom-right" />
 
       <header className="pp-encabezado">
         <div>

@@ -66,6 +66,6 @@ export const usuariosPrueba: UsuarioPrueba[] = [
     rol: 'seguridad',
     dni: '46213578',
     sede: 'Lima – Canto Bello',
-    clave: 'Mockup2026',
+    clave: 'seguridad123',
   },
 ];

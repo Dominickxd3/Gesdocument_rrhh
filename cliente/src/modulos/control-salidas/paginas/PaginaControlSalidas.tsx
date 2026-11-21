@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from 'react';
-import { Toast } from 'primereact/toast';
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
+import { useMemo, useState } from 'react';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
@@ -24,7 +24,7 @@ import './controlSalidas.css';
 export function PaginaControlSalidas() {
   const usuario = useUsuarioActual();
   const papeletas = usePapeletasCompartidas();
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const [fecha, setFecha] = useState(hoyLocal);
   const [sede, setSede] = useState<string | null>(usuario.sede ?? SEDES[0]);
   const [busqueda, setBusqueda] = useState('');
@@ -59,7 +59,6 @@ export function PaginaControlSalidas() {
 
   return (
     <div className="pagina-papeletas">
-      <Toast ref={aviso} position="bottom-right" />
       <header className="pp-encabezado">
         <div>
           <h1>Control de salidas</h1>

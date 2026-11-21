@@ -1,6 +1,6 @@
+import { useAviso } from '@/compartido/notificaciones/notificaciones';
 import { buscarTrabajador } from '@/modulos/trabajadores/aplicacion/almacenTrabajadores';
-import { useMemo, useRef, useState } from 'react';
-import { Toast } from 'primereact/toast';
+import { useMemo, useState } from 'react';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -18,7 +18,7 @@ import { VentanaMiDescanso } from '../componentes/VentanaMiDescanso';
 export function PaginaMisDescansos() {
   const usuario = useUsuarioActual();
   const todos = useListaDescansos();
-  const aviso = useRef<Toast>(null);
+  const aviso = useAviso();
   const [idDetalle, setIdDetalle] = useState<string | null>(null);
   // Formulario abierto: nuevo aviso o edición de un borrador.
   const [editando, setEditando] = useState<BorradorDescanso | 'nuevo' | null>(null);
@@ -88,7 +88,6 @@ export function PaginaMisDescansos() {
 
   return (
     <div className="pagina-papeletas pagina-descansos">
-      <Toast ref={aviso} position="bottom-right" />
       <ConfirmDialog />
 
       <header className="pp-encabezado">
