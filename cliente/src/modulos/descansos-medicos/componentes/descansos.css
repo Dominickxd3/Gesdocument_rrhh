@@ -183,3 +183,18 @@
   font-family: var(--fuente);
   font-size: 11px;
 }
+
+/* Borradores del trabajador: editables y eliminables hasta que los envía */
+.dm-borradores {
+  padding: 16px 18px;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  background: #ffffff;
+}
+.dm-borradores h2 { margin: 0; font-size: 15px; }
+.dm-borradores p { margin: 2px 0 10px; color: #6b7280; font-size: 13px; }
+.dm-borradores ul { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.dm-borradores li { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 8px; background: #f9fafb; }
+.dm-borradores li > .pi { color: #6b7280; }
+.dm-borradores li > div { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.dm-borradores small { color: #6b7280; }

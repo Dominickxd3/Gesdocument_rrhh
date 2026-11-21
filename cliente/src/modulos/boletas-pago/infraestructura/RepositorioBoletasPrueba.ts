@@ -1,6 +1,8 @@
+import { ahoraLocal } from '@/compartido/formato/fechas';
 import {
   clavePeriodo,
   type Boleta,
+  type BoletaDePeriodo,
   type ConfiguracionBoletas,
   type Periodo,
   type RepositorioBoletas,
@@ -68,7 +70,7 @@ export class RepositorioBoletasPrueba implements RepositorioBoletas {
 
   async enviar(periodo: Periodo, ids: string[]): Promise<string> {
     await esperar();
-    const fecha = new Date().toISOString();
+    const fecha = ahoraLocal();
     const pendientes = new Set(ids);
     for (const boleta of this.obtener(periodo)) {
       if (pendientes.has(boleta.id)) {
@@ -85,7 +87,29 @@ export class RepositorioBoletasPrueba implements RepositorioBoletas {
     if (boleta) {
       boleta.firma = 'pendiente';
       boleta.fechaFirma = null;
+      boleta.firmaColaborador = null;
     }
+  }
+
+  async listarBoletasDe(dni: string): Promise<BoletaDePeriodo[]> {
+    const periodos = await this.listarPeriodos();
+    return periodos.flatMap((periodo) =>
+      this.obtener(periodo)
+        .filter((b) => b.dni === dni && b.estadoEnvio === 'enviado')
+        .map((b) => ({ periodo, boleta: structuredClone(b) })),
+    );
+  }
+
+  async firmar(periodo: Periodo, id: string, firmaImagen: string): Promise<string> {
+    await esperar();
+    const fecha = ahoraLocal();
+    const boleta = this.obtener(periodo).find((b) => b.id === id);
+    if (boleta) {
+      boleta.firma = 'firmada';
+      boleta.fechaFirma = fecha;
+      boleta.firmaColaborador = firmaImagen;
+    }
+    return fecha;
   }
 
   private obtener(periodo: Periodo): Boleta[] {

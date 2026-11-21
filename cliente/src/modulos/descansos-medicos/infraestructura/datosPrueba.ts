@@ -1,3 +1,4 @@
+import { aDiaLocal, hoyLocal, noFuturo } from '@/compartido/formato/fechas';
 /**
  * Datos ficticios para el prototipo. Nombres, DNI, diagnósticos y centros médicos son inventados.
  * Semilla fija: el diseño muestra siempre lo mismo.
@@ -50,21 +51,32 @@ export const TRABAJADOR_DEMO: Trabajador = {
 };
 TRABAJADORES.push(TRABAJADOR_DEMO);
 
+/** Ficha del usuario de prueba "seguridad": también es trabajador y registra sus descansos. */
+export const TRABAJADOR_SEGURIDAD: Trabajador = {
+  dni: '46213578',
+  nombre: 'VIGO SALAS, PEDRO',
+  cargo: 'Prevencionista de Seguridad',
+  area: 'ADM GESTIÓN HUMANA',
+};
+TRABAJADORES.push(TRABAJADOR_SEGURIDAD);
+
 /** Casos del trabajador de prueba: uno observado y dos cerrados, para que vea cada situación. */
 const CASOS_DEMO = [7, 12, 21];
+/** Casos del usuario de Seguridad. */
+const CASOS_SEGURIDAD = [3, 16];
 
-export const HOY = new Date().toISOString().slice(0, 10);
+export const HOY = hoyLocal();
 
 function haceDias(dias: number) {
   const d = new Date(`${HOY}T12:00:00`);
   d.setDate(d.getDate() - dias);
-  return d.toISOString().slice(0, 10);
+  return aDiaLocal(d);
 }
 
 function masDias(iso: string, dias: number) {
   const d = new Date(`${iso}T12:00:00`);
   d.setDate(d.getDate() + dias);
-  return d.toISOString().slice(0, 10);
+  return aDiaLocal(d);
 }
 
 /** Los casos recientes muestran todos los estados abiertos; los antiguos ya están cerrados. */
@@ -122,10 +134,12 @@ export function crearDescansosPrueba(): Descanso[] {
       });
 
     const aleatorio = elegir(TRABAJADORES);
-    const trabajador = CASOS_DEMO.includes(i) ? TRABAJADOR_DEMO : aleatorio;
+    const trabajador = CASOS_DEMO.includes(i) ? TRABAJADOR_DEMO : CASOS_SEGURIDAD.includes(i) ? TRABAJADOR_SEGURIDAD : aleatorio;
     // El aviso y los sustentos los registra el propio trabajador: se muestra su nombre.
     const nombreCorto = trabajador.nombre.split(',').reverse().join(' ').trim();
     for (const h of historial) if (h.usuario === 'Trabajador') h.usuario = nombreCorto;
+    // Si el descanso empezó hoy o ayer, sus eventos no pueden figurar en días que aún no llegan.
+    for (const h of historial) h.fecha = noFuturo(h.fecha);
 
     return {
       id: `dm-${numero}`,

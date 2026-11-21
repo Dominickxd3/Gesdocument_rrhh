@@ -286,3 +286,9 @@
   margin-bottom: 4px;
   object-fit: contain;
 }
+
+/* Marco de la hoja: mide el espacio disponible y permite desplazarse si se acerca con zoom. */
+.hoja-escalable-marco {
+  width: 100%;
+  overflow-x: auto;
+}

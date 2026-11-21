@@ -771,3 +771,44 @@
 .pp-copia__fecha { font-size: 1.08em; }
 .pp-copia__fecha strong { white-space: nowrap; }
 .pp-copia__fecha .pp-copia__caja { font-size: 0.93em; }
+
+/* Vista del colaborador ("Mis papeletas") */
+.mp-motivo { display: flex; flex-direction: column; gap: 2px; }
+.mp-motivo small { color: var(--pp-gris-500); }
+.cs-col-accion { width: 1%; white-space: nowrap; text-align: right; }
+
+/* ---------- Papeleta en pantallas angostas (celular) ----------
+   Consulta de contenedor: depende del ancho de la hoja, no de la pantalla.
+   Así el PDF (generado a ancho A4) conserva el formato oficial. */
+@container (max-width: 560px) {
+  .pp-hoja__cuerpo { padding: 5cqw 4.5cqw !important; font-size: 3.1cqw !important; }
+  .pp-copia { grid-template-columns: minmax(0, 1fr) !important; grid-template-areas: 'izq' 'der' 'firmas'; row-gap: 1.2em; }
+  .pp-copia__titulo { margin-bottom: 0.8em; font-size: 1.35em; }
+  .pp-copia__datos > div { grid-template-columns: 9.5em minmax(0, 1fr) !important; }
+  .pp-copia__fecha,
+  .pp-copia__hora { grid-template-columns: 1fr 9em !important; }
+  .pp-copia__tipo-copia { align-self: flex-start; }
+  .pp-copia__firmas { gap: 1.2em; margin-top: 1.6em; }
+  .pp-copia__firmante { padding-left: 4em; font-size: 0.95em; }
+}
+@media (max-width: 640px) {
+  .pp-hoja.papel-A5,
+  .pp-hoja.papel-A4 { aspect-ratio: auto; }
+  .pp-hoja-contenedor { padding: 8px; }
+}
+
+/* Papeleta angosta: cada dato con su etiqueta arriba (como formulario), recuadros alineados
+   y el nombre del jefe junto al logo sin encimarse. */
+@container (max-width: 560px) {
+  .pp-copia__datos > div { grid-template-columns: minmax(0, 1fr) !important; align-items: start; }
+  .pp-copia__datos dt { padding: 0.7em 0 0.1em !important; color: #374151; font-size: 0.85em; }
+  .pp-copia__datos dd { padding: 0.1em 0 0.3em !important; }
+  .pp-copia__datos > div:first-child dt { padding-top: 0 !important; }
+  .pp-copia__fecha,
+  .pp-copia__duracion { font-size: 1em !important; }
+  .pp-copia__fecha,
+  .pp-copia__hora { grid-template-columns: 1fr 10em !important; }
+  .pp-copia__firmas > div { min-height: 4.4em; }
+  .pp-copia__logo { top: 0; left: 0; width: 2.2em; }
+  .pp-copia__firmante { padding-left: 2.6em !important; font-size: 0.85em !important; line-height: 1.2; }
+}

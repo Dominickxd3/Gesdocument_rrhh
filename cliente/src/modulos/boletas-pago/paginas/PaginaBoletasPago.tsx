@@ -1,4 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
+import { useUsuarioActual } from '@/compartido/sesion/ContextoSesion';
+import { esGestor } from '@/compartido/sesion/tipos';
+import { PaginaMisBoletas } from './PaginaMisBoletas';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { useBoletas } from '../aplicacion/useBoletas';
@@ -22,7 +25,13 @@ const CLASES_CONFIRMACION = {
   rejectLabel: 'Cancelar',
 };
 
+/** RR. HH. gestiona todas las boletas; el colaborador solo ve las suyas. */
 export function PaginaBoletasPago() {
+  const usuario = useUsuarioActual();
+  return esGestor(usuario) ? <BoletasRrhh /> : <PaginaMisBoletas />;
+}
+
+function BoletasRrhh() {
   const boletas = useBoletas(repositorioBoletas);
   const { periodo, configuracion, todas, boletasVisibles, seleccion, enviar } = boletas;
   const aviso = useRef<Toast>(null);

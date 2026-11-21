@@ -1,3 +1,4 @@
+import { aDiaLocal } from '@/compartido/formato/fechas';
 /**
  * Plantilla "Contrato de Trabajo por Incremento de Actividad", tomada del modelo de Gestión Humana
  * (combinación de correspondencia: NOMBRES, DNI, DIRECCIÓN, CARGO, MESES, DESDE, HASTA, SUELDO, HORARIO1, HORARIO2).
@@ -90,7 +91,7 @@ export function calcularHasta(desde: string, meses: number): string {
   const d = new Date(`${desde}T12:00:00`);
   d.setMonth(d.getMonth() + meses);
   d.setDate(d.getDate() - 1);
-  return d.toISOString().slice(0, 10);
+  return aDiaLocal(d);
 }
 
 export interface Seccion {

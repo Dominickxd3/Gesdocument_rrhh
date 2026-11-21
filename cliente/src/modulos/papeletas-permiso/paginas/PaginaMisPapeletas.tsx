@@ -1,0 +1,91 @@
+import { useMemo, useState } from 'react';
+import { Button } from 'primereact/button';
+import { Column } from 'primereact/column';
+import { useUsuarioActual } from '@/compartido/sesion/ContextoSesion';
+import { TablaListado } from '@/compartido/componentes/TablaListado';
+import { fechaLarga } from '@/compartido/almacen/crearAlmacen';
+import '@/compartido/estilos/listados';
+import '@/modulos/documentos/componentes/expediente.css';
+import { usePapeletasCompartidas } from '../aplicacion/almacenPapeletas';
+import { etiquetaTipo, puedeImprimir, type Papeleta } from '../dominio/papeleta';
+import { Horario, InsigniaEstado } from '../componentes/Insignias';
+import { VentanaMiPapeleta } from '../componentes/VentanaMiPapeleta';
+import '../componentes/papeletas.css';
+
+/** Nota del último rechazo o anulación, para que el colaborador sepa por qué. */
+const notaDe = (p: Papeleta) => [...p.historial].reverse().find((h) => h.nota)?.nota;
+
+/**
+ * Vista del colaborador (RNF01): solo sus papeletas. Las registra su jefe inmediato y las aprueba RR. HH.;
+ * aquí ve en qué estado están e imprime las aprobadas.
+ */
+export function PaginaMisPapeletas() {
+  const usuario = useUsuarioActual();
+  const papeletas = usePapeletasCompartidas();
+  const [aImprimir, setAImprimir] = useState<Papeleta | null>(null);
+
+  const mias = useMemo(
+    () => papeletas.filter((p) => p.trabajador.dni === usuario.dni).sort((a, b) => b.fecha.localeCompare(a.fecha) || b.numero - a.numero),
+    [papeletas, usuario.dni],
+  );
+
+  const accion = (p: Papeleta) =>
+    puedeImprimir(p) ? (
+      <Button
+        label="Ver papeleta"
+        icon="pi pi-eye"
+        size="small"
+        outlined
+        className="pp-boton-secundario"
+        onClick={(e) => {
+          e.stopPropagation();
+          setAImprimir(p);
+        }}
+      />
+    ) : null;
+
+  return (
+    <div className="pagina-papeletas">
+      <header className="pp-encabezado">
+        <div>
+          <h1>Mis papeletas</h1>
+          <p className="dm-subtitulo">Tu jefe inmediato registra la papeleta y RR. HH. la aprueba. Las aprobadas se muestran en vigilancia al salir.</p>
+        </div>
+      </header>
+
+      <TablaListado
+        datos={mias}
+        clave="id"
+        nombrePlural="papeletas"
+        vacio="Aún no tienes papeletas de permiso."
+        alAbrir={(p) => puedeImprimir(p) && setAImprimir(p)}
+      >
+        <Column header="N°" body={(p: Papeleta) => <strong>{p.numero}</strong>} className="pp-col-fecha" />
+        <Column header="Fecha" body={(p: Papeleta) => fechaLarga(p.fecha)} />
+        <Column
+          header="Motivo"
+          body={(p: Papeleta) => (
+            <div className="mp-motivo">
+              <span>{p.motivo}</span>
+              <small>{etiquetaTipo(p.tipo)}</small>
+            </div>
+          )}
+        />
+        <Column header="Horario" body={(p: Papeleta) => <Horario papeleta={p} />} />
+        <Column
+          header="Estado"
+          body={(p: Papeleta) => (
+            <div className="mp-motivo">
+              <InsigniaEstado estado={p.estado} />
+              {(p.estado === 'rechazada' || p.estado === 'anulada') && notaDe(p) && <small>{notaDe(p)}</small>}
+            </div>
+          )}
+          className="pp-col-estado"
+        />
+        <Column body={accion} className="cs-col-accion" />
+      </TablaListado>
+
+      <VentanaMiPapeleta papeleta={aImprimir} alCerrar={() => setAImprimir(null)} />
+    </div>
+  );
+}

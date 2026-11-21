@@ -3,6 +3,8 @@ import { usuariosPrueba } from './usuariosPrueba';
 
 const DEMORA_SIMULADA_MS = 400;
 
+const aSesion = ({ id, nombre, correo, cargo, rol, dni, sede }: (typeof usuariosPrueba)[number]): UsuarioSesion => ({ id, nombre, correo, cargo, rol, dni, sede });
+
 /**
  * Validación local para el mockup: compara contra `usuariosPrueba`, sin servidor.
  * Acepta el nombre de usuario o el correo. Para producción se reemplaza por una
@@ -20,7 +22,11 @@ export class ServicioAutenticacionLocal implements ServicioAutenticacion {
     );
     if (!encontrado) throw new ErrorCredenciales();
 
-    const { id, nombre, correo, cargo, rol, dni } = encontrado;
-    return { id, nombre, correo, cargo, rol, dni };
+    return aSesion(encontrado);
+  }
+
+  actualizarSesion(usuario: UsuarioSesion): UsuarioSesion | null {
+    const encontrado = usuariosPrueba.find((prueba) => prueba.id === usuario.id);
+    return encontrado ? aSesion(encontrado) : null;
   }
 }

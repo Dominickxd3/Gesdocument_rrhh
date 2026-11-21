@@ -102,7 +102,7 @@ export function TablaPapeletas({
 
   return (
     <div className="pp-tarjeta-tabla" ref={ref}>
-      <DataTable
+      <DataTable responsiveLayout="stack" breakpoint="900px"
         value={papeletas}
         dataKey="id"
         selectionMode="checkbox"

@@ -1,5 +1,6 @@
+import { LienzoFirma, type ControlFirma } from '@/compartido/componentes/LienzoFirma';
 import { totalDescuentos, totalIngresos, netoAPagar, type Boleta, type ConceptoBoleta, type Empresa } from '../dominio/boleta';
-import { formatearFechaHora, formatearNumeroBoleta as numero } from '../aplicacion/formato';
+import { formatearNumeroBoleta as numero } from '../aplicacion/formato';
 import { HojaEscalable } from './HojaEscalable';
 import { TrazoFirma } from './TrazoFirma';
 
@@ -8,6 +9,9 @@ interface PropiedadesBoletaDocumento {
   empresa: Empresa;
   /** Imagen configurada en "Configuración de boletas"; null si aún no se subió. */
   firmaEmpleador: string | null;
+  /** Colaborador firmando: su espacio de firma es el lugar donde dibuja. */
+  controlFirma?: ControlFirma;
+  zoom?: number;
 }
 
 interface GrupoConceptos {
@@ -20,7 +24,7 @@ interface GrupoConceptos {
  * Boleta de pago con la misma estructura que el PDF oficial de la web existente
  * (backend/src/pdf/pdf.service.ts): cuadrícula con bordes, grupos 01–04 y firmas al pie.
  */
-export function BoletaDocumento({ boleta, empresa, firmaEmpleador }: PropiedadesBoletaDocumento) {
+export function BoletaDocumento({ boleta, empresa, firmaEmpleador, controlFirma, zoom }: PropiedadesBoletaDocumento) {
   const { detalle } = boleta;
   const grupos: GrupoConceptos[] = [
     { titulo: '01 Ingresos', conceptos: detalle.ingresos, columna: 'ingresos' },
@@ -29,7 +33,7 @@ export function BoletaDocumento({ boleta, empresa, firmaEmpleador }: Propiedades
   ];
 
   return (
-    <HojaEscalable>
+    <HojaEscalable zoom={zoom}>
       <article className="boleta-pdf" aria-label={`Boleta de pago de ${boleta.trabajador}`}>
         <header className="boleta-pdf__encabezado">
           <img src="/logo-boleta.png" alt="" className="boleta-pdf__logo" />
@@ -175,8 +179,12 @@ export function BoletaDocumento({ boleta, empresa, firmaEmpleador }: Propiedades
           </div>
           <div className="firma-pdf">
             <div className="firma-pdf__imagen">
-              {boleta.fechaFirma ? (
+              {boleta.firmaColaborador ? (
+                <img src={boleta.firmaColaborador} alt={`Firma de ${boleta.trabajador}`} className="firma-pdf__imagen-empleador" />
+              ) : boleta.fechaFirma ? (
                 <TrazoFirma etiqueta={`Firma de ${boleta.trabajador}`} />
+              ) : controlFirma ? (
+                <LienzoFirma control={controlFirma} />
               ) : (
                 <span className="firma-pdf__pendiente">Pendiente de firma</span>
               )}
@@ -184,9 +192,6 @@ export function BoletaDocumento({ boleta, empresa, firmaEmpleador }: Propiedades
             <strong>{boleta.trabajador}</strong>
             <span>DNI: {boleta.dni}</span>
             <span className="negrita">Colaborador</span>
-            {boleta.fechaFirma && (
-              <span className="firma-pdf__fecha">Firmado el {formatearFechaHora(boleta.fechaFirma)}</span>
-            )}
           </div>
         </footer>
 

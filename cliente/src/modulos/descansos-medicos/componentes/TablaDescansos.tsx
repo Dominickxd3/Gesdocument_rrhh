@@ -47,7 +47,7 @@ export function TablaDescansos({ descansos, alAbrir, alLimpiarFiltros }: Propied
 
   return (
     <div className="pp-tarjeta-tabla" ref={ref}>
-      <DataTable
+      <DataTable responsiveLayout="stack" breakpoint="900px"
         value={descansos}
         dataKey="id"
         onRowClick={(e) => alAbrir(e.data as Descanso)}

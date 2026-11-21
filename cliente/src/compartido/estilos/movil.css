@@ -1,0 +1,140 @@
+/*
+ * Ajustes para celulares (cualquier ancho desde 320 px).
+ * Muchos trabajadores usarán la plataforma solo desde el teléfono: aquí se reacomodan
+ * tablas, pestañas, encabezados, ventanas y la barra de firma para pantallas angostas.
+ */
+
+/* Tablas como tarjetas en celulares y tablets verticales (DataTable breakpoint="900px"). */
+@media (max-width: 900px) {
+  /* ---------- Tablas: cada fila se vuelve una tarjeta (DataTable responsiveLayout="stack") ---------- */
+  .pp-tabla .p-datatable-thead { display: none; }
+  /* La tabla y sus celdas se ajustan al ancho de la tarjeta (nada se sale por la derecha). */
+  .pp-tabla .p-datatable-table { width: 100% !important; min-width: 0 !important; table-layout: fixed; }
+  .pp-tabla .p-datatable-wrapper { overflow-x: hidden !important; }
+  .pp-tabla .p-datatable-tbody > tr > td > * { min-width: 0 !important; max-width: 100%; overflow-wrap: anywhere; }
+  .pp-tabla .pp-trabajador { min-width: 0 !important; }
+
+  .pp-tabla .p-datatable-tbody > tr {
+    display: block;
+    padding: 12px 14px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .pp-tabla .p-datatable-tbody > tr > td {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 4px 0 !important;
+    border: 0 !important;
+    text-align: right;
+    white-space: normal;
+  }
+
+  .pp-tabla .p-datatable-tbody > tr > td > .p-column-title {
+    flex-shrink: 0;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: left;
+  }
+
+  /* El primer dato de la tarjeta (N°, trabajador, periodo) va como título, sin etiqueta. */
+  .pp-tabla .p-datatable-tbody > tr > td:first-child { justify-content: flex-start !important; padding-bottom: 6px !important; font-size: 15px; text-align: left; }
+  .pp-tabla .p-datatable-tbody > tr > td:first-child > .p-column-title { display: none !important; }
+  /* Tablas con casilla de selección: el título es la segunda celda. */
+  .pp-tabla .p-datatable-tbody > tr > td.p-selection-column + td > .p-column-title { display: none !important; }
+
+  /* Columnas sin título (flecha, acciones): la acción ocupa el ancho, la flecha sobra. */
+  .pp-tabla .p-datatable-tbody > tr > td.dm-col-flecha { display: none !important; }
+  .pp-tabla .p-datatable-tbody > tr > td.cs-col-accion { justify-content: stretch !important; padding-top: 8px !important; }
+  .pp-tabla .cs-col-accion .p-button { width: 100%; justify-content: center; }
+  .pp-tabla .p-datatable-tbody > tr > td.p-selection-column { justify-content: flex-start; }
+
+  /* Mensaje de lista vacía: centrado como en escritorio. */
+  .pp-tabla .p-datatable-tbody > tr.p-datatable-emptymessage > td { justify-content: center !important; padding: 20px 0 !important; text-align: center; }
+  .pp-tabla .p-datatable-tbody > tr.p-datatable-emptymessage { border-bottom: 0; }
+  /* La tarjeta mide lo que su contenido; no se estira hasta el fondo de la pantalla. */
+  .pp-tarjeta-tabla,
+  .pp-tarjeta-tabla .pp-tabla { flex: none !important; }
+  .pagina-papeletas { min-height: 0; }
+
+  .pp-paginacion { flex-wrap: wrap; gap: 4px 12px; padding: 10px 12px; font-size: 13px; }
+
+}
+
+@media (max-width: 640px) {
+  /* ---------- Encabezados y filtros ---------- */
+  .pp-encabezado { flex-wrap: wrap; gap: 12px; }
+  .pp-encabezado h1 { font-size: 22px; }
+  .pp-encabezado__acciones { flex-wrap: wrap; width: 100%; }
+  .pp-encabezado__acciones .p-button { flex: 1 1 auto; justify-content: center; }
+  .pp-filtros__fila { flex-wrap: wrap; }
+  .pp-filtros__fila > * { flex: 1 1 100% !important; width: 100% !important; min-width: 0 !important; }
+
+  /* ---------- Mi expediente: las cuatro secciones caben sin desplazarse ---------- */
+  .mi-expediente__encabezado h1 { font-size: 22px; }
+  .mi-expediente__encabezado p { font-size: 13px; }
+  .mi-expediente__pestanas { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+  .mi-expediente__pestana {
+    position: relative;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 2px 10px;
+    font-size: 11.5px;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+  }
+  .mi-expediente__pestana .pi { font-size: 17px; }
+  .mi-expediente__pendientes { position: absolute; top: 2px; left: calc(50% + 6px); min-width: 17px; height: 17px; padding: 0 4px; font-size: 10px; }
+
+  /* ---------- Ventanas: ocupan toda la pantalla ---------- */
+  .p-dialog.pp-ventana,
+  .p-dialog.ventana-boleta,
+  .p-dialog.pp-panel {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+  .p-dialog .p-dialog-content { padding: 14px 16px; }
+  .p-dialog .p-dialog-header { padding: 14px 16px; }
+  .p-dialog .p-dialog-footer { padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
+  /* Botones del pie en una sola fila: el principal se estira, los demás ocupan lo justo. */
+  .pp-ventana__pie,
+  .ventana-boleta__pie { flex-wrap: nowrap; gap: 8px; }
+  .pp-ventana__pie .p-button,
+  .ventana-boleta__pie .p-button { flex: 0 0 auto; justify-content: center; padding-inline: 12px; }
+  .pp-ventana__pie .p-button:last-of-type,
+  .ventana-boleta__pie .p-button:last-of-type { flex: 1 1 auto; min-width: 0; }
+  .pp-ventana__pie .pp-espaciador { display: none; }
+  /* Con tres botones: el principal arriba a todo el ancho y los otros dos debajo, a medias. */
+  .pp-ventana__pie:has(> button:nth-of-type(3)) { flex-wrap: wrap; }
+  .pp-ventana__pie:has(> button:nth-of-type(3)) > button { flex: 1 1 0; }
+  .pp-ventana__pie:has(> button:nth-of-type(3)) > button:last-of-type { order: -1; flex: 1 1 100%; }
+
+  /* ---------- Barra de firma: entra en pantallas de 320 px ---------- */
+  .barra-firma { width: 100%; }
+  .barra-firma__ayuda { white-space: normal; text-align: center; font-size: 11px; }
+  .barra-firma__botones { gap: 0; padding: 4px; }
+  .barra-firma__botones button { width: 34px; height: 38px; }
+  .barra-firma__botones .barra-firma__enviar { width: 40px; height: 40px; }
+  .barra-firma__separador { margin: 0 2px; }
+  .lienzo-firma { max-width: none; }
+
+  /* ---------- Documentos legales y hojas ---------- */
+  .dm-visor { padding: 8px !important; }
+  .doc-hoja { padding: 20px 16px !important; }
+  .doc-firmas { grid-template-columns: 1fr !important; gap: 28px; }
+}
+
+@media (max-width: 360px) {
+  .contenido-principal { padding-left: 12px !important; padding-right: 12px !important; }
+  .mi-expediente__pestana { font-size: 10.5px; }
+}

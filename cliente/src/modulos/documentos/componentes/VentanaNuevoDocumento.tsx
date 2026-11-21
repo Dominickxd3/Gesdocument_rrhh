@@ -21,12 +21,14 @@ import { CamposContrato, contratoCompleto, contratoInicial, type FormularioContr
 interface Propiedades {
   visible: boolean;
   dniInicial?: string;
+  /** Tipo con el que se abre (p. ej. al preparar un documento faltante del expediente). */
+  tipoInicial?: TipoDocumento;
   alCerrar: () => void;
   alCrear: (datos: Pick<Documento, 'dni' | 'trabajador' | 'tipo' | 'origen' | 'adenda' | 'contrato'>, enviar: boolean) => void;
 }
 
 /** CUS42 generar desde plantilla / CUS43 cargar y clasificar un documento del trabajador. */
-export function VentanaNuevoDocumento({ visible, dniInicial, alCerrar, alCrear }: Propiedades) {
+export function VentanaNuevoDocumento({ visible, dniInicial, tipoInicial, alCerrar, alCrear }: Propiedades) {
   const trabajadores = useTrabajadores();
   const [dni, setDni] = useState<string | null>(null);
   const [tipo, setTipo] = useState<TipoDocumento>('contrato');
@@ -45,7 +47,7 @@ export function VentanaNuevoDocumento({ visible, dniInicial, alCerrar, alCrear }
   useEffect(() => {
     if (!visible) return;
     setDni(dniInicial ?? null);
-    setTipo('contrato');
+    setTipo(tipoInicial ?? 'contrato');
     setOrigen('plantilla');
     setArchivo(null);
     setCargoNuevo('');
@@ -54,7 +56,7 @@ export function VentanaNuevoDocumento({ visible, dniInicial, alCerrar, alCrear }
     setEspeciales([]);
     setMotivo('cambio');
     setFechaFirma(hoyIso());
-  }, [visible, dniInicial]);
+  }, [visible, dniInicial, tipoInicial]);
 
   const trabajador = trabajadores.find((t) => t.dni === dni);
 

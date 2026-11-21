@@ -182,7 +182,7 @@ function VentanaFicha({ trabajador: t, alCerrar, alEditar }: { trabajador: Traba
           </section>
           <footer className="pp-panel__pie">
             <div className="pp-panel__decision">
-              <Button label="Ver expediente" icon="pi pi-folder-open" outlined className="pp-boton-secundario" onClick={() => navegar(`/documentos?dni=${t.dni}`)} />
+              <Button label="Ver expediente" icon="pi pi-folder-open" outlined className="pp-boton-secundario" onClick={() => navegar(`/documentos/expediente/${t.dni}`)} />
               <Button label="Editar" icon="pi pi-pencil" className="pp-boton-principal" onClick={() => alEditar(t.dni)} />
             </div>
           </footer>

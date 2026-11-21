@@ -6,9 +6,13 @@ import { pendientesDe } from '@/aplicacion/pendientes';
 import '@/compartido/estilos/listados';
 
 const ACCESOS_TRABAJADOR = [
-  { ruta: '/boletas-pago', icono: 'pi pi-wallet', titulo: 'Boletas de pago', detalle: 'Revisa y firma tus boletas' },
+  { ruta: '/mi-expediente', icono: 'pi pi-folder-open', titulo: 'Mi expediente', detalle: 'Documentos, boletas, descansos y memorándums' },
+  { ruta: '/mi-expediente/boletas', icono: 'pi pi-wallet', titulo: 'Boletas de pago', detalle: 'Revisa y firma tus boletas' },
   { ruta: '/papeletas-permiso', icono: 'pi pi-clock', titulo: 'Papeletas de permiso', detalle: 'Tus salidas durante la jornada' },
 ];
+
+/** Permiso adicional del trabajador con cargo de Seguridad. */
+const ACCESO_SEGURIDAD = { ruta: '/control-salidas', icono: 'pi pi-shield', titulo: 'Control de salidas', detalle: 'Papeletas autorizadas de hoy' };
 
 const ACCESOS_RRHH = [
   { ruta: '/trabajadores', icono: 'pi pi-users', titulo: 'Trabajadores', detalle: 'Fichas, jefaturas y expedientes' },
@@ -24,7 +28,7 @@ export function PaginaInicio() {
   useContador('/documentos', usuario);
   const pendientes = pendientesDe(usuario);
   const conPendientes = pendientes.filter((p) => p.cantidad > 0);
-  const accesos = esGestor(usuario) ? ACCESOS_RRHH : ACCESOS_TRABAJADOR;
+  const accesos = esGestor(usuario) ? ACCESOS_RRHH : usuario.rol === 'seguridad' ? [ACCESO_SEGURIDAD, ...ACCESOS_TRABAJADOR] : ACCESOS_TRABAJADOR;
   const nombre = usuario.nombre.split(' ')[0];
 
   return (

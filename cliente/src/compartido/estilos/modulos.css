@@ -30,6 +30,7 @@
 .doc-hoja__firmas > div { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .doc-hoja__firmas span { width: 100%; border-top: 1px solid #111; }
 .doc-hoja__firmado { color: #15803d; font-weight: 700; }
+.doc-hoja__firma-imagen { display: block; max-width: 180px; max-height: 64px; margin: 0 auto; }
 
 /* Inicio */
 .inicio { display: flex; flex-direction: column; gap: 24px; max-width: 980px; }
@@ -220,3 +221,8 @@ span.doc-firma-trabajador svg { display: block; width: 100%; height: auto; }
 .pp-filtros__fila .filtro-fechas { flex: 0 1 230px; }
 .pp-filtros__fila .pp-filtros__busqueda { flex: 1 1 160px; min-width: 160px; }
 .pp-filtros__fila .filtro-fechas { flex: 0 1 220px; }
+
+/* Firma del trabajador dentro del documento */
+.doc-firmar__ayuda { color: #2563eb; font-size: 13px; }
+.doc-firma-archivo { display: flex; flex-direction: column; align-items: center; gap: 4px; max-width: 320px; margin: 16px auto 0; text-align: center; }
+.doc-firma-archivo .doc-firmas__linea { display: block; width: 100%; border-top: 1px solid #000; }

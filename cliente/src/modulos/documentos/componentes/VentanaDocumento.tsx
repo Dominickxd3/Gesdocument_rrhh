@@ -7,7 +7,6 @@ import { BotonArchivo } from '@/compartido/componentes/BotonArchivo';
 import { momento } from '@/compartido/almacen/crearAlmacen';
 import { infoEstado, etiquetaTipo, ultimoEvento, type Documento, type EventoDocumento } from '../dominio/documento';
 import { VistaDocumento } from './VistaDocumento';
-import { PadFirma } from '@/compartido/componentes/PadFirma';
 
 const ACCIONES: Record<EventoDocumento['accion'], { texto: string; icono: string }> = {
   creado: { texto: 'preparó el documento', icono: 'pi pi-file' },
@@ -147,7 +146,7 @@ export function VentanaDocumento({ documento: d, modo, alCerrar, ...acciones }: 
               <Checkbox checked={acepto} onChange={(e) => setAcepto(!!e.checked)} />
               <span>
                 <strong>Leí el documento y estoy de acuerdo</strong>
-                <small>Tu firma electrónica quedará registrada con fecha y hora.</small>
+                <small>Al firmar, dibujarás tu firma sobre tu línea en el documento.</small>
               </span>
             </label>
             <div className="pp-panel__decision">
@@ -158,7 +157,8 @@ export function VentanaDocumento({ documento: d, modo, alCerrar, ...acciones }: 
         )}
       </div>
       <VistaDocumento documento={d} visible={viendo} alCerrar={() => setViendo(false)} />
-      <PadFirma
+      <VistaDocumento
+        documento={d}
         visible={firmando}
         alCerrar={() => setFirmando(false)}
         alFirmar={(imagen) => {

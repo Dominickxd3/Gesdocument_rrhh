@@ -27,7 +27,14 @@ interface Propiedades {
   modo: 'trabajador' | 'rrhh';
   trabajadorFijo?: Trabajador;
   alCerrar: () => void;
+  /** Enviar (trabajador) o registrar (RR. HH.). La página pide confirmación antes de enviar. */
   alGuardar: (datos: DatosAviso) => void;
+  /** Solo trabajador: datos de un borrador que está editando. */
+  inicial?: DatosAviso;
+  /** Solo trabajador: guardar sin enviar, para corregirlo después. */
+  alGuardarBorrador?: (datos: DatosAviso) => void;
+  /** Solo trabajador, editando un borrador: eliminarlo. */
+  alEliminarBorrador?: () => void;
 }
 
 const VACIO: DatosAviso = {
@@ -79,16 +86,16 @@ function Adjunto({ etiqueta, obligatorio, archivo, alElegir, alQuitar }: {
 }
 
 /** CUS19 + CUS20: registrar el aviso de ausencia y, si ya los tiene, los sustentos. */
-export function VentanaRegistro({ visible, modo, trabajadorFijo, alCerrar, alGuardar }: Propiedades) {
+export function VentanaRegistro({ visible, modo, trabajadorFijo, alCerrar, alGuardar, inicial, alGuardarBorrador, alEliminarBorrador }: Propiedades) {
   const [datos, setDatos] = useState<DatosAviso>(VACIO);
   const [intentado, setIntentado] = useState(false);
   const esTrabajador = modo === 'trabajador';
 
   useEffect(() => {
     if (!visible) return;
-    setDatos({ ...VACIO, trabajador: trabajadorFijo ?? VACIO.trabajador });
+    setDatos(inicial ?? { ...VACIO, trabajador: trabajadorFijo ?? VACIO.trabajador });
     setIntentado(false);
-  }, [visible, trabajadorFijo]);
+  }, [visible, trabajadorFijo, inicial]);
 
   const cambiar = (c: Partial<DatosAviso>) => setDatos((d) => ({ ...d, ...c }));
   const errores = validarAviso(datos);
@@ -113,14 +120,21 @@ export function VentanaRegistro({ visible, modo, trabajadorFijo, alCerrar, alGua
     <Dialog
       visible={visible}
       onHide={alCerrar}
-      header={esTrabajador ? 'Avisar ausencia por descanso médico' : 'Registrar aviso recibido'}
+      header={esTrabajador ? (inicial ? 'Editar borrador de aviso' : 'Avisar ausencia por descanso médico') : 'Registrar aviso recibido'}
       className="pp-ventana"
       style={{ width: '680px' }}
       breakpoints={{ '720px': '100vw' }}
       draggable={false}
       footer={
         <div className="pp-ventana__pie">
+          {alEliminarBorrador && (
+            <Button label="Eliminar" icon="pi pi-trash" text severity="danger" onClick={alEliminarBorrador} />
+          )}
+          <span className="pp-espaciador" />
           <Button label="Cancelar" text onClick={alCerrar} />
+          {esTrabajador && alGuardarBorrador && (
+            <Button label="Guardar borrador" icon="pi pi-save" outlined className="pp-boton-secundario" onClick={() => alGuardarBorrador(datos)} />
+          )}
           <Button
             label={esTrabajador ? (conCertificado ? 'Enviar a RR. HH.' : 'Enviar aviso') : 'Registrar aviso'}
             icon="pi pi-check"

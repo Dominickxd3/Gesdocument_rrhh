@@ -49,21 +49,21 @@ export function pendientesDe(usuario: UsuarioSesion): Pendiente[] {
 
   return [
     {
-      ruta: '/documentos',
+      ruta: '/mi-expediente/documentos',
       icono: 'pi pi-pencil',
       titulo: 'Documentos por firmar',
       detalle: 'Contratos, adendas y cargos enviados por RR. HH.',
       cantidad: documentos.filter((d) => d.dni === usuario.dni && d.estado === 'pendiente_firma').length,
     },
     {
-      ruta: '/descansos-medicos',
+      ruta: '/mi-expediente/descansos-medicos',
       icono: 'pi pi-heart',
       titulo: 'Descansos médicos por completar',
       detalle: 'Falta subir o corregir tu certificado',
       cantidad: descansos.filter((d) => d.trabajador.dni === usuario.dni && (d.estado === 'aviso' || d.estado === 'observado')).length,
     },
     {
-      ruta: '/incidencias',
+      ruta: '/mi-expediente/memorandums',
       icono: 'pi pi-inbox',
       titulo: 'Memorándums por recibir',
       detalle: 'Firma la recepción',
@@ -72,6 +72,7 @@ export function pendientesDe(usuario: UsuarioSesion): Pendiente[] {
   ];
 }
 
-for (const ruta of ['/descansos-medicos', '/documentos', '/incidencias']) {
+// Rutas de RR. HH. y de las secciones de "Mi expediente" del trabajador.
+for (const ruta of ['/descansos-medicos', '/documentos', '/incidencias', '/mi-expediente/documentos', '/mi-expediente/descansos-medicos', '/mi-expediente/memorandums']) {
   registrarContador(ruta, (usuario) => pendientesDe(usuario).find((p) => p.ruta === ruta)?.cantidad ?? 0);
 }

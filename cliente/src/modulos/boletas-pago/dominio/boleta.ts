@@ -75,6 +75,8 @@ export interface Boleta {
   detalle: DetalleBoleta;
   firma: EstadoFirma;
   fechaFirma: string | null;
+  /** Firma que el colaborador dibujó en la plataforma (PNG, data URL). */
+  firmaColaborador?: string | null;
   estadoEnvio: EstadoEnvio;
   fechaEnvio: string | null;
 }
@@ -157,4 +159,13 @@ export interface RepositorioBoletas {
   enviar(periodo: Periodo, ids: string[]): Promise<string>;
   /** Borra la firma: la boleta vuelve a quedar pendiente y el colaborador debe firmar de nuevo. */
   revertirFirma(periodo: Periodo, id: string): Promise<void>;
+  /** Vista del colaborador: solo sus boletas ya enviadas, de todos los periodos (RNF01). */
+  listarBoletasDe(dni: string): Promise<BoletaDePeriodo[]>;
+  /** El colaborador firma su boleta con la firma que dibujó y devuelve la fecha registrada. */
+  firmar(periodo: Periodo, id: string, firmaImagen: string): Promise<string>;
+}
+
+export interface BoletaDePeriodo {
+  periodo: Periodo;
+  boleta: Boleta;
 }

@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { BarraFirma, LienzoFirma, useControlFirma } from '@/compartido/componentes/LienzoFirma';
+import { useEffect, useRef, useState } from 'react';
+import { guardarComoPdf, nombreArchivo } from '@/compartido/documentos/guardarComoPdf';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -14,8 +16,30 @@ import { nombreLegible } from '@/modulos/trabajadores/dominio/trabajador';
 import { MEDIDAS, TEXTO_ACTUACION, infoEstado, textoMemorandum, type Incidencia } from '../dominio/incidencia';
 
 /** Documento del memorándum (vista previa e impresión). */
-export function VistaMemorandum({ incidencia: i, visible, alCerrar }: { incidencia: Incidencia | null; visible: boolean; alCerrar: () => void }) {
+export function VistaMemorandum({
+  incidencia: i,
+  visible,
+  alCerrar,
+  alFirmar,
+}: {
+  incidencia: Incidencia | null;
+  visible: boolean;
+  alCerrar: () => void;
+  /** Trabajador firmando la recepción: dibuja su firma sobre su línea del memorándum. */
+  alFirmar?: (imagen: string) => void;
+}) {
   const firma = i?.actuaciones.find((a) => a.tipo === 'firma');
+  const firmando = !!alFirmar && !firma;
+  const visor = useRef<HTMLDivElement>(null);
+  const control = useControlFirma();
+  const { borrar } = control;
+  const [zoom, setZoom] = useState(1);
+  useEffect(() => {
+    if (visible) {
+      borrar();
+      setZoom(1);
+    }
+  }, [visible, borrar]);
   return (
     <Dialog
       visible={visible && !!i?.memorandum}
@@ -27,14 +51,26 @@ export function VistaMemorandum({ incidencia: i, visible, alCerrar }: { incidenc
       draggable={false}
       footer={
         <div className="pp-ventana__pie">
-          <Button label="Imprimir" icon="pi pi-print" text onClick={() => window.print()} />
+          {!firmando && i && (
+            <Button
+              label="Descargar PDF"
+              icon="pi pi-download"
+              outlined
+              className="pp-boton-secundario"
+              onClick={() => void guardarComoPdf(visor.current, nombreArchivo('Memorándum', `N° ${String(i.numero).padStart(4, '0')}`, i.trabajador))}
+            />
+          )}
           <span className="pp-espaciador" />
-          <Button label="Cerrar" className="pp-boton-principal" onClick={alCerrar} />
+          {firmando ? (
+            <Button label="Cancelar" text onClick={alCerrar} />
+          ) : (
+            <Button label="Cerrar" className="pp-boton-principal" onClick={alCerrar} />
+          )}
         </div>
       }
     >
       {i?.memorandum && (
-        <div className="dm-visor">
+        <div className="dm-visor" style={{ zoom }} ref={visor}>
           <article className="doc-hoja">
             <header>
               <img src="/isotipo-empresa.png" alt="" />
@@ -61,12 +97,31 @@ export function VistaMemorandum({ incidencia: i, visible, alCerrar }: { incidenc
                 Jefatura de Gestión Humana
               </div>
               <div>
-                {firma ? <em className="doc-hoja__firmado">Recibido y firmado · {momento(firma.fecha)}</em> : <span />}
+                {firma?.firmaImagen ? (
+                  <img src={firma.firmaImagen} alt={`Firma de ${nombreLegible(i.trabajador)}`} className="doc-hoja__firma-imagen" />
+                ) : firma ? (
+                  <em className="doc-hoja__firmado">Recibido y firmado</em>
+                ) : firmando ? (
+                  <LienzoFirma control={control} />
+                ) : (
+                  <span />
+                )}
                 {nombreLegible(i.trabajador)}
               </div>
             </div>
           </article>
         </div>
+      )}
+      {firmando && i?.memorandum && (
+        <BarraFirma
+          control={control}
+          zoom={zoom}
+          alCambiarZoom={setZoom}
+          alEnviar={() => {
+            const imagen = control.imagen();
+            if (imagen) alFirmar?.(imagen);
+          }}
+        />
       )}
     </Dialog>
   );
@@ -79,13 +134,14 @@ interface PropiedadesDetalle {
   alActuacion?: (i: Incidencia) => void;
   alCerrarSinMemo?: (i: Incidencia) => void;
   alEmitir?: (i: Incidencia) => void;
-  alFirmar?: (i: Incidencia) => void;
+  alFirmar?: (i: Incidencia, imagen: string) => void;
 }
 
 /** Detalle de la incidencia (RR. HH.) o del memorándum (trabajador), en ventana centrada. */
 export function VentanaIncidencia({ incidencia: i, modo, alCerrar, ...acciones }: PropiedadesDetalle) {
   const [viendo, setViendo] = useState(false);
   const [acepto, setAcepto] = useState(false);
+  const [firmando, setFirmando] = useState(false);
   if (!i) return null;
 
   const estado = infoEstado(i.estado);
@@ -226,11 +282,20 @@ export function VentanaIncidencia({ incidencia: i, modo, alCerrar, ...acciones }
                 <small>Firmar la recepción no significa estar de acuerdo con la medida.</small>
               </span>
             </label>
-            <Button label="Firmar recepción" icon="pi pi-pencil" className="pp-boton-aprobar dm-boton-ancho" disabled={!acepto} onClick={() => acciones.alFirmar?.(i)} />
+            <Button label="Firmar recepción" icon="pi pi-pencil" className="pp-boton-aprobar dm-boton-ancho" disabled={!acepto} onClick={() => setFirmando(true)} />
           </footer>
         )}
       </div>
       <VistaMemorandum incidencia={i} visible={viendo} alCerrar={() => setViendo(false)} />
+      <VistaMemorandum
+        incidencia={i}
+        visible={firmando}
+        alCerrar={() => setFirmando(false)}
+        alFirmar={(imagen) => {
+          setFirmando(false);
+          acciones.alFirmar?.(i, imagen);
+        }}
+      />
     </Dialog>
   );
 }

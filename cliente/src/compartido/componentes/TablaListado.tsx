@@ -39,7 +39,7 @@ export function TablaListado<T extends object>({
 
   return (
     <div className="pp-tarjeta-tabla" ref={ref}>
-      <DataTable
+      <DataTable responsiveLayout="stack" breakpoint="900px"
         value={datos as DataTableValueArray}
         dataKey={clave}
         onRowClick={alAbrir ? (e) => alAbrir(e.data as T) : undefined}

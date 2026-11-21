@@ -22,25 +22,43 @@ export interface GrupoNavegacion {
 }
 
 const GESTORES: Rol[] = ['rrhh', 'administrador'];
+/** Todos los usuarios. Seguridad es un trabajador más, con el permiso adicional de Control de salidas. */
+const PERSONAL: Rol[] = ['trabajador', 'rrhh', 'administrador', 'seguridad'];
+/** Quienes ven solo sus propios datos (RNF01). */
+const TRABAJADORES: Rol[] = ['trabajador', 'seguridad'];
 
 export const gruposNavegacion: GrupoNavegacion[] = [
   {
     titulo: 'Espacio de trabajo',
     elementos: [
-      { etiqueta: 'Inicio', ruta: '/inicio', icono: 'pi pi-home' },
-      { etiqueta: 'Documentos', etiquetaTrabajador: 'Mis documentos', ruta: '/documentos', icono: 'pi pi-folder' },
+      { etiqueta: 'Inicio', ruta: '/inicio', icono: 'pi pi-home', roles: PERSONAL },
+      { etiqueta: 'Control de salidas', ruta: '/control-salidas', icono: 'pi pi-shield', roles: ['seguridad'] },
+      // El trabajador tiene todo lo suyo agrupado en "Mi expediente".
+      {
+        etiqueta: 'Mi expediente',
+        ruta: '/mi-expediente',
+        icono: 'pi pi-folder-open',
+        roles: TRABAJADORES,
+        hijos: [
+          { etiqueta: 'Documentos', ruta: '/mi-expediente/documentos', icono: 'pi pi-file' },
+          { etiqueta: 'Boletas de pago', ruta: '/mi-expediente/boletas', icono: 'pi pi-wallet' },
+          { etiqueta: 'Descansos médicos', ruta: '/mi-expediente/descansos-medicos', icono: 'pi pi-heart' },
+          { etiqueta: 'Memorándums', ruta: '/mi-expediente/memorandums', icono: 'pi pi-exclamation-triangle' },
+        ],
+      },
+      { etiqueta: 'Expedientes', ruta: '/documentos', icono: 'pi pi-folder', roles: GESTORES },
       {
         etiqueta: 'Boletas de pago',
         ruta: '/boletas-pago',
         icono: 'pi pi-wallet',
+        roles: GESTORES,
         hijos: [
           { etiqueta: 'Configuración', ruta: '/boletas-pago/configuracion', icono: 'pi pi-cog', roles: GESTORES },
         ],
       },
-      { etiqueta: 'Papeletas de permiso', ruta: '/papeletas-permiso', icono: 'pi pi-clock' },
-      { etiqueta: 'Descansos médicos', ruta: '/descansos-medicos', icono: 'pi pi-heart' },
-      // El trabajador solo ve los memorándums que se le emitieron (CUS36–CUS39).
-      { etiqueta: 'Incidencias', etiquetaTrabajador: 'Mis memorándums', ruta: '/incidencias', icono: 'pi pi-exclamation-triangle' },
+      { etiqueta: 'Papeletas de permiso', etiquetaTrabajador: 'Mis papeletas', ruta: '/papeletas-permiso', icono: 'pi pi-clock', roles: PERSONAL },
+      { etiqueta: 'Descansos médicos', ruta: '/descansos-medicos', icono: 'pi pi-heart', roles: GESTORES },
+      { etiqueta: 'Incidencias', ruta: '/incidencias', icono: 'pi pi-exclamation-triangle', roles: GESTORES },
     ],
   },
   {

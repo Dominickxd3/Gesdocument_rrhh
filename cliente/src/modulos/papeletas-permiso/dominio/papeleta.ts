@@ -25,6 +25,8 @@ export interface Trabajador {
   nombre: string;
   cargo: string;
   area: string;
+  /** Sede donde marca; Seguridad filtra las salidas por sede (RF12). */
+  sede?: string;
 }
 
 export interface EventoHistorial {
@@ -49,6 +51,17 @@ export interface Papeleta {
   retorno: string | null;
   estado: EstadoPapeleta;
   historial: EventoHistorial[];
+  /** Registro de Seguridad en la puerta (CUS18); solo en papeletas aprobadas. */
+  controlSalida?: ControlSalida;
+}
+
+export interface ControlSalida {
+  /** Hora de salida observada, HH:mm. */
+  hora: string;
+  usuario: string;
+  /** Momento en que se registró. */
+  registrado: string;
+  nota?: string;
 }
 
 export interface DatosPapeleta {

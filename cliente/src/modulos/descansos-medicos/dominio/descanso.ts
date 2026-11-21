@@ -1,3 +1,4 @@
+import { aDiaLocal } from '@/compartido/formato/fechas';
 /**
  * Modelo y reglas de descansos médicos (prototipo de diseño).
  * Basado en el informe: RF13, RF14, CUS19–CUS28 y el BPMN de descansos médicos.
@@ -90,7 +91,7 @@ export const PLAZO_PRESENTAR = 3;
 export const PLAZO_REGULARIZAR = 1;
 
 const aFecha = (iso: string) => new Date(`${iso}T12:00:00`);
-const aIso = (d: Date) => d.toISOString().slice(0, 10);
+const aIso = aDiaLocal;
 
 /** Días calendario del periodo, incluyendo inicio y fin. */
 export function diasPeriodo(inicio: string, fin: string): number {

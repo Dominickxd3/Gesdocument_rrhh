@@ -1,8 +1,13 @@
+import { aDiaLocal, hoyLocal, noFuturo } from '@/compartido/formato/fechas';
 /**
  * Datos ficticios para el prototipo. Nombres, DNI y motivos son inventados.
  * Se generan con semilla fija para que el diseño muestre siempre lo mismo.
  */
 import type { EstadoPapeleta, Papeleta, TipoPermiso, Trabajador } from '../dominio/papeleta';
+import { SEDES } from '@/modulos/trabajadores/infraestructura/datosTrabajadores';
+
+/** Sede fija según el DNI (la mayoría en Lima), sin alterar la semilla de los demás datos. */
+const sedeDe = (dni: string) => (Number(dni) % 5 < 3 ? SEDES[0] : SEDES[1 + (Number(dni) % 2)]);
 
 export const AREAS = [
   'ADM ADMINISTRACIÓN',
@@ -56,15 +61,15 @@ export const TRABAJADORES: Trabajador[] = Array.from({ length: 36 }, () => ({
   nombre: `${elegir(APELLIDOS)} ${elegir(APELLIDOS)}, ${elegir(NOMBRES)}`.toUpperCase(),
   cargo: elegir(CARGOS),
   area: elegir(AREAS),
-}));
+})).map((t) => ({ ...t, sede: sedeDe(t.dni) }));
 
 /** "Hoy" del prototipo. */
-export const HOY = new Date().toISOString().slice(0, 10);
+export const HOY = hoyLocal();
 
 function fechaHaceDias(dias: number) {
   const d = new Date(`${HOY}T12:00:00`);
   d.setDate(d.getDate() - dias);
-  return d.toISOString().slice(0, 10);
+  return aDiaLocal(d);
 }
 
 export function crearPapeletasPrueba(): Papeleta[] {
@@ -89,7 +94,8 @@ export function crearPapeletasPrueba(): Papeleta[] {
     else estado = azar() < 0.88 ? 'aprobada' : azar() < 0.6 ? 'rechazada' : 'anulada';
 
     const trabajador = elegir(TRABAJADORES);
-    const creada = `${fecha}T${salida}:00`;
+    // La solicitud y su aprobación nunca quedan en el futuro, aunque la salida sea más tarde.
+    const creada = noFuturo(`${fecha}T${salida}:00`);
     const historial: Papeleta['historial'] = [{ accion: 'creada', usuario: elegir(JEFES), fecha: creada }];
     if (estado === 'aprobada') historial.push({ accion: 'aprobada', usuario: elegir(USUARIOS_RRHH), fecha: creada });
     if (estado === 'rechazada')
@@ -111,5 +117,29 @@ export function crearPapeletasPrueba(): Papeleta[] {
       historial,
     });
   }
-  return lista;
+  return [...lista, ...papeletasDeCuentasPrueba()];
+}
+
+/** Trabajadores de los usuarios de prueba (se vinculan por DNI con su cuenta). */
+const JOSE: Trabajador = { dni: '45871236', nombre: 'QUISPE ROJAS, JOSÉ', cargo: 'Operario de producción', area: 'COM PRODUCCIÓN', sede: 'Lima – Canto Bello' };
+const PEDRO: Trabajador = { dni: '46213578', nombre: 'VIGO SALAS, PEDRO', cargo: 'Prevencionista de Seguridad', area: 'ADM GESTIÓN HUMANA', sede: 'Lima – Canto Bello' };
+
+/** Papeletas fijas de los usuarios de prueba, para ver "Mis papeletas" y Control de salidas. */
+function papeletasDeCuentasPrueba(): Papeleta[] {
+  const datos: [Trabajador, number, EstadoPapeleta, TipoPermiso, string, string, string | null, string][] = [
+    [JOSE, 0, 'aprobada', 'comision', 'Trámite en RENIEC por encargo de la empresa', '11:00', '12:30', JEFES[0]],
+    [JOSE, 6, 'aprobada', 'compensacion', 'Cita médica programada', '15:00', null, JEFES[0]],
+    [JOSE, 13, 'rechazada', 'otros', 'Asunto personal', '09:00', '10:00', JEFES[0]],
+    [PEDRO, 1, 'pendiente', 'medio_dia_vacaciones', 'Medio día de vacaciones', '13:00', null, JEFES[1]],
+    [PEDRO, 9, 'aprobada', 'comision', 'Capacitación en seguridad en sede Lurín', '08:30', '12:00', JEFES[1]],
+  ];
+  return datos.map(([trabajador, dias, estado, tipo, motivo, salida, retorno, jefe], i) => {
+    const fecha = fechaHaceDias(dias);
+    const creada = noFuturo(`${fecha}T07:30:00`);
+    const historial: Papeleta['historial'] = [{ accion: 'creada', usuario: jefe, fecha: creada }];
+    if (estado === 'aprobada') historial.push({ accion: 'aprobada', usuario: USUARIOS_RRHH[0], fecha: noFuturo(`${fecha}T08:00:00`) });
+    if (estado === 'rechazada') historial.push({ accion: 'rechazada', usuario: USUARIOS_RRHH[1], fecha: noFuturo(`${fecha}T08:00:00`), nota: 'No adjuntó sustento.' });
+    const numero = 1200 + i;
+    return { id: `pp-${numero}`, numero, fecha, trabajador, tipo, motivo, observaciones: '', salida, retorno, estado, historial };
+  });
 }

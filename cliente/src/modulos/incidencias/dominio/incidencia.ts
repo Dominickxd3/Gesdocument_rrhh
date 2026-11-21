@@ -24,6 +24,8 @@ export interface Actuacion {
   usuario: string;
   fecha: string;
   texto?: string;
+  /** Firma dibujada por el trabajador al recibir el memorándum (PNG, data URL). */
+  firmaImagen?: string;
 }
 
 export interface Memorandum {

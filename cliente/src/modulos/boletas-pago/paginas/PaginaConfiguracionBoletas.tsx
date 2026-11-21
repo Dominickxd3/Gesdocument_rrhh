@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { Toast } from 'primereact/toast';
+import { BotonVolver } from '@/compartido/componentes/BotonVolver';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { repositorioBoletas } from '../aplicacion/repositorioBoletas';
 import { useConfiguracionBoletas } from '../aplicacion/useConfiguracionBoletas';
@@ -72,6 +73,7 @@ export function PaginaConfiguracionBoletas() {
     <div className="pagina-configuracion">
       <Toast ref={aviso} position="bottom-right" />
       <ConfirmDialog />
+      <BotonVolver destino="/boletas-pago" etiqueta="Volver a boletas" />
 
       <header>
         <h1>Configuración de boletas</h1>

@@ -1,5 +1,6 @@
 import { Calendar } from 'primereact/calendar';
 import { addLocale } from 'primereact/api';
+import { aDiaLocal, diaLocalDe } from '@/compartido/formato/fechas';
 
 /** Rango de fechas de los filtros (AAAA-MM-DD); null = sin límite. */
 export interface RangoFechas {
@@ -20,18 +21,22 @@ addLocale('es', {
   clear: 'Limpiar',
 });
 
-const aIso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const aFecha = (iso: string) => new Date(`${iso}T12:00:00`);
 
-/** ¿La fecha (ISO, con o sin hora) cae dentro del rango? */
+/** Si solo se eligió un día, el rango es ese único día (no "desde ese día en adelante"). */
+const hastaDe = (r: RangoFechas) => r.hasta ?? r.desde;
+
+/** ¿La fecha (ISO, con o sin hora) cae dentro del rango? Se compara el día en hora local. */
 export function enRango(fecha: string, r: RangoFechas): boolean {
-  const dia = fecha.slice(0, 10);
-  return (!r.desde || dia >= r.desde) && (!r.hasta || dia <= r.hasta);
+  const dia = diaLocalDe(fecha);
+  const hasta = hastaDe(r);
+  return (!r.desde || dia >= r.desde) && (!hasta || dia <= hasta);
 }
 
 /** ¿El periodo [inicio, fin] se cruza con el rango? (descansos médicos) */
 export function periodoEnRango(inicio: string, fin: string, r: RangoFechas): boolean {
-  return (!r.desde || fin.slice(0, 10) >= r.desde) && (!r.hasta || inicio.slice(0, 10) <= r.hasta);
+  const hasta = hastaDe(r);
+  return (!r.desde || diaLocalDe(fin) >= r.desde) && (!hasta || diaLocalDe(inicio) <= hasta);
 }
 
 /** Filtro "Desde – Hasta" en un solo campo, con calendario en español y botones Hoy / Limpiar. */
@@ -42,7 +47,7 @@ export function FiltroFechas({ valor, alCambiar, etiqueta = 'Desde – Hasta' }:
       value={seleccion as (Date | null)[] | null}
       onChange={(e) => {
         const [d, h] = (e.value as (Date | null)[] | null) ?? [null, null];
-        alCambiar({ desde: d ? aIso(d) : null, hasta: h ? aIso(h) : null });
+        alCambiar({ desde: d ? aDiaLocal(d) : null, hasta: h ? aDiaLocal(h) : null });
       }}
       selectionMode="range"
       readOnlyInput

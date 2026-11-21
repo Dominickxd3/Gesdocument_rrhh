@@ -141,11 +141,11 @@ export function PanelDetalle(props: Propiedades) {
             )}
             <div className="pp-panel__secundarias">
               <Button
-                label="Imprimir"
-                icon="pi pi-print"
+                label="Ver papeleta"
+                icon="pi pi-file"
                 text
                 disabled={!puedeImprimir(p)}
-                tooltip={puedeImprimir(p) ? undefined : 'Solo se imprimen papeletas aprobadas'}
+                tooltip={puedeImprimir(p) ? undefined : 'Solo las papeletas aprobadas tienen formato oficial'}
                 tooltipOptions={{ showOnDisabled: true, position: 'top' }}
                 onClick={() => props.alImprimir(p)}
               />

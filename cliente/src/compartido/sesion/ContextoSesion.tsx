@@ -17,7 +17,14 @@ interface PropiedadesProveedorSesion {
 }
 
 export function ProveedorSesion({ servicio, children }: PropiedadesProveedorSesion) {
-  const [usuario, setUsuario] = useState<UsuarioSesion | null>(leerSesion);
+  // Al recargar se toman los datos vigentes del usuario (la sesión guardada puede estar desactualizada).
+  const [usuario, setUsuario] = useState<UsuarioSesion | null>(() => {
+    const guardado = leerSesion();
+    if (!guardado || !servicio.actualizarSesion) return guardado;
+    const vigente = servicio.actualizarSesion(guardado);
+    if (!vigente) borrarSesion();
+    return vigente;
+  });
 
   const iniciarSesion = useCallback(
     async (credenciales: Credenciales, recordar: boolean) => {

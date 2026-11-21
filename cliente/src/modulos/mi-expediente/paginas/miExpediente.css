@@ -1,0 +1,76 @@
+.mi-expediente {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: calc(100vh - 64px);
+}
+
+.mi-expediente__encabezado h1 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.mi-expediente__encabezado p {
+  margin: 4px 0 0;
+  color: #6b7280;
+}
+
+.mi-expediente__pestanas {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.mi-expediente__pestana {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: #6b7280;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mi-expediente__pestana:hover {
+  color: #111827;
+}
+
+.mi-expediente__pestana.active {
+  border-bottom-color: #111111;
+  color: #111111;
+}
+
+.mi-expediente__pestana:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: -2px;
+}
+
+.mi-expediente__pendientes {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #111111;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Las secciones son páginas completas: dentro del expediente pierden su margen y su título grande. */
+.mi-expediente__contenido > * {
+  min-height: 0;
+  padding: 0 0 24px;
+}
+
+.mi-expediente__contenido .pp-encabezado h1 {
+  font-size: 19px;
+}
+

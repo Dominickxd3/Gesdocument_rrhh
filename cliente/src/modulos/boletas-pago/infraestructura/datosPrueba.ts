@@ -1,3 +1,4 @@
+import { aMomentoLocal, noFuturo } from '@/compartido/formato/fechas';
 /**
  * Generador de datos ficticios para el mockup. Los nombres, DNI y montos son inventados.
  * Usa una semilla por periodo para que cada mes muestre siempre los mismos datos.
@@ -42,9 +43,13 @@ function crearAleatorio(semilla: number) {
 const redondear = (monto: number) => Math.round(monto * 100) / 100;
 const sinTildes = (texto: string) => texto.normalize('NFD').replace(/[̀-ͯ]/g, '');
 
-/** Las boletas de un mes se envían y firman a inicios del mes siguiente. */
+/**
+ * Las boletas de un mes cerrado se envían y firman a inicios del mes siguiente;
+ * las del mes en curso, dentro del mismo mes. Nunca después de hoy.
+ */
 function fechaDespuesDe(periodo: Periodo, dia: number, hora: number): string {
-  return new Date(periodo.anio, periodo.mes, dia, hora, 15).toISOString();
+  const mes = periodo.estado === 'en_curso' ? periodo.mes - 1 : periodo.mes;
+  return noFuturo(aMomentoLocal(new Date(periodo.anio, mes, dia, hora, 15)));
 }
 
 const fechaCorta = (fecha: Date) =>
@@ -158,5 +163,46 @@ export function generarBoletas(periodo: Periodo): Boleta[] {
       fechaEnvio: enviado ? fechaDespuesDe(periodo, diaEnvio, 8) : null,
     });
   }
+  boletas.push(...boletasDeCuentasPrueba(periodo, boletas));
   return boletas.sort((a, b) => a.trabajador.localeCompare(b.trabajador));
+}
+
+/** Colaboradores de los usuarios de prueba (se vinculan por DNI con su cuenta de la plataforma). */
+const CUENTAS_PRUEBA = [
+  { dni: '45871236', trabajador: 'QUISPE ROJAS JOSÉ', usuario: 'jose.quispe', area: 'COM PRODUCCIÓN', cargo: 'Operario', ingreso: '15/03/2021' },
+  { dni: '46213578', trabajador: 'VIGO SALAS PEDRO', usuario: 'seguridad', area: 'ADM GESTIÓN HUMANA', cargo: 'Prevencionista de Seguridad', ingreso: '01/08/2019' },
+];
+
+/**
+ * Boleta del mes para cada usuario de prueba, con los montos de una boleta generada como base.
+ * La del último mes cerrado queda enviada y por firmar; las anteriores, firmadas.
+ */
+function boletasDeCuentasPrueba(periodo: Periodo, base: Boleta[]): Boleta[] {
+  const hoy = new Date();
+  const mesesAtras = (hoy.getFullYear() - periodo.anio) * 12 + hoy.getMonth() + 1 - periodo.mes;
+  const enviado = periodo.estado === 'cerrado';
+  const firmada = enviado && mesesAtras > 1;
+  return CUENTAS_PRUEBA.map((cuenta, i) => {
+    const plantilla = base[i * 7 % base.length]!;
+    return {
+      ...structuredClone(plantilla),
+      id: `${periodo.anio}${periodo.mes}-cuenta-${cuenta.dni}`,
+      numero: periodo.mes * 1000 + 900 + i,
+      dni: cuenta.dni,
+      trabajador: cuenta.trabajador,
+      usuario: cuenta.usuario,
+      area: cuenta.area,
+      cargo: cuenta.cargo,
+      detalle: {
+        ...structuredClone(plantilla.detalle),
+        fechaIngreso: cuenta.ingreso,
+        centroCostos: `${sinTildes(cuenta.area)} - 2020`,
+        ocupacion: cuenta.cargo,
+      },
+      firma: firmada ? 'firmada' : 'pendiente',
+      fechaFirma: firmada ? fechaDespuesDe(periodo, 5, 10) : null,
+      estadoEnvio: enviado ? 'enviado' : 'no_enviado',
+      fechaEnvio: enviado ? fechaDespuesDe(periodo, 2, 8) : null,
+    };
+  });
 }

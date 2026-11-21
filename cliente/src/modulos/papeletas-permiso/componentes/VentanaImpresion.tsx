@@ -1,15 +1,13 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { guardarComoPdf, nombreArchivo } from '@/compartido/documentos/guardarComoPdf';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import { SelectButton } from 'primereact/selectbutton';
 import { duracionMinutos, etiquetaTipo, type Papeleta } from '../dominio/papeleta';
 
 interface Propiedades {
   papeleta: Papeleta | null;
   alCerrar: () => void;
 }
-
-type Papel = 'A5' | 'A4';
 
 /**
  * Formato oficial de la papeleta (modelo PDF del sistema actual):
@@ -33,7 +31,8 @@ function tiempoLargo(minutos: number | null) {
   return `${dd(Math.floor(minutos / 60))}:${dd(minutos % 60)}:00`;
 }
 
-function Copia({ p, copia }: { p: Papeleta; copia: string }) {
+/** Una copia de la papeleta impresa. Control de salidas muestra la "Copia para Vigilancia". */
+export function CopiaPapeleta({ p, copia }: { p: Papeleta; copia: string }) {
   const emision = p.historial[0]?.fecha ?? p.fecha;
   const jefe = p.historial.find((h) => h.accion === 'creada')?.usuario ?? '';
   const filas: [string, string][] = [
@@ -101,38 +100,46 @@ function Copia({ p, copia }: { p: Papeleta; copia: string }) {
   );
 }
 
-/** Vista previa del formato impreso. A5 llena la hoja; A4 deja márgenes, igual que los modelos PDF. */
+/**
+ * Papeleta en formato oficial (las dos copias), para ver y descargar en PDF.
+ * Ya no se imprime: se muestra en digital y se guarda como archivo si hace falta.
+ */
 export function VentanaImpresion({ papeleta: p, alCerrar }: Propiedades) {
-  const [papel, setPapel] = useState<Papel>('A5');
+  const hoja = useRef<HTMLElement>(null);
+  const [descargando, setDescargando] = useState(false);
+
+  const descargar = async () => {
+    if (!p) return;
+    setDescargando(true);
+    await guardarComoPdf(hoja.current, nombreArchivo('Papeleta', `N° ${String(p.numero).padStart(4, '0')}`, p.trabajador.nombre));
+    setDescargando(false);
+  };
 
   return (
     <Dialog
       visible={!!p}
       onHide={alCerrar}
-      header="Vista previa de impresión"
+      header={p ? `Papeleta de permiso N° ${p.numero}` : ''}
       className="pp-ventana pp-ventana-impresion"
       style={{ width: '980px' }}
       breakpoints={{ '1024px': '96vw' }}
       draggable={false}
       footer={
         <div className="pp-ventana__pie">
-          <SelectButton value={papel} options={['A5', 'A4']} onChange={(e) => e.value && setPapel(e.value)} allowEmpty={false} />
+          <Button label="Descargar PDF" icon="pi pi-download" outlined className="pp-boton-secundario" loading={descargando} onClick={() => void descargar()} />
           <span className="pp-espaciador" />
-          <Button label="Cerrar" text onClick={alCerrar} />
-          <Button label="Imprimir" icon="pi pi-print" className="pp-boton-principal" onClick={() => window.print()} />
+          <Button label="Cerrar" className="pp-boton-principal" onClick={alCerrar} />
         </div>
       }
     >
       {p && (
         <div className="pp-hoja-contenedor">
-          {/* Tamaño de página para la impresora: siempre horizontal. */}
-          <style>{`@page { size: ${papel} landscape; margin: 0; }`}</style>
-          <article className={`pp-hoja papel-${papel}`} id="pp-hoja-imprimible">
+          <article className="pp-hoja papel-A5" id="pp-hoja-imprimible" ref={hoja}>
             <div className="pp-hoja__cuerpo">
               {COPIAS.map((copia, i) => (
                 <div key={copia} className="pp-hoja__bloque">
                   {i > 0 && <hr className="pp-hoja__corte" />}
-                  <Copia p={p} copia={copia} />
+                  <CopiaPapeleta p={p} copia={copia} />
                 </div>
               ))}
             </div>

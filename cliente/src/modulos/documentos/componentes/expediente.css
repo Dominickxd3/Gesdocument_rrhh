@@ -1,0 +1,300 @@
+.expediente {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.expediente__ficha,
+.expediente__seccion {
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.expediente__ficha {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 300px;
+  align-items: center;
+  gap: 16px 20px;
+}
+
+.expediente__avatar {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #111111;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.expediente__persona h2 {
+  margin: 0 0 4px;
+  font-size: 19px;
+}
+
+.expediente__persona p {
+  margin: 0;
+  color: #4b5563;
+}
+
+.expediente__persona .expediente__ingreso {
+  margin-top: 2px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.expediente__avance {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.expediente__avance-cifra {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.expediente__avance-cifra strong {
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.expediente__avance-cifra span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.expediente__barra {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f3f4f6;
+}
+
+.expediente__barra span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #15803d;
+}
+
+.expediente__contadores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.expediente__seccion h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 15px;
+}
+
+.expediente__seccion h3 .pi {
+  color: #6b7280;
+}
+
+.expediente__cantidad {
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.expediente__vacio {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* Requeridos */
+.expediente__requeridos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.expediente__requeridos li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.expediente__requeridos li > .pi {
+  font-size: 18px;
+}
+
+.expediente__requeridos .es-firmado > .pi { color: #15803d; }
+.expediente__requeridos .es-en_curso > .pi { color: #b45309; }
+.expediente__requeridos .es-falta > .pi { color: #9ca3af; }
+.expediente__requeridos .es-falta { border-style: dashed; }
+
+.expediente__requerido-texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.expediente__requerido-texto span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Documentos por categoría */
+.expediente__documentos {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.expediente__documentos li + li {
+  border-top: 1px solid #f3f4f6;
+}
+
+.expediente__documentos button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.expediente__documentos button:hover {
+  background: #f9fafb;
+}
+
+.expediente__documentos button:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: 1px;
+}
+
+.expediente__documentos button > .pi-file {
+  color: #6b7280;
+}
+
+.expediente__documento-titulo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.expediente__documento-titulo small {
+  color: #6b7280;
+}
+
+.expediente__flecha {
+  color: #9ca3af;
+}
+
+@media (max-width: 1023px) {
+  .expediente__ficha {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .expediente__avance {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 767px) {
+  .expediente__requeridos {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Lista de expedientes (RR. HH.) */
+.dm-subtitulo {
+  margin: 4px 0 0;
+  color: #6b7280;
+}
+
+.dm-pestanas {
+  display: flex;
+  gap: 4px;
+  align-self: flex-start;
+  padding: 4px;
+  border-radius: 10px;
+  background: #f3f4f6;
+}
+
+.dm-pestanas button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #4b5563;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.dm-pestanas button span {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.dm-pestanas button[aria-selected='true'] {
+  background: #ffffff;
+  color: #111827;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+}
+
+.dm-pestanas button:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: 1px;
+}
+
+.dm-requeridos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 120px;
+}
+
+.dm-requeridos > span {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.dm-requeridos .expediente__barra {
+  flex: 1;
+  height: 6px;
+}
+
+.dm-pendientes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dm-col-flecha {
+  width: 1%;
+  text-align: right;
+}

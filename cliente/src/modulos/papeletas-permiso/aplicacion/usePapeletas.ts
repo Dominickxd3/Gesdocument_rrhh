@@ -1,6 +1,8 @@
+import { ahoraLocal } from '@/compartido/formato/fechas';
 import { SIN_RANGO, enRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
 import { ordenarPorTrabajador } from '@/compartido/formato/orden';
 import { useCallback, useMemo, useState } from 'react';
+import { almacenPapeletas } from './almacenPapeletas';
 import type {
   DatosPapeleta,
   EventoHistorial,
@@ -9,7 +11,7 @@ import type {
   ResumenPapeletas,
   TipoPermiso,
 } from '../dominio/papeleta';
-import { HOY, crearPapeletasPrueba } from '../infraestructura/datosPrueba';
+import { HOY } from '../infraestructura/datosPrueba';
 
 export interface FiltrosPapeletas {
   busqueda: string;
@@ -37,7 +39,9 @@ const USUARIO_ACTUAL = 'Usted (RRHH)';
  * se pierden al recargar la página.
  */
 export function usePapeletas() {
-  const [papeletas, setPapeletas] = useState<Papeleta[]>(crearPapeletasPrueba);
+  // Compartidas con Control de salidas (Seguridad): ver almacenPapeletas.
+  const papeletas = almacenPapeletas.usar();
+  const setPapeletas = almacenPapeletas.escribir;
   const [filtros, setFiltros] = useState<FiltrosPapeletas>(FILTROS_INICIALES);
   const [seleccion, setSeleccion] = useState<Papeleta[]>([]);
 
@@ -95,7 +99,7 @@ export function usePapeletas() {
   const registrar = (p: Papeleta, evento: Omit<EventoHistorial, 'usuario' | 'fecha'>, cambios: Partial<Papeleta>) => ({
     ...p,
     ...cambios,
-    historial: [...p.historial, { ...evento, usuario: USUARIO_ACTUAL, fecha: new Date().toISOString() }],
+    historial: [...p.historial, { ...evento, usuario: USUARIO_ACTUAL, fecha: ahoraLocal() }],
   });
 
   const cambiarEstado = useCallback(
@@ -127,7 +131,7 @@ export function usePapeletas() {
         id: `pp-${numero}`,
         numero,
         estado: 'pendiente',
-        historial: [{ accion: 'creada', usuario: USUARIO_ACTUAL, fecha: new Date().toISOString() }],
+        historial: [{ accion: 'creada', usuario: USUARIO_ACTUAL, fecha: ahoraLocal() }],
       };
       setPapeletas((lista) => [nueva, ...lista]);
       return numero;

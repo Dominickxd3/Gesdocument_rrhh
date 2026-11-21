@@ -14,6 +14,8 @@ export interface UsuarioPrueba {
   rol: Rol;
   /** Solo para trabajadores: vincula la cuenta con su ficha. */
   dni?: string;
+  /** Solo para Seguridad: la sede donde controla las salidas. */
+  sede?: string;
   clave: string;
 }
 
@@ -53,6 +55,17 @@ export const usuariosPrueba: UsuarioPrueba[] = [
     cargo: 'Operario de producción',
     rol: 'trabajador',
     dni: '45871236',
+    clave: 'Mockup2026',
+  },
+  {
+    id: '4',
+    usuario: 'seguridad',
+    nombre: 'Pedro Vigo Salas',
+    correo: 'seguridad.lima@grupopecuario.com',
+    cargo: 'Prevencionista de Seguridad',
+    rol: 'seguridad',
+    dni: '46213578',
+    sede: 'Lima – Canto Bello',
     clave: 'Mockup2026',
   },
 ];

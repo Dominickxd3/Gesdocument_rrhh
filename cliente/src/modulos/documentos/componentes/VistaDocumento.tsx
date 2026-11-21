@@ -1,5 +1,7 @@
 import { TrazoFirma } from '@/modulos/boletas-pago/componentes/TrazoFirma';
-import { useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { guardarComoPdf, nombreArchivo } from '@/compartido/documentos/guardarComoPdf';
+import { BarraFirma, LienzoFirma, useControlFirma, type ControlFirma } from '@/compartido/componentes/LienzoFirma';
 import { repositorioBoletas } from '@/modulos/boletas-pago/aplicacion/repositorioBoletas';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
@@ -127,6 +129,16 @@ function FirmaTrabajador({ evento }: { evento: EventoDocumento }) {
  * a la izquierda la firma del representante sobre la línea, "GRUPO PECUARIO S.A.C." y "EL EMPLEADOR";
  * a la derecha el nombre del trabajador, su DNI y "EL TRABAJADOR".
  */
+/** Mientras el trabajador firma, su espacio de firma en el documento es un recuadro para dibujar. */
+const ContextoFirmar = createContext<ControlFirma | null>(null);
+
+/** Firma ya registrada, recuadro para dibujarla o espacio vacío. */
+function EspacioFirmaTrabajador({ firma }: { firma?: EventoDocumento }) {
+  const control = useContext(ContextoFirmar);
+  if (firma) return <FirmaTrabajador evento={firma} />;
+  return control ? <LienzoFirma control={control} /> : null;
+}
+
 function Firmas({ nombre, dni, firma }: { nombre: string; dni: string; firma?: EventoDocumento }) {
   const firmaEmpleador = useFirmaEmpleador();
   return (
@@ -140,7 +152,9 @@ function Firmas({ nombre, dni, firma }: { nombre: string; dni: string; firma?: E
         <span>EL EMPLEADOR</span>
       </div>
       <div className="doc-firmas__parte">
-        <div className="doc-firmas__espacio">{firma && <FirmaTrabajador evento={firma} />}</div>
+        <div className="doc-firmas__espacio">
+          <EspacioFirmaTrabajador firma={firma} />
+        </div>
         <span className="doc-firmas__linea" />
         <strong>{nombre.replace(',', '')}</strong>
         <span>DNI N° {dni}</span>
@@ -199,10 +213,30 @@ function HojaContrato({ documento: d, firma, total }: { documento: Documento; fi
 }
 
 /** Vista previa del documento: el archivo subido o el texto generado desde la plantilla. */
-export function VistaDocumento({ documento: d, visible, alCerrar }: { documento: Documento | null; visible: boolean; alCerrar: () => void }) {
+interface PropiedadesVista {
+  documento: Documento | null;
+  visible: boolean;
+  alCerrar: () => void;
+  /** Trabajador firmando: dibuja su firma sobre su línea del documento y confirma. */
+  alFirmar?: (imagen: string) => void;
+}
+
+export function VistaDocumento({ documento: d, visible, alCerrar, alFirmar }: PropiedadesVista) {
   const archivo = d?.origen.tipo === 'archivo' ? archivoSubido(d.origen.nombre) : undefined;
   const t = d ? buscarTrabajador(d.dni) : undefined;
   const firma = d ? ultimoEvento(d, 'firmado') : undefined;
+  const visor = useRef<HTMLDivElement>(null);
+  const control = useControlFirma();
+  const { borrar } = control;
+  const [zoom, setZoom] = useState(1);
+  const firmando = !!alFirmar && !firma;
+
+  useEffect(() => {
+    if (visible) {
+      borrar();
+      setZoom(1);
+    }
+  }, [visible, borrar]);
 
   return (
     <Dialog
@@ -224,15 +258,42 @@ export function VistaDocumento({ documento: d, visible, alCerrar }: { documento:
       draggable={false}
       footer={
         <div className="pp-ventana__pie">
-          <Button label="Descargar" icon="pi pi-download" text onClick={() => (archivo ? window.open(archivo.url, '_blank', 'noopener') : window.print())} />
+          {!firmando && (
+            <Button
+              label={archivo ? 'Descargar' : 'Descargar PDF'}
+              icon="pi pi-download"
+              outlined
+              className="pp-boton-secundario"
+              onClick={() =>
+                archivo
+                  ? window.open(archivo.url, '_blank', 'noopener')
+                  : d && void guardarComoPdf(visor.current, nombreArchivo(etiquetaTipo(d.tipo), `N° ${d.numero}`, d.trabajador))
+              }
+            />
+          )}
           <span className="pp-espaciador" />
-          <Button label="Cerrar" className="pp-boton-principal" onClick={alCerrar} />
+          {firmando ? (
+            <Button label="Cancelar" text onClick={alCerrar} />
+          ) : (
+            <Button label="Cerrar" className="pp-boton-principal" onClick={alCerrar} />
+          )}
         </div>
       }
     >
-      <div className="dm-visor">
+      <ContextoFirmar.Provider value={firmando ? control : null}>
+      <div className="dm-visor" style={{ zoom }} ref={visor}>
         {d && archivo ? (
-          archivo.tipo.startsWith('image/') ? <img src={archivo.url} alt="" /> : <iframe src={archivo.url} title={etiquetaTipo(d.tipo)} />
+          <>
+            {archivo.tipo.startsWith('image/') ? <img src={archivo.url} alt="" /> : <iframe src={archivo.url} title={etiquetaTipo(d.tipo)} />}
+            {/* Documento subido como archivo: se firma en este espacio, bajo el documento. */}
+            {firmando && (
+              <div className="doc-firma-archivo">
+                <LienzoFirma control={control} />
+                <span className="doc-firmas__linea" />
+                <strong>{nombreLegible(d.trabajador)}</strong>
+              </div>
+            )}
+          </>
         ) : d?.contrato ? (
           // Vendedores: el contrato y la adenda de obligaciones se firman juntos (dos páginas).
           <div className="doc-paginas">
@@ -268,7 +329,7 @@ export function VistaDocumento({ documento: d, visible, alCerrar }: { documento:
                   Gestión Humana
                 </div>
                 <div>
-                  {firma ? <FirmaTrabajador evento={firma} /> : <span />}
+                  {firma || alFirmar ? <EspacioFirmaTrabajador firma={firma} /> : <span />}
                   {nombreLegible(d.trabajador)}
                 </div>
               </div>
@@ -276,6 +337,18 @@ export function VistaDocumento({ documento: d, visible, alCerrar }: { documento:
           )
         )}
       </div>
+      </ContextoFirmar.Provider>
+      {firmando && (
+        <BarraFirma
+          control={control}
+          zoom={zoom}
+          alCambiarZoom={setZoom}
+          alEnviar={() => {
+            const imagen = control.imagen();
+            if (imagen) alFirmar?.(imagen);
+          }}
+        />
+      )}
     </Dialog>
   );
 }

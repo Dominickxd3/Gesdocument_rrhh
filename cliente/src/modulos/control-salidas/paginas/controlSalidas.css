@@ -1,0 +1,138 @@
+.cs-subtitulo {
+  margin: 4px 0 0;
+  color: #6b7280;
+}
+
+.cs-resumen {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cs-resumen > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.cs-resumen span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.cs-resumen strong {
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cs-resumen .es-pendiente strong {
+  color: #b45309;
+}
+
+.cs-fecha {
+  height: 40px;
+  border-radius: 8px;
+}
+
+.cs-col-accion {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* Ventana de registro */
+.cs-verificacion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.cs-verificacion .pi {
+  font-size: 22px;
+}
+
+.cs-verificacion div {
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-verificacion span {
+  color: #166534;
+  font-size: 13px;
+}
+
+.cs-ventana__trabajador {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+
+.cs-datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  margin: 0 0 16px;
+}
+
+.cs-datos dt {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.cs-datos dd {
+  margin: 2px 0 0;
+  font-weight: 500;
+}
+
+.cs-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cs-formulario input[type='time'] {
+  width: 160px;
+  height: 40px;
+}
+
+.cs-registro {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  color: #166534;
+}
+
+/* Celular: los tres contadores siguen en una fila, más compactos. */
+@media (max-width: 640px) {
+  .cs-resumen { gap: 8px; }
+  .cs-resumen > div { padding: 10px; }
+  .cs-resumen span { font-size: 11.5px; line-height: 1.2; }
+  .cs-resumen strong { font-size: 20px; }
+}
+
+
+/* Pantallas medianas (laptop): el botón de la fila muestra solo el ícono para que la tabla quepa.
+   El nombre sigue disponible para lectores de pantalla. */
+@media (min-width: 901px) and (max-width: 1439px) {
+  .cs-col-accion .p-button { padding: 8px 10px; }
+  .cs-col-accion .p-button .p-button-icon { margin: 0; }
+  .cs-col-accion .p-button .p-button-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}

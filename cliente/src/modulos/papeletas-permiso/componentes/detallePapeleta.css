@@ -1,0 +1,95 @@
+/* Papeleta detallada: la ven el trabajador y Seguridad */
+.dp-verificacion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f0fdf4;
+  color: #15803d;
+}
+.dp-verificacion .pi { font-size: 22px; }
+.dp-verificacion div { display: flex; flex-direction: column; }
+.dp-verificacion span { color: #166534; font-size: 13px; }
+
+.dp-cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.dp-titulo-seccion {
+  margin: 0 0 10px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dp-hoja.pp-hoja {
+  aspect-ratio: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+}
+
+/* Una sola copia: letra más grande que en la hoja con dos copias. */
+.dp-hoja.papel-A5 .pp-hoja__cuerpo { padding: 4cqw 3.4cqw; font-size: 1.75cqw; }
+.dp-hoja .pp-copia { grid-template-columns: minmax(0, 1fr) 17em; column-gap: 2em; }
+.dp-hoja .pp-copia__datos > div { grid-template-columns: 11.5em minmax(0, 1fr); }
+.dp-hoja .pp-copia__fecha,
+.dp-hoja .pp-copia__hora { grid-template-columns: 1fr 8.5em; }
+
+.dp-lateral { display: flex; flex-direction: column; gap: 20px; }
+
+.dp-colaborador { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.dp-colaborador__avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #111111;
+  color: #ffffff;
+  font-weight: 600;
+}
+.dp-colaborador div { display: flex; flex-direction: column; }
+.dp-colaborador strong { font-size: 16px; }
+.dp-colaborador span { color: #6b7280; font-size: 13px; }
+
+.dp-datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+}
+.dp-datos dt { color: #6b7280; font-size: 12px; }
+.dp-datos dd { margin: 2px 0 0; font-weight: 500; }
+
+.dp-horario { margin: 0 0 12px; }
+
+/* Estado del control de salida en la vista del trabajador */
+.dp-estado {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #1e40af;
+  font-size: 14px;
+}
+.dp-estado.es-registrada { border: 1px solid #bbf7d0; background: #ffffff; color: #166534; }
+.dp-estado .pi { margin-top: 2px; }
+
+@media (max-width: 900px) {
+  .dp-cuerpo { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .dp-datos { grid-template-columns: 1fr; }
+}

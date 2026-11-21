@@ -1,10 +1,10 @@
 import { Button } from 'primereact/button';
-import { LogoEmpresa } from '@/compartido/componentes/logo-empresa/LogoEmpresa';
 
 interface PropiedadesBarraSuperiorMovil {
   alAbrirMenu: () => void;
 }
 
+/** Barra superior del celular: solo el botón del menú (el logo y el nombre están dentro del menú). */
 export function BarraSuperiorMovil({ alAbrirMenu }: PropiedadesBarraSuperiorMovil) {
   return (
     <header className="barra-superior-movil">
@@ -16,7 +16,6 @@ export function BarraSuperiorMovil({ alAbrirMenu }: PropiedadesBarraSuperiorMovi
         className="boton-menu"
         onClick={alAbrirMenu}
       />
-      <LogoEmpresa />
     </header>
   );
 }

@@ -1,0 +1,30 @@
+.boton-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  margin-bottom: -8px;
+  padding: 6px 10px 6px 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #4b5563;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.boton-volver:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.boton-volver:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: 2px;
+}
+
+.boton-volver .pi {
+  font-size: 13px;
+}

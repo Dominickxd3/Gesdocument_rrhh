@@ -31,6 +31,52 @@ export const TIPOS_DOCUMENTO: { valor: TipoDocumento; etiqueta: string }[] = [
 
 export const etiquetaTipo = (t: TipoDocumento) => TIPOS_DOCUMENTO.find((x) => x.valor === t)?.etiqueta ?? t;
 
+/**
+ * Expediente digital (RF03, RF04; CUS40): cómo se agrupan los documentos de cada trabajador
+ * y cuáles son obligatorios. Para cambiar el expediente basta con editar estas dos listas.
+ */
+export const CATEGORIAS_EXPEDIENTE: { id: string; titulo: string; icono: string; tipos: TipoDocumento[] }[] = [
+  { id: 'contratacion', titulo: 'Contratación', icono: 'pi pi-file-edit', tipos: ['contrato', 'adenda'] },
+  { id: 'normas', titulo: 'Normas y seguridad', icono: 'pi pi-shield', tipos: ['reglamento', 'epp'] },
+  { id: 'personales', titulo: 'Datos personales', icono: 'pi pi-id-card', tipos: ['domicilio'] },
+  { id: 'constancias', titulo: 'Constancias', icono: 'pi pi-verified', tipos: ['constancia'] },
+];
+
+/** Documentos que todo expediente debe tener firmados; los demás se generan cuando se necesitan. */
+export const TIPOS_REQUERIDOS: TipoDocumento[] = ['contrato', 'reglamento', 'epp', 'domicilio'];
+
+export type SituacionRequisito = 'firmado' | 'en_curso' | 'falta';
+
+/** Situación de cada documento requerido según la última versión que tenga el trabajador. */
+export function situacionRequisito(documentos: Documento[], tipo: TipoDocumento): { situacion: SituacionRequisito; documento?: Documento } {
+  const delTipo = documentos.filter((d) => d.tipo === tipo).sort((a, b) => b.numero - a.numero);
+  const firmado = delTipo.find((d) => d.estado === 'firmado');
+  if (firmado) return { situacion: 'firmado', documento: firmado };
+  if (delTipo[0]) return { situacion: 'en_curso', documento: delTipo[0] };
+  return { situacion: 'falta' };
+}
+
+export interface ResumenExpediente {
+  requeridosCompletos: number;
+  requeridosTotal: number;
+  pendientesFirma: number;
+  observados: number;
+  total: number;
+  ultimaActualizacion: string | null;
+}
+
+export function resumirExpediente(documentos: Documento[]): ResumenExpediente {
+  const fechas = documentos.map((d) => d.historial[d.historial.length - 1].fecha).sort();
+  return {
+    requeridosCompletos: TIPOS_REQUERIDOS.filter((t) => situacionRequisito(documentos, t).situacion === 'firmado').length,
+    requeridosTotal: TIPOS_REQUERIDOS.length,
+    pendientesFirma: documentos.filter((d) => d.estado === 'pendiente_firma').length,
+    observados: documentos.filter((d) => d.estado === 'observado').length,
+    total: documentos.length,
+    ultimaActualizacion: fechas[fechas.length - 1] ?? null,
+  };
+}
+
 export interface EventoDocumento {
   accion: 'creado' | 'enviado' | 'observado' | 'corregido' | 'firmado';
   usuario: string;

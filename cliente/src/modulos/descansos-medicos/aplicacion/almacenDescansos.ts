@@ -1,3 +1,4 @@
+import { ahoraLocal } from '@/compartido/formato/fechas';
 import { avisarCambioContadores } from '@/compartido/navegacion/contadores';
 import { useSyncExternalStore } from 'react';
 import {
@@ -34,7 +35,7 @@ const suscribir = (avisar: () => void) => {
 export const useListaDescansos = () => useSyncExternalStore(suscribir, () => descansos);
 export const leerDescansos = () => descansos;
 
-const ahora = () => new Date().toISOString();
+const ahora = ahoraLocal;
 
 function actualizar(id: string, evento: Omit<EventoHistorial, 'fecha'>, cambios: Partial<Descanso>) {
   publicar(

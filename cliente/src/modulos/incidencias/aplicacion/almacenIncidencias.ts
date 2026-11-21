@@ -100,4 +100,6 @@ export const emitirMemorandum = (i: Incidencia, medida: string, texto: string, u
   actualizar(i.id, { tipo: 'memo', usuario, texto: medida }, { estado: 'memo_emitido', memorandum: { medida, texto, emitido: ahoraIso() } });
 
 /** CUS36 + CUS37: el trabajador confirma la recepción y firma. */
-export const firmarRecepcion = (i: Incidencia, usuario: string) => actualizar(i.id, { tipo: 'firma', usuario }, { estado: 'memo_firmado' });
+/** El trabajador dibuja su firma para dejar constancia de que recibió el memorándum. */
+export const firmarRecepcion = (i: Incidencia, usuario: string, firmaImagen: string) =>
+  actualizar(i.id, { tipo: 'firma', usuario, firmaImagen }, { estado: 'memo_firmado' });

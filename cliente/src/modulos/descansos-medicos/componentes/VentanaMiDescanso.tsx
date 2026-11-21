@@ -174,6 +174,23 @@ export function VentanaMiDescanso({ descanso: d, alCerrar, alEnviar }: Propiedad
                     <small>{archivo ?? 'No presentado'}</small>
                   </div>
                   {d.sustentos[s.tipo] && <Button label="Ver" icon="pi pi-eye" text size="small" onClick={() => setVerTipo(s.tipo)} />}
+                  {/* Lo recién adjuntado se puede quitar o cambiar mientras no se envíe. */}
+                  {puedeSubir && nuevos[s.tipo] && (
+                    <Button
+                      icon="pi pi-times"
+                      text
+                      rounded
+                      size="small"
+                      aria-label="Quitar archivo"
+                      onClick={() =>
+                        setNuevos((n) => {
+                          const resto = { ...n };
+                          delete resto[s.tipo];
+                          return resto;
+                        })
+                      }
+                    />
+                  )}
                   {puedeSubir && <BotonAdjuntar alElegir={(nombre) => setNuevos((n) => ({ ...n, [s.tipo]: nombre }))} />}
                 </li>
               );

@@ -1,0 +1,99 @@
+/* Espacio de firma dentro del documento: sin recuadro, como en la hoja impresa. */
+.lienzo-firma {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.lienzo-firma__canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 520 / 160;
+  background: transparent;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.lienzo-firma__indicacion {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+/* Barra flotante de firma: queda fija abajo, centrada sobre el documento. */
+.barra-firma {
+  position: sticky;
+  bottom: 8px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  margin: 12px auto 0;
+  pointer-events: none;
+}
+
+.barra-firma__ayuda {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #3f3f46;
+  color: #ffffff;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.barra-firma__botones {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+  pointer-events: auto;
+}
+
+.barra-firma__botones button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #374151;
+  cursor: pointer;
+}
+
+.barra-firma__botones button:hover:not(:disabled) { background: #f3f4f6; }
+.barra-firma__botones button:disabled { color: #d1d5db; cursor: default; }
+.barra-firma__botones button:focus-visible { outline: 2px solid #111111; outline-offset: 1px; }
+.barra-firma__botones button.es-borrar:not(:disabled) { color: #e11d48; }
+.barra-firma__rehacer { transform: scaleX(-1); }
+
+.barra-firma__separador {
+  width: 1px;
+  height: 24px;
+  margin: 0 4px;
+  background: #e5e7eb;
+}
+
+.barra-firma__botones .barra-firma__enviar {
+  width: 44px;
+  height: 44px;
+  margin-left: 2px;
+  border-radius: 12px;
+  background: #111111;
+  color: #ffffff;
+}
+
+.barra-firma__botones .barra-firma__enviar:hover:not(:disabled) { background: #333333; }
+.barra-firma__botones .barra-firma__enviar:disabled { background: #a3a3a3; color: #ffffff; }

@@ -1,3 +1,4 @@
+import { aDiaLocal, ahoraLocal, hoyLocal, noFuturo } from '@/compartido/formato/fechas';
 import { useSyncExternalStore } from 'react';
 import { avisarCambioContadores } from '@/compartido/navegacion/contadores';
 
@@ -25,8 +26,9 @@ export function crearAlmacen<T>(inicial: () => T) {
   };
 }
 
-export const ahoraIso = () => new Date().toISOString();
-export const hoyIso = () => new Date().toISOString().slice(0, 10);
+/** Hora local de Perú (ver compartido/formato/fechas.ts). */
+export const ahoraIso = ahoraLocal;
+export const hoyIso = hoyLocal;
 
 const formatoCorto = new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: 'short' });
 const formatoMomento = new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
@@ -54,5 +56,6 @@ export function crearAleatorio(semilla: number) {
 export function haceDias(dias: number, hora = '09:00') {
   const d = new Date();
   d.setDate(d.getDate() - dias);
-  return `${d.toISOString().slice(0, 10)}T${hora}:00`;
+  // Un evento de hoy con hora posterior a la actual quedaría en el futuro: se limita a ahora.
+  return noFuturo(`${aDiaLocal(d)}T${hora}:00`);
 }

@@ -1,6 +1,7 @@
 import { Avatar } from 'primereact/avatar';
 import { useUsuarioActual } from '@/compartido/sesion/ContextoSesion';
-import { obtenerIniciales } from '@/compartido/sesion/tipos';
+import { NOMBRE_ROL, obtenerIniciales, rutaInicialPara } from '@/compartido/sesion/tipos';
+import { BotonVolver } from '@/compartido/componentes/BotonVolver';
 import './miCuenta.css';
 
 /** Datos de la cuenta del usuario en sesión (opción "Configurar" del menú del usuario). */
@@ -10,10 +11,13 @@ export function PaginaMiCuenta() {
     { etiqueta: 'Nombre', valor: usuario.nombre },
     { etiqueta: 'Cargo', valor: usuario.cargo },
     { etiqueta: 'Correo', valor: usuario.correo },
+    { etiqueta: 'Rol', valor: NOMBRE_ROL[usuario.rol ?? 'trabajador'] },
+    ...(usuario.sede ? [{ etiqueta: 'Sede', valor: usuario.sede }] : []),
   ];
 
   return (
     <div className="pagina-mi-cuenta">
+      <BotonVolver destino={rutaInicialPara(usuario.rol ?? 'trabajador')} />
       <header>
         <h1>Mi cuenta</h1>
         <p>Datos del usuario con el que iniciaste sesión</p>

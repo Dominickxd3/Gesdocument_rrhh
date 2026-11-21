@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+import { guardarComoPdf, nombreArchivo } from '@/compartido/documentos/guardarComoPdf';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { nombrePeriodo, type Boleta, type ConfiguracionBoletas, type Periodo } from '../dominio/boleta';
@@ -25,6 +27,7 @@ export function VentanaBoleta({
   alCopiarEnlace,
   alRevertirFirma,
 }: PropiedadesVentanaBoleta) {
+  const hoja = useRef<HTMLDivElement>(null);
   const encabezado = boleta && (
     <div className="ventana-boleta__encabezado">
       <span className="ventana-boleta__titulo">Boleta de pago · {nombrePeriodo(periodo)}</span>
@@ -33,6 +36,13 @@ export function VentanaBoleta({
 
   const pie = boleta && (
     <div className="ventana-boleta__pie">
+      <Button
+        label="Descargar PDF"
+        icon="pi pi-download"
+        text
+        className="boton-texto"
+        onClick={() => void guardarComoPdf(hoja.current, nombreArchivo('Boleta', nombrePeriodo(periodo), boleta.trabajador))}
+      />
       {boleta.firma === 'firmada' ? (
         <Button
           label="Revertir firma"
@@ -77,7 +87,9 @@ export function VentanaBoleta({
       breakpoints={{ '960px': '94vw', '640px': '100vw' }}
     >
       {boleta && (
-        <BoletaDocumento boleta={boleta} empresa={configuracion.empresa} firmaEmpleador={configuracion.firmaEmpleador} />
+        <div ref={hoja}>
+          <BoletaDocumento boleta={boleta} empresa={configuracion.empresa} firmaEmpleador={configuracion.firmaEmpleador} />
+        </div>
       )}
     </Dialog>
   );

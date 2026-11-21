@@ -104,7 +104,7 @@ export function TablaBoletas({
 
   return (
     <div className="tarjeta-tabla">
-      <DataTable
+      <DataTable responsiveLayout="stack" breakpoint="900px"
         value={boletas}
         dataKey="id"
         loading={cargando}

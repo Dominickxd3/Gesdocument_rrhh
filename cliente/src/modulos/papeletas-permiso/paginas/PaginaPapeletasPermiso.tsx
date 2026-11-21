@@ -1,4 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
+import { useUsuarioActual } from '@/compartido/sesion/ContextoSesion';
+import { esGestor } from '@/compartido/sesion/tipos';
+import { PaginaMisPapeletas } from './PaginaMisPapeletas';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -13,8 +16,14 @@ import { VentanaRechazo } from '../componentes/VentanaRechazo';
 import { VentanaImpresion } from '../componentes/VentanaImpresion';
 import '../componentes/papeletas.css';
 
-/** Prototipo de diseño (media fidelidad). Datos ficticios en memoria. */
+/** RR. HH. revisa y aprueba todas; el colaborador solo ve las suyas (RNF01). */
 export function PaginaPapeletasPermiso() {
+  const usuario = useUsuarioActual();
+  return esGestor(usuario) ? <PapeletasRrhh /> : <PaginaMisPapeletas />;
+}
+
+/** Prototipo de diseño (media fidelidad). Datos ficticios en memoria. */
+function PapeletasRrhh() {
   const pp = usePapeletas();
   const aviso = useRef<Toast>(null);
 

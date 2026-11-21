@@ -195,8 +195,8 @@ function MisMemorandums() {
         incidencia={detalle}
         modo="trabajador"
         alCerrar={() => setIdDetalle(null)}
-        alFirmar={(i) => {
-          firmarRecepcion(i, usuario.nombre);
+        alFirmar={(i, imagen) => {
+          firmarRecepcion(i, usuario.nombre, imagen);
           aviso.current?.show({ severity: 'success', summary: 'Recepción firmada', life: 2500 });
         }}
       />

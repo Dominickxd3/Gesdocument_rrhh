@@ -95,5 +95,20 @@ export function crearTrabajadores(): Trabajador[] {
     },
   });
 
+  // Ficha del usuario de prueba "seguridad": es un trabajador más, con cargo de Seguridad.
+  lista.push({
+    dni: '46213578',
+    nombre: 'VIGO SALAS, PEDRO',
+    area: 'ADM GESTIÓN HUMANA',
+    cargo: 'Prevencionista de Seguridad',
+    correo: 'pedro.vigo@correo.com',
+    telefono: '956 321 478',
+    sede: 'Lima – Canto Bello',
+    fechaIngreso: '2019-08-01',
+    jefe: 'TORRES CANO, MARÍA',
+    historialJefes: [{ jefe: 'TORRES CANO, MARÍA', desde: '2019-08-01' }],
+    ...datosContrato('2019-08-01', 'Prevencionista de Seguridad'),
+  });
+
   return lista.sort((a, b) => a.nombre.localeCompare(b.nombre));
 }
