@@ -7,6 +7,8 @@ import { esGestor, type UsuarioSesion } from '@/compartido/sesion/tipos';
 import { almacenDocumentos } from '@/modulos/documentos/aplicacion/almacenDocumentos';
 import { almacenIncidencias } from '@/modulos/incidencias/aplicacion/almacenIncidencias';
 import { leerDescansos } from '@/modulos/descansos-medicos/aplicacion/almacenDescansos';
+import { almacenPapeletas } from '@/modulos/papeletas-permiso/aplicacion/almacenPapeletas';
+import { faltaFirmaColaborador } from '@/modulos/papeletas-permiso/dominio/papeleta';
 
 export interface Pendiente {
   ruta: string;
@@ -20,6 +22,7 @@ export function pendientesDe(usuario: UsuarioSesion): Pendiente[] {
   const documentos = almacenDocumentos.leer();
   const incidencias = almacenIncidencias.leer();
   const descansos = leerDescansos();
+  const papeletas = almacenPapeletas.leer();
 
   if (esGestor(usuario)) {
     return [
@@ -56,6 +59,13 @@ export function pendientesDe(usuario: UsuarioSesion): Pendiente[] {
       cantidad: documentos.filter((d) => d.dni === usuario.dni && d.estado === 'pendiente_firma').length,
     },
     {
+      ruta: '/papeletas-permiso',
+      icono: 'pi pi-clock',
+      titulo: 'Papeletas por firmar',
+      detalle: 'RR. HH. las aprobó; fírmalas antes de salir',
+      cantidad: papeletas.filter((p) => p.trabajador.dni === usuario.dni && faltaFirmaColaborador(p)).length,
+    },
+    {
       ruta: '/mi-expediente/descansos-medicos',
       icono: 'pi pi-heart',
       titulo: 'Descansos médicos por completar',
@@ -73,6 +83,6 @@ export function pendientesDe(usuario: UsuarioSesion): Pendiente[] {
 }
 
 // Rutas de RR. HH. y de las secciones de "Mi expediente" del trabajador.
-for (const ruta of ['/descansos-medicos', '/documentos', '/incidencias', '/mi-expediente/documentos', '/mi-expediente/descansos-medicos', '/mi-expediente/memorandums']) {
+for (const ruta of ['/papeletas-permiso', '/descansos-medicos', '/documentos', '/incidencias', '/mi-expediente/documentos', '/mi-expediente/descansos-medicos', '/mi-expediente/memorandums']) {
   registrarContador(ruta, (usuario) => pendientesDe(usuario).find((p) => p.ruta === ruta)?.cantidad ?? 0);
 }

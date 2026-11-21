@@ -93,3 +93,8 @@
 @media (max-width: 640px) {
   .dp-datos { grid-template-columns: 1fr; }
 }
+.dp-estado.es-alerta { margin: 0 0 12px; background: #fffbeb; color: #92400e; }
+.dp-estado.es-firmar { background: #eff6ff; color: #1e40af; }
+
+/* Barra de firma debajo de la hoja (no flota encima de la papeleta). */
+.dp-barra-firma .barra-firma { position: static; margin-top: 10px; }

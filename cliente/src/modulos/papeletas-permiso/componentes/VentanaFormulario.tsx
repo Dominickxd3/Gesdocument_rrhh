@@ -12,6 +12,7 @@ import {
   validarPapeleta,
   type DatosPapeleta,
   type Papeleta,
+  numeroPapeleta,
 } from '../dominio/papeleta';
 import { HOY, TRABAJADORES } from '../infraestructura/datosPrueba';
 import { SelectorTrabajador } from '@/compartido/componentes/SelectorTrabajador';
@@ -76,7 +77,7 @@ export function VentanaFormulario({ visible, papeleta, siguienteNumero, alCerrar
       onHide={alCerrar}
       header={
         <div className="pp-ventana__titulo">
-          <span>{papeleta ? `Editar papeleta #${papeleta.numero}` : 'Nueva papeleta de salida'}</span>
+          <span>{papeleta ? `Editar papeleta N° ${numeroPapeleta(papeleta.numero)}` : 'Nueva papeleta de salida'}</span>
           {!papeleta && <small>Se asignará el N° {siguienteNumero} al guardar</small>}
         </div>
       }

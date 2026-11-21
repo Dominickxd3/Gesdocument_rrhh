@@ -1,4 +1,5 @@
 import type { ReactNode, Ref } from 'react';
+import type { ControlFirma } from '@/compartido/componentes/LienzoFirma';
 import { fechaLarga, momento } from '@/compartido/almacen/crearAlmacen';
 import { buscarTrabajador } from '@/modulos/trabajadores/aplicacion/almacenTrabajadores';
 import { iniciales, nombreLegible } from '@/modulos/trabajadores/dominio/trabajador';
@@ -15,6 +16,10 @@ interface Propiedades {
   refHoja?: Ref<HTMLElement>;
   /** Sección final de la columna derecha (control de salida). */
   children?: ReactNode;
+  /** El colaborador está firmando su papeleta. */
+  controlFirma?: ControlFirma;
+  /** Contenido justo debajo de la hoja (p. ej. la barra de firma). */
+  bajoLaHoja?: ReactNode;
 }
 
 /** Última aprobación de RR. HH. en el historial. */
@@ -24,7 +29,7 @@ export const aprobacionDe = (p: Papeleta) => [...p.historial].reverse().find((h)
  * Papeleta detallada: autorización de RR. HH., la papeleta en formato oficial y los datos del colaborador.
  * La ven igual el trabajador (para mostrarla al salir) y Seguridad (que la evalúa y registra la salida).
  */
-export function DetallePapeleta({ papeleta, copia, refHoja, children }: Propiedades) {
+export function DetallePapeleta({ papeleta, copia, refHoja, children, controlFirma, bajoLaHoja }: Propiedades) {
   const aprobacion = aprobacionDe(papeleta);
   const ficha = buscarTrabajador(papeleta.trabajador.dni);
   // El jefe inmediato es quien registró la papeleta; la ficha lo confirma si existe.
@@ -58,9 +63,10 @@ export function DetallePapeleta({ papeleta, copia, refHoja, children }: Propieda
           <h3 className="dp-titulo-seccion">Papeleta</h3>
           <article className="pp-hoja papel-A5 dp-hoja" ref={refHoja}>
             <div className="pp-hoja__cuerpo">
-              <CopiaPapeleta p={papeleta} copia={copia} />
+              <CopiaPapeleta p={papeleta} copia={copia} controlFirma={controlFirma} />
             </div>
           </article>
+          {bajoLaHoja}
         </section>
 
         <div className="dp-lateral">

@@ -1,3 +1,4 @@
+import { numeroPapeleta } from '../dominio/papeleta';
 import { useMemo, useRef, useState } from 'react';
 import { useUsuarioActual } from '@/compartido/sesion/ContextoSesion';
 import { esGestor } from '@/compartido/sesion/tipos';
@@ -40,18 +41,18 @@ function PapeletasRrhh() {
 
   const aprobar = (lista: Papeleta[]) => {
     pp.aprobar(lista.map((p) => p.id));
-    avisar(lista.length === 1 ? `Papeleta #${lista[0].numero} aprobada` : `${lista.length} papeletas aprobadas`);
+    avisar(lista.length === 1 ? `Papeleta N° ${numeroPapeleta(lista[0].numero)} aprobada` : `${lista.length} papeletas aprobadas`);
   };
 
   const rechazar = (motivo: string) => {
     pp.rechazar(aRechazar.map((p) => p.id), motivo);
-    avisar(aRechazar.length === 1 ? `Papeleta #${aRechazar[0].numero} rechazada` : `${aRechazar.length} papeletas rechazadas`, motivo);
+    avisar(aRechazar.length === 1 ? `Papeleta N° ${numeroPapeleta(aRechazar[0].numero)} rechazada` : `${aRechazar.length} papeletas rechazadas`, motivo);
     setARechazar([]);
   };
 
   const anular = (p: Papeleta) =>
     confirmDialog({
-      header: `Anular papeleta #${p.numero}`,
+      header: `Anular papeleta N° ${numeroPapeleta(p.numero)}`,
       message: 'Quedará como anulada y no contará en reportes. Podrás restaurarla después.',
       icon: 'pi pi-ban',
       acceptLabel: 'Sí, anular',
@@ -60,14 +61,14 @@ function PapeletasRrhh() {
       rejectClassName: 'p-button-text',
       accept: () => {
         pp.anular(p.id);
-        avisar(`Papeleta #${p.numero} anulada`, undefined, 'info');
+        avisar(`Papeleta N° ${numeroPapeleta(p.numero)} anulada`, undefined, 'info');
       },
     });
 
   const guardar = (datos: DatosPapeleta) => {
     const numero = pp.guardar(datos, formulario.papeleta?.id);
     setFormulario({ visible: false, papeleta: null });
-    avisar(formulario.papeleta ? `Papeleta #${numero} actualizada` : `Papeleta #${numero} registrada`, 'Queda pendiente de aprobación.');
+    avisar(formulario.papeleta ? `Papeleta N° ${numeroPapeleta(numero)} actualizada` : `Papeleta N° ${numeroPapeleta(numero)} registrada`, 'Queda pendiente de aprobación.');
   };
 
   return (
@@ -115,7 +116,7 @@ function PapeletasRrhh() {
         alAnular={anular}
         alRestaurar={(p) => {
           pp.restaurar(p.id);
-          avisar(`Papeleta #${p.numero} restaurada`, 'Volvió a pendiente.', 'info');
+          avisar(`Papeleta N° ${numeroPapeleta(p.numero)} restaurada`, 'Volvió a pendiente.', 'info');
         }}
         alImprimir={setAImprimir}
       />

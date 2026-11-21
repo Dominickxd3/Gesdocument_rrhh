@@ -1,8 +1,10 @@
 import { useRef, useState } from 'react';
+import { LienzoFirma, type ControlFirma } from '@/compartido/componentes/LienzoFirma';
+import { TrazoFirma } from '@/modulos/boletas-pago/componentes/TrazoFirma';
 import { guardarComoPdf, nombreArchivo } from '@/compartido/documentos/guardarComoPdf';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import { duracionMinutos, etiquetaTipo, type Papeleta } from '../dominio/papeleta';
+import { duracionMinutos, etiquetaTipo, type Papeleta, numeroPapeleta } from '../dominio/papeleta';
 
 interface Propiedades {
   papeleta: Papeleta | null;
@@ -32,9 +34,12 @@ function tiempoLargo(minutos: number | null) {
 }
 
 /** Una copia de la papeleta impresa. Control de salidas muestra la "Copia para Vigilancia". */
-export function CopiaPapeleta({ p, copia }: { p: Papeleta; copia: string }) {
+export function CopiaPapeleta({ p, copia, controlFirma }: { p: Papeleta; copia: string; /** El colaborador está firmando: su línea es el espacio para dibujar. */ controlFirma?: ControlFirma }) {
   const emision = p.historial[0]?.fecha ?? p.fecha;
   const jefe = p.historial.find((h) => h.accion === 'creada')?.usuario ?? '';
+  // Visto bueno de Gestión Humana: queda al aprobarse la papeleta.
+  const aprobacion = p.estado === 'aprobada' ? [...p.historial].reverse().find((h) => h.accion === 'aprobada') : undefined;
+  const firma = p.firmaColaborador;
   const filas: [string, string][] = [
     ['DOI:', p.trabajador.dni],
     ['Nombres y Apellidos:', p.trabajador.nombre],
@@ -90,9 +95,25 @@ export function CopiaPapeleta({ p, copia }: { p: Papeleta; copia: string }) {
           <span className="pp-copia__linea">V°B° Jefe Inmediato</span>
         </div>
         <div>
+          {aprobacion && (
+            <span className="pp-copia__visto">
+              <span className="pp-copia__visto-marca" aria-hidden="true">✓</span> {aprobacion.usuario}
+            </span>
+          )}
           <span className="pp-copia__linea">V°B° Gestion Humana</span>
         </div>
         <div>
+          {firma ? (
+            firma.imagen ? (
+              <img src={firma.imagen} alt={`Firma de ${p.trabajador.nombre}`} className="pp-copia__firma" />
+            ) : (
+              <span className="pp-copia__firma">
+                <TrazoFirma etiqueta={`Firma de ${p.trabajador.nombre}`} />
+              </span>
+            )
+          ) : (
+            controlFirma && <LienzoFirma control={controlFirma} />
+          )}
           <span className="pp-copia__linea">Colaborador</span>
         </div>
       </div>
@@ -119,7 +140,7 @@ export function VentanaImpresion({ papeleta: p, alCerrar }: Propiedades) {
     <Dialog
       visible={!!p}
       onHide={alCerrar}
-      header={p ? `Papeleta de permiso N° ${p.numero}` : ''}
+      header={p ? `Papeleta de permiso N° ${numeroPapeleta(p.numero)}` : ''}
       className="pp-ventana pp-ventana-impresion"
       style={{ width: '980px' }}
       breakpoints={{ '1024px': '96vw' }}

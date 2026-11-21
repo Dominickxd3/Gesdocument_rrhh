@@ -53,6 +53,14 @@ export interface Papeleta {
   historial: EventoHistorial[];
   /** Registro de Seguridad en la puerta (CUS18); solo en papeletas aprobadas. */
   controlSalida?: ControlSalida;
+  /** Firma del colaborador en su papeleta aprobada (la dibuja él mismo). */
+  firmaColaborador?: FirmaColaborador;
+}
+
+export interface FirmaColaborador {
+  /** Firma dibujada (PNG, data URL). Las papeletas de ejemplo antiguas no la tienen y muestran un trazo de muestra. */
+  imagen?: string;
+  fecha: string;
 }
 
 export interface ControlSalida {
@@ -106,6 +114,12 @@ export function formatearHora(hora: string): string {
 }
 
 export const puedeImprimir = (p: Papeleta) => p.estado === 'aprobada';
+
+/** Correlativo de la papeleta con cuatro dígitos: 1 → "0001". */
+export const numeroPapeleta = (numero: number) => String(numero).padStart(4, '0');
+
+/** Aprobada por RR. HH. y aún sin la firma del colaborador. */
+export const faltaFirmaColaborador = (p: Papeleta) => p.estado === 'aprobada' && !p.firmaColaborador;
 export const puedeEditar = (p: Papeleta) => p.estado === 'pendiente';
 export const puedeResolver = (p: Papeleta) => p.estado === 'pendiente';
 

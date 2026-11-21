@@ -812,3 +812,29 @@
   .pp-copia__logo { top: 0; left: 0; width: 2.2em; }
   .pp-copia__firmante { padding-left: 2.6em !important; font-size: 0.85em !important; line-height: 1.2; }
 }
+
+/* Firmas de la papeleta: visto bueno de Gestión Humana y firma del colaborador sobre su línea. */
+.pp-copia__visto {
+  display: block;
+  margin-bottom: 0.2em;
+  color: #15803d;
+  font-size: 1.05em;
+  font-weight: 700;
+  text-align: center;
+}
+.pp-copia__visto-marca { font-size: 1.2em; }
+.pp-copia__firma {
+  display: block;
+  max-width: 100%;
+  height: 3.2em;
+  margin: 0 auto 0.1em;
+  object-fit: contain;
+}
+.pp-copia__firma svg { height: 100%; }
+.pp-copia__firmas .lienzo-firma { max-width: none; margin-bottom: 0.1em; }
+
+/* Papeleta angosta (celular): las firmas una debajo de otra, así el espacio para firmar es amplio. */
+@container (max-width: 560px) {
+  .pp-copia__firmas { grid-template-columns: minmax(0, 1fr) !important; gap: 1.4em; }
+  .pp-copia__firma { height: 4.5em; }
+}

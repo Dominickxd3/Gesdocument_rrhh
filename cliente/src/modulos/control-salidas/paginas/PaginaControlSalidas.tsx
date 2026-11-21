@@ -14,7 +14,7 @@ import { fechaLarga } from '@/compartido/almacen/crearAlmacen';
 import '@/compartido/estilos/listados';
 import { nombreLegible } from '@/modulos/trabajadores/dominio/trabajador';
 import { SEDES } from '@/modulos/trabajadores/infraestructura/datosTrabajadores';
-import { formatearHora, type Papeleta } from '@/modulos/papeletas-permiso/dominio/papeleta';
+import { formatearHora, type Papeleta, numeroPapeleta } from '@/modulos/papeletas-permiso/dominio/papeleta';
 import { registrarSalida, usePapeletasCompartidas } from '@/modulos/papeletas-permiso/aplicacion/almacenPapeletas';
 import { autorizacionDe, papeletasAutorizadas } from '../aplicacion/controlSalidas';
 import { VentanaRegistroSalida } from '../componentes/VentanaRegistroSalida';
@@ -107,7 +107,7 @@ export function PaginaControlSalidas() {
         alAbrir={(p) => setIdAbierta(p.id)}
         claseFila={(p) => (p.controlSalida ? 'cs-fila es-registrada' : 'cs-fila')}
       >
-        <Column header="N°" body={(p: Papeleta) => <strong>{p.numero}</strong>} className="pp-col-fecha" />
+        <Column header="N°" body={(p: Papeleta) => <strong>{numeroPapeleta(p.numero)}</strong>} className="pp-col-fecha" />
         <Column header="Trabajador" body={(p: Papeleta) => <CeldaPersona nombre={p.trabajador.nombre} detalle={`DNI ${p.trabajador.dni}`} />} />
         <Column header="Área" body={(p: Papeleta) => p.trabajador.area} className="col-area tr-col-gris" headerClassName="col-area" />
         <Column header="Salida" body={(p: Papeleta) => <strong>{formatearHora(p.salida)}</strong>} />
@@ -123,7 +123,7 @@ export function PaginaControlSalidas() {
         alRegistrar={(p, hora, nota) => {
           registrarSalida(p.id, hora, nombreLegible(usuario.nombre), nota);
           setIdAbierta(null);
-          aviso.current?.show({ severity: 'success', summary: `Salida registrada · Papeleta N° ${p.numero}`, life: 3000 });
+          aviso.current?.show({ severity: 'success', summary: `Salida registrada · Papeleta N° ${numeroPapeleta(p.numero)}`, life: 3000 });
         }}
       />
     </div>

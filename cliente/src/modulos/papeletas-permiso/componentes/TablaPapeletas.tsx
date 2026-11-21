@@ -3,7 +3,7 @@ import { useFilasDisponibles } from '@/compartido/ganchos/useFilasDisponibles';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
-import { puedeResolver, type Papeleta } from '../dominio/papeleta';
+import { puedeResolver, type Papeleta, numeroPapeleta } from '../dominio/papeleta';
 import { Avatar, Horario, InsigniaEstado } from './Insignias';
 
 interface Propiedades {
@@ -23,7 +23,7 @@ function NumeroFecha({ p }: { p: Papeleta }) {
   const d = new Date(`${p.fecha}T12:00:00`);
   return (
     <div className="pp-fecha">
-      <strong>#{p.numero}</strong>
+      <strong>N° {numeroPapeleta(p.numero)}</strong>
       <small>
         {formatoDia.format(d)} {formatoFecha.format(d)}
       </small>

@@ -1,0 +1,35 @@
+/*
+ * Lista de resultados del buscador de trabajadores.
+ * Nunca más ancha que la pantalla: si lo fuera, en el celular desplazaba toda la ventana hacia un lado.
+ */
+.selector-trabajador__panel {
+  max-width: calc(100vw - 16px) !important;
+}
+
+.selector-trabajador__panel .p-autocomplete-item {
+  padding: 10px 12px;
+  white-space: normal;
+}
+
+.selector-trabajador__panel .pp-sugerencia,
+.selector-trabajador__panel .pp-sugerencia > div {
+  min-width: 0;
+}
+
+.selector-trabajador__panel .pp-avatar {
+  flex-shrink: 0;
+}
+
+.selector-trabajador__panel .pp-sugerencia strong,
+.selector-trabajador__panel .pp-sugerencia small {
+  overflow-wrap: anywhere;
+}
+
+/* Celular: la lista ocupa el ancho de la pantalla, con un margen a cada lado. */
+@media (max-width: 640px) {
+  .selector-trabajador__panel {
+    left: 8px !important;
+    width: calc(100vw - 16px) !important;
+    min-width: 0 !important;
+  }
+}

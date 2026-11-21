@@ -10,6 +10,7 @@ import {
   puedeResolver,
   type EventoHistorial,
   type Papeleta,
+  numeroPapeleta,
 } from '../dominio/papeleta';
 import { Avatar, InsigniaEstado } from './Insignias';
 
@@ -58,7 +59,7 @@ export function PanelDetalle(props: Propiedades) {
           <header className="pp-panel__encabezado">
             <div>
               <span className="pp-panel__kicker">Papeleta de salida</span>
-              <h2>#{p.numero}</h2>
+              <h2>N° {numeroPapeleta(p.numero)}</h2>
             </div>
             <InsigniaEstado estado={p.estado} />
             <Button icon="pi pi-times" text rounded aria-label="Cerrar" className="pp-panel__cerrar" onClick={alCerrar} />

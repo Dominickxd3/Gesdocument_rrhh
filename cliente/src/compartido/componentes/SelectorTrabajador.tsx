@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AutoComplete } from 'primereact/autocomplete';
 import { Button } from 'primereact/button';
+import './selectorTrabajador.css';
 
 export interface OpcionTrabajador {
   dni: string;
@@ -99,6 +100,7 @@ export function SelectorTrabajador({ opciones, valor, alCambiar, etiqueta = 'Tra
         showEmptyMessage
         className={error ? 'p-invalid' : ''}
         inputClassName="pp-ancho-completo"
+        panelClassName="selector-trabajador__panel"
       />
       {error && <small className="pp-campo__error">{error}</small>}
     </label>

@@ -10,6 +10,11 @@ export const almacenPapeletas = crearAlmacen(crearPapeletasPrueba);
 
 export const usePapeletasCompartidas = () => almacenPapeletas.usar();
 
+/** El colaborador firma su papeleta aprobada por RR. HH. (firma dibujada). */
+export function firmarPapeleta(id: string, imagen: string) {
+  almacenPapeletas.escribir((lista) => lista.map((p) => (p.id === id ? { ...p, firmaColaborador: { imagen, fecha: ahoraLocal() } } : p)));
+}
+
 /** CUS18: Seguridad registra que verificó la papeleta y la hora en que el trabajador salió. */
 export function registrarSalida(id: string, hora: string, usuario: string, nota?: string) {
   almacenPapeletas.escribir((lista) =>

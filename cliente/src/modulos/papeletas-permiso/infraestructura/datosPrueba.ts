@@ -76,7 +76,8 @@ export function crearPapeletasPrueba(): Papeleta[] {
   const lista: Papeleta[] = [];
   const total = 64;
   for (let i = 0; i < total; i++) {
-    const numero = 1000 + total - i;
+    // Correlativo nuevo: la papeleta más antigua es la 0001.
+    const numero = total - i;
     const dias = Math.floor(i / 6);
     const fecha = fechaHaceDias(dias);
     const [tipo, motivo] = elegir(MOTIVOS);
@@ -115,9 +116,11 @@ export function crearPapeletasPrueba(): Papeleta[] {
       retorno,
       estado,
       historial,
+      // Las aprobadas de días anteriores ya las firmó el colaborador; las de hoy, aún no.
+      firmaColaborador: estado === 'aprobada' && dias > 0 ? { fecha: creada } : undefined,
     });
   }
-  return [...lista, ...papeletasDeCuentasPrueba()];
+  return [...lista, ...papeletasDeCuentasPrueba(total + 1)];
 }
 
 /** Trabajadores de los usuarios de prueba (se vinculan por DNI con su cuenta). */
@@ -125,7 +128,7 @@ const JOSE: Trabajador = { dni: '45871236', nombre: 'QUISPE ROJAS, JOSÉ', cargo
 const PEDRO: Trabajador = { dni: '46213578', nombre: 'VIGO SALAS, PEDRO', cargo: 'Prevencionista de Seguridad', area: 'ADM GESTIÓN HUMANA', sede: 'Lima – Canto Bello' };
 
 /** Papeletas fijas de los usuarios de prueba, para ver "Mis papeletas" y Control de salidas. */
-function papeletasDeCuentasPrueba(): Papeleta[] {
+function papeletasDeCuentasPrueba(primerNumero: number): Papeleta[] {
   const datos: [Trabajador, number, EstadoPapeleta, TipoPermiso, string, string, string | null, string][] = [
     [JOSE, 0, 'aprobada', 'comision', 'Trámite en RENIEC por encargo de la empresa', '11:00', '12:30', JEFES[0]],
     [JOSE, 6, 'aprobada', 'compensacion', 'Cita médica programada', '15:00', null, JEFES[0]],
@@ -139,7 +142,9 @@ function papeletasDeCuentasPrueba(): Papeleta[] {
     const historial: Papeleta['historial'] = [{ accion: 'creada', usuario: jefe, fecha: creada }];
     if (estado === 'aprobada') historial.push({ accion: 'aprobada', usuario: USUARIOS_RRHH[0], fecha: noFuturo(`${fecha}T08:00:00`) });
     if (estado === 'rechazada') historial.push({ accion: 'rechazada', usuario: USUARIOS_RRHH[1], fecha: noFuturo(`${fecha}T08:00:00`), nota: 'No adjuntó sustento.' });
-    const numero = 1200 + i;
-    return { id: `pp-${numero}`, numero, fecha, trabajador, tipo, motivo, observaciones: '', salida, retorno, estado, historial };
+    const numero = primerNumero + i;
+    // José ya firmó su papeleta de hace 6 días; las demás aprobadas esperan su firma para probar el flujo.
+    const firmaColaborador = estado === 'aprobada' && dias === 6 ? { fecha: creada } : undefined;
+    return { id: `pp-${numero}`, numero, fecha, trabajador, tipo, motivo, observaciones: '', salida, retorno, estado, historial, firmaColaborador };
   });
 }

@@ -169,8 +169,9 @@ export function LienzoFirma({ control, etiqueta = 'Firme aquí' }: { control: Co
 
 interface PropiedadesBarra {
   control: ControlFirma;
-  zoom: number;
-  alCambiarZoom: (zoom: number) => void;
+  /** Sin zoom (p. ej. la papeleta, que ya se ve a buen tamaño) se ocultan esos botones. */
+  zoom?: number;
+  alCambiarZoom?: (zoom: number) => void;
   alEnviar: () => void;
   enviando?: boolean;
 }
@@ -184,10 +185,10 @@ const FACTOR = 1.25;
  * Barra flotante para firmar: deshacer/rehacer por trazo, borrar, zoom del documento y enviar.
  * El botón de enviar se activa cuando hay una firma dibujada.
  */
-export function BarraFirma({ control, zoom, alCambiarZoom, alEnviar, enviando = false }: PropiedadesBarra) {
+export function BarraFirma({ control, zoom = 1, alCambiarZoom, alEnviar, enviando = false }: PropiedadesBarra) {
   // Tras cada cambio de zoom se centra el espacio de firma, para no tener que buscarlo.
   const cambiar = (siguiente: number) => {
-    alCambiarZoom(siguiente);
+    alCambiarZoom?.(siguiente);
     requestAnimationFrame(() =>
       requestAnimationFrame(() => document.querySelector('.lienzo-firma')?.scrollIntoView({ block: 'center', inline: 'center', behavior: 'smooth' })),
     );
@@ -207,6 +208,8 @@ export function BarraFirma({ control, zoom, alCambiarZoom, alEnviar, enviando = 
         <button type="button" className="es-borrar" onClick={control.borrar} disabled={control.vacia} aria-label="Borrar firma" title="Borrar">
           <i className="pi pi-eraser" aria-hidden="true" />
         </button>
+        {alCambiarZoom && (
+          <>
         <span className="barra-firma__separador" />
         <button type="button" onClick={() => ajustar(1 / FACTOR)} disabled={zoom <= ZOOM_MIN} aria-label="Alejar" title="Alejar">
           <i className="pi pi-search-minus" aria-hidden="true" />
@@ -217,6 +220,8 @@ export function BarraFirma({ control, zoom, alCambiarZoom, alEnviar, enviando = 
         <button type="button" onClick={() => ajustar(FACTOR)} disabled={zoom >= ZOOM_MAX} aria-label="Acercar" title="Acercar">
           <i className="pi pi-search-plus" aria-hidden="true" />
         </button>
+          </>
+        )}
         <span className="barra-firma__separador" />
         <button
           type="button"

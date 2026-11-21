@@ -80,6 +80,8 @@ Usuarios de prueba (contraseña `Mockup2026`, salvo `admin`): `admin`, `maria.to
 
 - **Guardar documentos:** boletas, contratos y demás documentos, papeletas y memorándums tienen el botón **Descargar PDF** (`compartido/documentos/guardarComoPdf.ts`). Descarga el archivo directamente, sin diálogo de impresión ni librerías: dibuja la hoja como imagen y arma un PDF A4 (una o varias páginas) con un nombre como "Boleta - Septiembre 2026 - QUISPE ROJAS JOSÉ.pdf". El texto del PDF no se puede seleccionar; en producción el servidor podrá generar el PDF con texto. Los documentos subidos como archivo se descargan tal cual.
 - **Papeleta digital:** ya no se imprime (sin selector A5/A4). El trabajador abre su papeleta aprobada con el mismo detalle que ve Seguridad (`papeletas-permiso/componentes/DetallePapeleta.tsx`): autorización de RR. HH., la papeleta en formato oficial y sus datos, para mostrarla en vigilancia. Seguridad la evalúa y registra la salida.
+- **Firmas de la papeleta:** al aprobarla, el visto bueno de RR. HH. (nombre de quien aprobó) queda en la línea "V°B° Gestión Humana". Luego el colaborador la firma él mismo, dibujando sobre la línea "Colaborador" ("Mis papeletas" avisa cuáles faltan firmar). Seguridad ve si el colaborador ya firmó.
+- **Correlativo:** las papeletas se numeran desde 0001 con cuatro dígitos (`numeroPapeleta` en `papeletas-permiso/dominio/papeleta.ts`).
 
 ## Control de salidas (Seguridad)
 

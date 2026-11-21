@@ -3,7 +3,7 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { guardarComoPdf, nombreArchivo } from '@/compartido/documentos/guardarComoPdf';
-import { formatearHora, type Papeleta } from '@/modulos/papeletas-permiso/dominio/papeleta';
+import { formatearHora, type Papeleta, numeroPapeleta } from '@/modulos/papeletas-permiso/dominio/papeleta';
 import { DetallePapeleta } from '@/modulos/papeletas-permiso/componentes/DetallePapeleta';
 
 interface Propiedades {
@@ -64,7 +64,7 @@ export function VentanaRegistroSalida({ papeleta, alCerrar, alRegistrar }: Propi
     <Dialog
       visible
       onHide={alCerrar}
-      header={`Papeleta N° ${papeleta.numero}`}
+      header={`Papeleta N° ${numeroPapeleta(papeleta.numero)}`}
       footer={pie}
       modal
       draggable={false}
@@ -74,6 +74,12 @@ export function VentanaRegistroSalida({ papeleta, alCerrar, alRegistrar }: Propi
       breakpoints={{ '1200px': '96vw', '640px': '100vw' }}
     >
       <DetallePapeleta papeleta={papeleta} copia="Copia para Vigilancia" refHoja={hoja}>
+        {!papeleta.firmaColaborador && (
+          <p className="dp-estado es-alerta">
+            <i className="pi pi-exclamation-triangle" aria-hidden="true" />
+            <span>El colaborador aún no firmó su papeleta. Pídele que la firme desde su cuenta antes de salir.</span>
+          </p>
+        )}
         {registrada ? (
           <div className="cs-registro">
             <i className="pi pi-check-circle" aria-hidden="true" />
