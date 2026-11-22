@@ -97,9 +97,10 @@ function estadoPara(indice: number): EstadoDescanso {
 }
 
 export function crearDescansosPrueba(): Descanso[] {
-  return Array.from({ length: 26 }, (_, i) => {
+  // 26 del último mes (con casos por revisar) y el histórico de unos 6 meses, ya resuelto.
+  return Array.from({ length: 64 }, (_, i) => {
     const numero = 300 - i;
-    const dias = Math.floor(i * 1.2);
+    const dias = i < 26 ? Math.floor(i * 1.2) : 31 + Math.floor((i - 26) * 4);
     const inicio = haceDias(dias);
     const fin = masDias(inicio, elegir([0, 1, 2, 2, 3, 6]));
     const estado = estadoPara(i);

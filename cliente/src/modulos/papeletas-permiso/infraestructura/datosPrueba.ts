@@ -74,11 +74,17 @@ function fechaHaceDias(dias: number) {
 
 export function crearPapeletasPrueba(): Papeleta[] {
   const lista: Papeleta[] = [];
-  const total = 64;
+  // 64 papeletas de los últimos 11 días (detalle diario) y el histórico de unos 6 meses,
+  // para que los gráficos por mes del Inicio muestren una tendencia.
+  const recientes = 64;
+  const total = recientes + 330;
+  let diasHistorico = 11;
   for (let i = 0; i < total; i++) {
     // Correlativo nuevo: la papeleta más antigua es la 0001.
     const numero = total - i;
-    const dias = Math.floor(i / 6);
+    // Unas 2 papeletas por día en promedio, con días más y menos cargados.
+    if (i >= recientes) diasHistorico += azar() < 0.5 ? 0 : 1;
+    const dias = i < recientes ? Math.floor(i / 6) : diasHistorico;
     const fecha = fechaHaceDias(dias);
     const [tipo, motivo] = elegir(MOTIVOS);
     const hSalida = 7 + Math.floor(azar() * 10);
@@ -133,6 +139,11 @@ function papeletasDeCuentasPrueba(primerNumero: number): Papeleta[] {
     [JOSE, 0, 'aprobada', 'comision', 'Trámite en RENIEC por encargo de la empresa', '11:00', '12:30', JEFES[0]],
     [JOSE, 6, 'aprobada', 'compensacion', 'Cita médica programada', '15:00', null, JEFES[0]],
     [JOSE, 13, 'rechazada', 'otros', 'Asunto personal', '09:00', '10:00', JEFES[0]],
+    [JOSE, 41, 'aprobada', 'compensacion', 'Compensa horas del sábado', '16:00', null, JEFES[0]],
+    [JOSE, 75, 'aprobada', 'comision', 'Entrega de documentos a SUNAT', '10:00', '11:30', JEFES[1]],
+    [JOSE, 79, 'aprobada', 'otros', 'Trámites en el banco', '08:30', '09:15', JEFES[1]],
+    [JOSE, 118, 'aprobada', 'medio_dia_vacaciones', 'Asuntos familiares', '13:00', null, JEFES[1]],
+    [JOSE, 150, 'rechazada', 'otros', 'Asunto personal', '11:00', '12:00', JEFES[1]],
     [PEDRO, 1, 'pendiente', 'medio_dia_vacaciones', 'Medio día de vacaciones', '13:00', null, JEFES[1]],
     [PEDRO, 9, 'aprobada', 'comision', 'Capacitación en seguridad en sede Lurín', '08:30', '12:00', JEFES[1]],
   ];
@@ -144,7 +155,8 @@ function papeletasDeCuentasPrueba(primerNumero: number): Papeleta[] {
     if (estado === 'rechazada') historial.push({ accion: 'rechazada', usuario: USUARIOS_RRHH[1], fecha: noFuturo(`${fecha}T08:00:00`), nota: 'No adjuntó sustento.' });
     const numero = primerNumero + i;
     // José ya firmó su papeleta de hace 6 días; las demás aprobadas esperan su firma para probar el flujo.
-    const firmaColaborador = estado === 'aprobada' && dias === 6 ? { fecha: creada } : undefined;
+    // Las del histórico (6 días o más) ya están firmadas; las recientes quedan para probar la firma.
+    const firmaColaborador = estado === 'aprobada' && dias >= 6 ? { fecha: creada } : undefined;
     return { id: `pp-${numero}`, numero, fecha, trabajador, tipo, motivo, observaciones: '', salida, retorno, estado, historial, firmaColaborador };
   });
 }

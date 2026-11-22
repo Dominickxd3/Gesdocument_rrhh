@@ -138,3 +138,49 @@
   .contenido-principal { padding-left: 12px !important; padding-right: 12px !important; }
   .mi-expediente__pestana { font-size: 10.5px; }
 }
+
+/* ---------- Revisión en celulares: tarjetas más ordenadas ---------- */
+@media (max-width: 900px) {
+  /* Todos los datos de la tarjeta con el mismo tamaño de letra (antes unos 13 px y otros 14 px). */
+  .pp-tabla .p-datatable-tbody > tr > td:not(:first-child) { font-size: 13px; }
+
+  /* La persona se lee como dato principal: sin la etiqueta "Trabajador" y alineada a la izquierda,
+     así el nombre no se parte en tres líneas al lado de la etiqueta. */
+  .pp-tabla .p-datatable-tbody > tr > td:has(> .pp-trabajador) { justify-content: flex-start !important; text-align: left; }
+  .pp-tabla .p-datatable-tbody > tr > td:has(> .pp-trabajador) > .p-column-title { display: none !important; }
+  .pp-tabla .p-datatable-tbody > tr > td > .pp-trabajador { text-align: left; }
+
+  /* La casilla de selección va en la esquina de la tarjeta, no sola en una fila. */
+  .pp-tabla .p-datatable-tbody > tr,
+  .tabla-boletas .p-datatable-tbody > tr { position: relative; }
+  .pp-tabla .p-datatable-tbody > tr > td.p-selection-column,
+  .tabla-boletas .p-datatable-tbody > tr > td.p-selection-column {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    width: auto !important;
+    padding: 0 !important;
+  }
+  .pp-tabla .p-datatable-tbody > tr:has(> td.p-selection-column) > td:nth-child(2) { padding-right: 36px !important; }
+
+  /* Boletas: la tarjeta empieza con el nombre del trabajador (el DNI ya se ve al abrirla). */
+  .tabla-boletas .p-datatable-tbody > tr { display: block; padding: 12px 14px; }
+  .tabla-boletas .p-datatable-tbody > tr > td.columna-dni { display: none !important; }
+  .tabla-boletas .p-datatable-tbody > tr > td { padding: 4px 0 !important; border: 0 !important; font-size: 13px; }
+  .tabla-boletas .p-datatable-tbody > tr > td > .p-column-title { color: #6b7280; font-size: 12px; font-weight: 500; }
+  .tabla-boletas .p-datatable-tbody > tr > td.columna-trabajador { justify-content: flex-start; padding: 0 36px 6px 0 !important; font-size: 15px; font-weight: 600; text-align: left; }
+  .tabla-boletas .p-datatable-tbody > tr > td.columna-trabajador > .p-column-title { display: none !important; }
+  .tabla-boletas .p-datatable-tbody > tr + tr { border-top: 1px solid #e5e7eb; }
+}
+
+@media (max-width: 767px) {
+  /* Boletas: los dos contadores lado a lado y compactos, para que la lista se vea sin bajar tanto. */
+  .tarjetas-resumen { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px; }
+  .tarjeta-resumen { gap: 10px; padding: 12px; }
+  .tarjeta-resumen__icono { width: 34px; height: 34px; font-size: 15px; }
+  .tarjeta-resumen__etiqueta { font-size: 10.5px; }
+  .tarjeta-resumen__valor { font-size: 22px; }
+  /* Botones de la barra de filtros: el texto en una sola línea. */
+  .barra-filtros__acciones { flex-wrap: wrap; gap: 8px; }
+  .barra-filtros__acciones .p-button { flex: 1 1 100%; justify-content: center; white-space: nowrap; }
+}

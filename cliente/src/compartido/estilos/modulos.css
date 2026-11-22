@@ -226,3 +226,23 @@ span.doc-firma-trabajador svg { display: block; width: 100%; height: auto; }
 .doc-firmar__ayuda { color: #2563eb; font-size: 13px; }
 .doc-firma-archivo { display: flex; flex-direction: column; align-items: center; gap: 4px; max-width: 320px; margin: 16px auto 0; text-align: center; }
 .doc-firma-archivo .doc-firmas__linea { display: block; width: 100%; border-top: 1px solid #000; }
+
+/* Inicio como tablero de lectura rápida: ocupa el ancho disponible. */
+.inicio { max-width: 1400px; gap: 22px; }
+.inicio__cifras { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; padding: 0; overflow: hidden; }
+.inicio__cifras button { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; border: 0; border-left: 1px solid #f1f2f4; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.inicio__cifras button:first-child { border-left: 0; }
+.inicio__cifras button:hover { background: #f9fafb; }
+.inicio__cifras dt { color: #374151; font-size: 13px; font-weight: 600; }
+.inicio__cifras dd { margin: 0; font-size: 28px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.inicio__cifras small { color: #6b7280; font-size: 12px; }
+@media (max-width: 640px) {
+  .inicio__cifras { grid-template-columns: 1fr; }
+  .inicio__cifras button { flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 10px; border-left: 0; border-top: 1px solid #f1f2f4; }
+  .inicio__cifras button:first-child { border-top: 0; }
+  .inicio__cifras dt { flex: 1 1 60%; }
+  .inicio__cifras dd { font-size: 22px; }
+  .inicio__cifras small { flex: 1 1 100%; }
+}
+.inicio__ancha { grid-column: 1 / -1; }
+.inicio__cifras dd span { color: #6b7280; font-size: 15px; font-weight: 500; }
