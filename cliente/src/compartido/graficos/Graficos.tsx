@@ -11,9 +11,9 @@ import './graficos.css';
 export type Semaforo = 'bien' | 'atencion' | 'critico';
 
 const SEMAFORO: Record<Semaforo, { icono: string; texto: string }> = {
-  bien: { icono: 'pi pi-check-circle', texto: 'Al día' },
-  atencion: { icono: 'pi pi-exclamation-circle', texto: 'Atención' },
-  critico: { icono: 'pi pi-times-circle', texto: 'Urgente' },
+  bien: { icono: 'pi pi-check-circle', texto: 'Bueno' },
+  atencion: { icono: 'pi pi-exclamation-circle', texto: 'Intermedio' },
+  critico: { icono: 'pi pi-times-circle', texto: 'En riesgo' },
 };
 
 /** Colores de cada estado del semáforo (también los usan la dona y las barras). */
@@ -44,7 +44,7 @@ export function TarjetaPendiente({
   alAbrir,
 }: {
   titulo: string;
-  cantidad: number | string;
+  cantidad: ReactNode;
   icono: string;
   estado: Semaforo;
   /** Texto de la etiqueta del semáforo; por defecto "Al día", "Atención" o "Urgente". */
@@ -75,6 +75,7 @@ export function TarjetaMeta({
   total,
   meta,
   unidad,
+  detalle,
   alAbrir,
 }: {
   titulo: string;
@@ -83,6 +84,8 @@ export function TarjetaMeta({
   /** Meta en porcentaje (0–100). */
   meta: number;
   unidad: string;
+  /** Texto bajo la barra; por defecto, cantidades, meta y lo que falta. */
+  detalle?: ReactNode;
   alAbrir?: () => void;
 }) {
   const pct = pctDe(valor, total);
@@ -100,20 +103,24 @@ export function TarjetaMeta({
         <span className="gr-meta__linea" style={{ left: `${meta}%` }} title={`Meta ${meta} %`} />
       </span>
       <small>
-        {valor} de {total} {unidad} · meta {meta} %{faltan > 0 && <> · <b>faltan {faltan}</b></>}
+        {detalle ?? (
+          <>
+            {valor} de {total} {unidad} · meta {meta} %{faltan > 0 && <> · <b>faltan {faltan}</b></>}
+          </>
+        )}
       </small>
     </button>
   );
 }
 
 /* ---------- Tarjeta que contiene un gráfico ---------- */
-export function TarjetaGrafico({ titulo, pregunta, accion, children, extra }: { titulo: string; pregunta: string; accion?: { etiqueta: string; alPresionar: () => void }; children: ReactNode; extra?: ReactNode }) {
+export function TarjetaGrafico({ titulo, pregunta, accion, children, extra }: { titulo: string; pregunta?: string; accion?: { etiqueta: string; alPresionar: () => void }; children: ReactNode; extra?: ReactNode }) {
   return (
     <section className="gr-tarjeta">
       <header className="gr-tarjeta__cabeza">
         <div>
           <h3>{titulo}</h3>
-          <p>{pregunta}</p>
+          {pregunta && <p>{pregunta}</p>}
         </div>
         {extra}
         {accion && (
@@ -198,8 +205,11 @@ export interface FilaPorcentaje {
   total: number;
 }
 
-export function BarrasMeta({ filas, meta, unidad }: { filas: FilaPorcentaje[]; meta: number; unidad: string }) {
-  const ordenadas = [...filas].sort((a, b) => pctDe(a.valor, a.total) - pctDe(b.valor, b.total) || a.etiqueta.localeCompare(b.etiqueta, 'es'));
+/** Colores para distinguir elementos (áreas, meses). Orden fijo; cada elemento conserva su color. */
+export const PALETA = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#6250d6', '#0f8b8d', '#a0522d'];
+
+export function BarrasMeta({ filas, meta, unidad, ordenado = false, colorDe }: { filas: FilaPorcentaje[]; meta: number; unidad: string; /** Respeta el orden recibido. */ ordenado?: boolean; /** Color propio de cada fila (si no, el del semáforo). */ colorDe?: (etiqueta: string) => string }) {
+  const ordenadas = ordenado ? filas : [...filas].sort((a, b) => pctDe(a.valor, a.total) - pctDe(b.valor, b.total) || a.etiqueta.localeCompare(b.etiqueta, 'es'));
   return (
     <ul className="gr-barras-meta">
       {ordenadas.map((f) => {
@@ -209,7 +219,7 @@ export function BarrasMeta({ filas, meta, unidad }: { filas: FilaPorcentaje[]; m
           <li key={f.etiqueta} title={`${f.etiqueta}: ${f.valor} de ${f.total} ${unidad} (${pct} %)`}>
             <span className="gr-barras-meta__nombre">{f.etiqueta}</span>
             <span className="gr-barras-meta__pista">
-              <span className="gr-barras-meta__barra" style={{ width: `${pct}%`, background: COLOR[estado] }} />
+              <span className={`gr-barras-meta__barra es-${estado}`} style={{ width: `${pct}%`, background: colorDe?.(f.etiqueta) }} />
               <span className="gr-barras-meta__linea" style={{ left: `${meta}%` }} />
             </span>
             <strong className={`gr-barras-meta__valor es-${estado}`}>{pct}%</strong>
@@ -227,27 +237,30 @@ export interface Mes {
   nombre: string;
   valor: number;
   detalle?: string;
+  /** Color propio de la barra. */
+  color?: string;
 }
 
-export function ColumnasMes({ meses, unidad, subirEsMalo = false }: { meses: Mes[]; unidad: [string, string]; /** Si subir es una mala noticia (ausentismo). */ subirEsMalo?: boolean }) {
+export function ColumnasMes({ meses, unidad, semaforo = false, resumen = true, conUnidad = false }: { meses: Mes[]; unidad: [string, string]; /** Escribe la unidad junto a cada cifra: "43 días". */ conUnidad?: boolean; /** Colorea cada mes frente al promedio (más es peor). */ semaforo?: boolean; /** Muestra la cifra del último mes y su variación. */ resumen?: boolean }) {
+  const promedio = meses.reduce((s, m) => s + m.valor, 0) / Math.max(1, meses.length);
+  const colorDe = (v: number): Semaforo => (v <= promedio ? "bien" : v <= promedio * 1.15 ? "atencion" : "critico");
   const [activo, setActivo] = useState<number | null>(null);
   const maximo = Math.max(1, ...meses.map((m) => m.valor));
   const actual = meses[meses.length - 1];
   const anterior = meses[meses.length - 2];
   const variacion = anterior?.valor ? Math.round(((actual.valor - anterior.valor) / anterior.valor) * 100) : null;
   const sube = (variacion ?? 0) > 0;
-  const estado: Semaforo = variacion === null || variacion === 0 ? 'bien' : sube === subirEsMalo ? 'atencion' : 'bien';
   const elegido = activo !== null ? meses[activo] : null;
   const u = (n: number) => (n === 1 ? unidad[0] : unidad[1]);
 
   return (
     <div className="gr-columnas">
+      {resumen && (
       <p className="gr-columnas__resumen">
         <strong>{actual.valor}</strong> {u(actual.valor)} en {actual.nombre.toLowerCase()}
-        {variacion !== null && (
-          <Etiqueta estado={estado} texto={`${sube ? '▲' : variacion < 0 ? '▼' : '='} ${Math.abs(variacion)} % vs. mes anterior`} />
-        )}
+        {variacion !== null && <span className="gr-columnas__variacion">{`${sube ? '+' : variacion < 0 ? '−' : ''}${Math.abs(variacion)} % vs. mes anterior`}</span>}
       </p>
+      )}
       <div className="gr-columnas__area" onMouseLeave={() => setActivo(null)}>
         {meses.map((m, i) => (
           <button
@@ -259,22 +272,26 @@ export function ColumnasMes({ meses, unidad, subirEsMalo = false }: { meses: Mes
             onClick={() => setActivo(i)}
             aria-label={`${m.nombre}: ${m.valor} ${u(m.valor)}`}
           >
-            <span className="gr-columnas__valor">{m.valor}</span>
-            <span className="gr-columnas__barra" style={{ height: `${(m.valor / maximo) * 100}%` }} />
+            <span className="gr-columnas__zona">
+              <span className="gr-columnas__valor">{conUnidad ? `${m.valor} ${u(m.valor)}` : m.valor}</span>
+              <span className={`gr-columnas__barra${semaforo ? ` es-${colorDe(m.valor)}` : ""}`} style={{ height: `${(m.valor / maximo) * 85}%`, background: m.color }} />
+            </span>
             <span className="gr-columnas__eje">{m.etiqueta}</span>
           </button>
         ))}
       </div>
-      <p className="gr-columnas__detalle" aria-live="polite">
-        {elegido ? (
-          <>
-            <b>{elegido.nombre}:</b> {elegido.valor} {u(elegido.valor)}
-            {elegido.detalle && ` · ${elegido.detalle}`}
-          </>
-        ) : (
-          'Toca o señala un mes para ver el detalle.'
-        )}
-      </p>
+      {meses.some((m) => m.detalle) && (
+        <p className="gr-columnas__detalle" aria-live="polite">
+          {elegido ? (
+            <>
+              <b>{elegido.nombre}:</b> {elegido.valor} {u(elegido.valor)}
+              {elegido.detalle && ` · ${elegido.detalle}`}
+            </>
+          ) : (
+            'Toca un mes para ver el detalle.'
+          )}
+        </p>
+      )}
     </div>
   );
 }
@@ -315,6 +332,17 @@ export function Pestanas<T extends string>({ opciones, valor, alCambiar }: { opc
         </button>
       ))}
     </div>
+  );
+}
+
+/* ---------- Leyenda del semáforo ---------- */
+export function LeyendaSemaforo() {
+  return (
+    <ul className="gr-leyenda-sem" aria-label="Significado de los colores">
+      <li className="es-bien">Bueno</li>
+      <li className="es-atencion">Intermedio</li>
+      <li className="es-critico">Bajo o en riesgo</li>
+    </ul>
   );
 }
 

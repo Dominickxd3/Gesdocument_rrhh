@@ -246,3 +246,67 @@ span.doc-firma-trabajador svg { display: block; width: 100%; height: auto; }
 }
 .inicio__ancha { grid-column: 1 / -1; }
 .inicio__cifras dd span { color: #6b7280; font-size: 15px; font-weight: 500; }
+
+/* Filtro de periodo del Inicio de RR. HH. */
+.inicio__filtro { display: flex; align-items: center; gap: 8px; margin-top: -6px; }
+.inicio__filtro > span { color: #6b7280; font-size: 13px; }
+.inicio__mes { width: 180px; }
+.inicio__anio { width: 120px; }
+@media (max-width: 640px) {
+  .inicio__filtro .inicio__mes { flex: 1; width: auto; }
+}
+
+/* Inicio ocupa todo el ancho disponible; la leyenda del semáforo va a la derecha del filtro. */
+.inicio { max-width: none; width: 100%; }
+.inicio__filtro .gr-leyenda-sem { margin-left: auto; }
+@media (max-width: 640px) {
+  .inicio__filtro { flex-wrap: wrap; }
+  .inicio__filtro .gr-leyenda-sem { margin-left: 0; width: 100%; }
+}
+
+/* Fechas del periodo elegido, a la derecha del filtro. */
+.inicio__rango { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; color: #374151; font-size: 13.5px; font-weight: 500; }
+.inicio__rango .pi { color: #6b7280; }
+@media (max-width: 640px) {
+  .inicio__rango { margin-left: 0; width: 100%; }
+}
+
+/* Indicadores fijos de RR. HH.: número en negro, sin etiqueta de estado ni color que cambie. */
+.gr-fila.es-fija .gr-etiqueta { display: none; }
+.gr-fila.es-fija .gr-pendiente__cuerpo strong,
+.gr-fila.es-fija .gr-meta__cifra strong { color: #111827 !important; }
+.gr-fila.es-fija .gr-meta__barra { background: #334155 !important; }
+
+/* Las fechas del periodo van pegadas al selector, en una caja de la misma altura. */
+.inicio__filtro .inicio__rango { margin-left: 4px; height: 42px; padding: 0 14px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb; }
+@media (max-width: 640px) {
+  .inicio__filtro .inicio__rango { margin-left: 0; width: 100%; justify-content: center; }
+}
+
+/* Filtro de periodo a la derecha, en la misma línea del saludo. */
+.inicio__filtro { justify-content: flex-end; }
+@media (min-width: 641px) {
+  .inicio__filtro { align-self: flex-end; margin-top: -70px; }
+}
+
+/* Papeletas / descansos por mes: gráfico a la izquierda y desglose del mes a la derecha. */
+.inicio__tendencia { display: grid; grid-template-columns: minmax(0, 1fr) 170px; align-items: end; gap: 20px; }
+.inicio__desglose { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 14px; border-radius: 10px; background: #f9fafb; }
+.inicio__desglose dt { color: #6b7280; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.inicio__desglose div { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.inicio__desglose span { color: #374151; font-size: 13px; }
+.inicio__desglose strong { font-size: 20px; font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) {
+  .inicio__tendencia { grid-template-columns: 1fr; }
+}
+
+/* Filtro de fechas: ancho suficiente para "01/11/2026 - 23/11/2026" completo. */
+.filtro-fechas,
+.pp-filtros__fila .filtro-fechas { flex: 0 0 260px; min-width: 260px; }
+.filtro-fechas .p-inputtext { text-overflow: clip; }
+@media (max-width: 767px) {
+  .filtro-fechas,
+  .pp-filtros__fila .filtro-fechas { flex: 1 1 100%; min-width: 0; }
+}
+/* En el mes actual no se puede avanzar al mes siguiente (no hay fechas futuras). */
+.filtro-fechas__panel.es-mes-actual .p-datepicker-next { visibility: hidden; pointer-events: none; }

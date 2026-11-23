@@ -66,7 +66,8 @@ export function generarBoletas(periodo: Periodo): Boleta[] {
   const aleatorio = crearAleatorio(periodo.anio * 100 + periodo.mes);
   const elegir = <T,>(lista: T[]) => lista[Math.floor(aleatorio() * lista.length)]!;
   const enCurso = periodo.estado === 'en_curso';
-  const cantidad = enCurso ? 38 : 120 + Math.floor(aleatorio() * 40);
+  // Todos los meses tienen la planilla completa (el mes en curso también).
+  const cantidad = 120 + Math.floor(aleatorio() * 40);
   const generadorDni = crearAleatorio(4242);
   const inicioMes = new Date(periodo.anio, periodo.mes - 1, 1);
   const finMes = new Date(periodo.anio, periodo.mes, 0);
@@ -113,7 +114,8 @@ export function generarBoletas(periodo: Periodo): Boleta[] {
         ]
       : [{ concepto: 'SNP - APORTE ONP', monto: redondear(bruto * 0.13) }];
 
-    const enviado = enCurso ? aleatorio() > 0.85 : aleatorio() > 0.03;
+    // Mes en curso: ya se envió la mayoría (unas 7 de cada 10) y cerca de la mitad está firmada.
+    const enviado = enCurso ? aleatorio() > 0.3 : aleatorio() > 0.03;
     const firmada = enviado && aleatorio() > (enCurso ? 0.5 : 0.45);
     const diaEnvio = 1 + Math.floor(aleatorio() * 3);
     const fechaIngreso = new Date(2012 + Math.floor(aleatorio() * 13), Math.floor(aleatorio() * 12), 1 + Math.floor(aleatorio() * 27));

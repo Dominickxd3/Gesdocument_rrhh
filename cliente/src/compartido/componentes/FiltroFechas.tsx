@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import { Calendar } from 'primereact/calendar';
 import { addLocale } from 'primereact/api';
 import { aDiaLocal, diaLocalDe } from '@/compartido/formato/fechas';
@@ -9,6 +10,12 @@ export interface RangoFechas {
 }
 
 export const SIN_RANGO: RangoFechas = { desde: null, hasta: null };
+
+/** Filtro predeterminado de los listados: del día 1 del mes actual hasta hoy (ej.: 01/11 – 23/11). */
+export function mesActualHastaHoy(): RangoFechas {
+  const hoy = aDiaLocal(new Date());
+  return { desde: `${hoy.slice(0, 8)}01`, hasta: hoy };
+}
 
 addLocale('es', {
   firstDayOfWeek: 1,
@@ -39,20 +46,37 @@ export function periodoEnRango(inicio: string, fin: string, r: RangoFechas): boo
   return (!r.desde || diaLocalDe(fin) >= r.desde) && (!hasta || diaLocalDe(inicio) <= hasta);
 }
 
-/** Filtro "Desde – Hasta" en un solo campo, con calendario en español y botones Hoy / Limpiar. */
+/**
+ * Filtro de fechas en un solo campo, con calendario en español y botones Hoy / Limpiar.
+ *  - Un clic en un día filtra ese día y cierra el calendario.
+ *  - Para un rango, se vuelve a abrir y se toca el día final.
+ *  - No deja elegir días futuros (el límite es hoy).
+ */
 export function FiltroFechas({ valor, alCambiar, etiqueta = 'Desde – Hasta' }: { valor: RangoFechas; alCambiar: (r: RangoFechas) => void; etiqueta?: string }) {
+  const calendario = useRef<Calendar>(null);
   const seleccion = valor.desde ? [aFecha(valor.desde), valor.hasta ? aFecha(valor.hasta) : null] : null;
+  const hoy = new Date();
+  // Mes que se está mirando en el calendario: al llegar al mes actual se bloquea la flecha "siguiente".
+  const [vista, setVista] = useState<Date>(() => (valor.desde ? aFecha(valor.desde) : hoy));
+  const enMesActual = vista.getFullYear() > hoy.getFullYear() || (vista.getFullYear() === hoy.getFullYear() && vista.getMonth() >= hoy.getMonth());
   return (
     <Calendar
+      ref={calendario}
       value={seleccion as (Date | null)[] | null}
       onChange={(e) => {
         const [d, h] = (e.value as (Date | null)[] | null) ?? [null, null];
         alCambiar({ desde: d ? aDiaLocal(d) : null, hasta: h ? aDiaLocal(h) : null });
+        // Primer clic: ya filtra ese día; se cierra para que se vea el resultado.
+        if (d && !h) setTimeout(() => calendario.current?.hide(), 0);
       }}
       selectionMode="range"
       readOnlyInput
       locale="es"
       dateFormat="dd/mm/yy"
+      maxDate={hoy}
+      viewDate={vista}
+      onViewDateChange={(e) => setVista(e.value)}
+      panelClassName={enMesActual ? 'filtro-fechas__panel es-mes-actual' : 'filtro-fechas__panel'}
       placeholder={etiqueta}
       showIcon
       showButtonBar

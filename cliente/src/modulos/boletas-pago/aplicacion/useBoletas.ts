@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { leerFiltroDeEnlace } from '@/compartido/navegacion/filtroDeEnlace';
 import {
   calcularResumen,
   clavePeriodo,
@@ -26,7 +27,9 @@ export function useBoletas(repositorio: RepositorioBoletas) {
   const [periodo, setPeriodo] = useState<Periodo | null>(null);
   const [boletas, setBoletas] = useState<Boleta[]>([]);
   const [cargando, setCargando] = useState(true);
-  const [filtros, setFiltros] = useState<FiltrosBoletas>(FILTROS_INICIALES);
+  // Si se llega desde el Inicio, ya viene filtrado por trabajador y periodo.
+  const [enlace] = useState(leerFiltroDeEnlace);
+  const [filtros, setFiltros] = useState<FiltrosBoletas>(() => ({ ...FILTROS_INICIALES, busqueda: enlace.dni ?? '' }));
   const [seleccion, setSeleccion] = useState<Boleta[]>([]);
   const [enviando, setEnviando] = useState(false);
 
@@ -34,9 +37,10 @@ export function useBoletas(repositorio: RepositorioBoletas) {
     void repositorio.obtenerConfiguracion().then(setConfiguracion);
     void repositorio.listarPeriodos().then((lista) => {
       setPeriodos(lista);
-      setPeriodo(lista.find((p) => p.estado === 'cerrado') ?? lista[0] ?? null);
+      const delEnlace = lista.find((p) => p.anio === enlace.anio && p.mes === enlace.mes);
+      setPeriodo(delEnlace ?? lista.find((p) => p.estado === 'cerrado') ?? lista[0] ?? null);
     });
-  }, [repositorio]);
+  }, [repositorio, enlace]);
 
   const cargar = useCallback(async () => {
     if (!periodo) return;

@@ -1,5 +1,5 @@
 import { useAviso } from '@/compartido/notificaciones/notificaciones';
-import { FiltroFechas, SIN_RANGO, enRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
+import { FiltroFechas, SIN_RANGO, enRango, mesActualHastaHoy, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
 import { useMemo, useState } from 'react';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
@@ -43,7 +43,8 @@ export function PaginaReportes() {
   const aviso = useAviso();
   const [busqueda, setBusqueda] = useState('');
   const [modulo, setModulo] = useState<Evento['modulo'] | null>(null);
-  const [fechas, setFechas] = useState<RangoFechas>(SIN_RANGO);
+  // Por defecto: del 1 del mes actual hasta hoy.
+  const [fechas, setFechas] = useState<RangoFechas>(mesActualHastaHoy);
 
   const eventos = useMemo<Evento[]>(() => {
     const lista: Evento[] = [

@@ -1,7 +1,8 @@
 import { ahoraLocal } from '@/compartido/formato/fechas';
-import { SIN_RANGO, enRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
+import { SIN_RANGO, enRango, mesActualHastaHoy, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
 import { ordenarPorTrabajador } from '@/compartido/formato/orden';
 import { useCallback, useMemo, useState } from 'react';
+import { leerFiltroDeEnlace } from '@/compartido/navegacion/filtroDeEnlace';
 import { almacenPapeletas } from './almacenPapeletas';
 import type {
   DatosPapeleta,
@@ -42,7 +43,11 @@ export function usePapeletas() {
   // Compartidas con Control de salidas (Seguridad): ver almacenPapeletas.
   const papeletas = almacenPapeletas.usar();
   const setPapeletas = almacenPapeletas.escribir;
-  const [filtros, setFiltros] = useState<FiltrosPapeletas>(FILTROS_INICIALES);
+  // Si se llega desde el Inicio, ya viene filtrado por trabajador y periodo.
+  const [filtros, setFiltros] = useState<FiltrosPapeletas>(() => {
+    const e = leerFiltroDeEnlace();
+    return { ...FILTROS_INICIALES, busqueda: e.dni ?? '', fechas: e.desde ? { desde: e.desde, hasta: e.hasta ?? null } : mesActualHastaHoy() };
+  });
   const [seleccion, setSeleccion] = useState<Papeleta[]>([]);
 
   const actualizarFiltros = useCallback((cambios: Partial<FiltrosPapeletas>) => {

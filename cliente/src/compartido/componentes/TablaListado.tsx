@@ -82,10 +82,13 @@ export function TablaListado<T extends object>({
 /** Celda de persona: iniciales, nombre y una línea secundaria. */
 export function CeldaPersona({ nombre, detalle }: { nombre: string; detalle: string }) {
   const [apellidos, nombres = ''] = nombre.split(',');
+  // "APELLIDOS, NOMBRE" o, sin coma (boletas), "APELLIDO APELLIDO NOMBRE": inicial del nombre y del primer apellido.
+  const palabras = nombre.trim().split(/\s+/);
+  const iniciales = nombres.trim() ? `${nombres.trim()[0]}${apellidos.trim()[0] ?? ''}` : `${palabras[palabras.length - 1]?.[0] ?? ''}${palabras.length > 1 ? palabras[0][0] : ''}`;
   return (
     <div className="pp-trabajador">
       <span className="pp-avatar" aria-hidden="true">
-        {`${nombres.trim()[0] ?? ''}${apellidos.trim()[0] ?? ''}`}
+        {iniciales}
       </span>
       <div>
         <strong>{nombre}</strong>

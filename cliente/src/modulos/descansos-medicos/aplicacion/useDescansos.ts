@@ -1,6 +1,7 @@
-import { SIN_RANGO, periodoEnRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
+import { SIN_RANGO, mesActualHastaHoy, periodoEnRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
 import { ordenarPorTrabajador } from '@/compartido/formato/orden';
 import { useCallback, useMemo, useState } from 'react';
+import { leerFiltroDeEnlace } from '@/compartido/navegacion/filtroDeEnlace';
 import type { EstadoDescanso } from '../dominio/descanso';
 import { useListaDescansos } from './almacenDescansos';
 
@@ -18,7 +19,11 @@ const FILTROS_INICIALES: FiltrosDescansos = { busqueda: '', area: null, estado: 
 /** Lista y filtros de la vista de RR. HH. Los datos vienen del almacén compartido. */
 export function useDescansos() {
   const descansos = useListaDescansos();
-  const [filtros, setFiltros] = useState<FiltrosDescansos>(FILTROS_INICIALES);
+  // Si se llega desde el Inicio, ya viene filtrado por trabajador y periodo.
+  const [filtros, setFiltros] = useState<FiltrosDescansos>(() => {
+    const e = leerFiltroDeEnlace();
+    return { ...FILTROS_INICIALES, busqueda: e.dni ?? '', fechas: e.desde ? { desde: e.desde, hasta: e.hasta ?? null } : mesActualHastaHoy() };
+  });
 
   const actualizarFiltros = useCallback((c: Partial<FiltrosDescansos>) => setFiltros((f) => ({ ...f, ...c })), []);
   const limpiarFiltros = useCallback(() => setFiltros(FILTROS_INICIALES), []);

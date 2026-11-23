@@ -1,5 +1,5 @@
 import { useAviso } from '@/compartido/notificaciones/notificaciones';
-import { FiltroFechas, SIN_RANGO, enRango, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
+import { FiltroFechas, SIN_RANGO, enRango, mesActualHastaHoy, type RangoFechas } from '@/compartido/componentes/FiltroFechas';
 import { ordenarPorTrabajador } from '@/compartido/formato/orden';
 import { useMemo, useState } from 'react';
 import { Button } from 'primereact/button';
@@ -43,7 +43,8 @@ function IncidenciasRrhh() {
   const aviso = useAviso();
   const [busqueda, setBusqueda] = useState('');
   const [area, setArea] = useState<string | null>(null);
-  const [fechas, setFechas] = useState<RangoFechas>(SIN_RANGO);
+  // Por defecto: del 1 del mes actual hasta hoy.
+  const [fechas, setFechas] = useState<RangoFechas>(mesActualHastaHoy);
   const [estado, setEstado] = useState<EstadoIncidencia | null>(null);
   const [idDetalle, setIdDetalle] = useState<string | null>(null);
   const [registrando, setRegistrando] = useState(false);

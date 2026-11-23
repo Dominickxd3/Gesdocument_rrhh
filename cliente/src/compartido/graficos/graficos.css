@@ -73,7 +73,11 @@
 
 /* ---------- Pantallas medianas y celulares ---------- */
 @media (max-width: 1199px) {
-  .gr-fila, .gr-fila.es-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gr-fila { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+  /* Los 3 indicadores de RR. HH. se mantienen en una fila hasta tablet; luego, uno debajo del otro. */
+  .gr-fila.es-3 { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
   .gr-fila, .gr-fila.es-3, .gr-fila.es-2 { grid-template-columns: 1fr; gap: 8px; }
@@ -154,3 +158,114 @@
   .gr-barras-meta__valor { grid-area: valor; }
   .gr-columnas__area { gap: 4px; height: 140px; }
 }
+
+/* ---------- Top 5 de trabajadores ---------- */
+.gr-top { width: 100%; border-collapse: collapse; font-size: 13px; }
+.gr-top th { padding: 0 10px 8px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 12px; font-weight: 500; text-align: left; }
+.gr-top td { padding: 10px; border-bottom: 1px solid #f1f2f4; vertical-align: middle; }
+.gr-top tbody tr { cursor: pointer; }
+.gr-top tbody tr:hover, .gr-top tbody tr:focus-visible { background: #f9fafb; outline: none; }
+.gr-top tbody tr:last-child td { border-bottom: 0; }
+.gr-top__puesto { width: 32px; color: #6b7280; font-weight: 600; text-align: center; }
+.gr-top tbody tr:first-child .gr-top__puesto { color: #b45309; }
+.gr-top__area { color: #6b7280; }
+.gr-top__detalle { color: #6b7280; font-size: 12.5px; }
+.gr-top__num { width: 90px; text-align: right; }
+.gr-top__num strong { font-size: 18px; font-variant-numeric: tabular-nums; }
+.gr-top .pp-trabajador small { display: none; }
+
+@media (max-width: 900px) {
+  .gr-top .gr-top__area { display: none; }
+  .gr-top .pp-trabajador small { display: block; }
+}
+@media (max-width: 640px) {
+  /* En celulares cada fila es una línea compacta: puesto, persona y número; el detalle debajo. */
+  .gr-top thead { display: none; }
+  .gr-top tbody tr { display: grid; grid-template-columns: 24px 1fr auto; grid-template-areas: 'puesto persona numero' '. detalle detalle'; align-items: center; column-gap: 8px; padding: 10px 0; border-bottom: 1px solid #f1f2f4; }
+  .gr-top tbody tr:last-child { border-bottom: 0; }
+  .gr-top td { padding: 0; border: 0; }
+  .gr-top__puesto { grid-area: puesto; width: auto; }
+  .gr-top td:nth-child(2) { grid-area: persona; min-width: 0; }
+  .gr-top__detalle { grid-area: detalle; padding-top: 4px !important; }
+  .gr-top__num { grid-area: numero; width: auto; }
+}
+
+/* ---------- Versión sobria: el color solo indica el estado, en texto pequeño ---------- */
+.gr-pendiente::before, .gr-meta::before { display: none; }
+.gr-pendiente, .gr-meta { padding-left: 16px; }
+/* Semáforo: verde = bueno, amarillo = intermedio, rojo = bajo o en riesgo. */
+:root {
+  --sem-bien: #15803d;          --sem-bien-relleno: #22a55b;    --sem-bien-fondo: #ecfdf3;
+  --sem-atencion: #a16207;      --sem-atencion-relleno: #eab308; --sem-atencion-fondo: #fefce8;
+  --sem-critico: #b91c1c;       --sem-critico-relleno: #dc2626;  --sem-critico-fondo: #fef2f2;
+}
+.gr-etiqueta { padding: 2px 8px; font-size: 12px; font-weight: 600; }
+.gr-meta.es-bien .gr-meta__barra, .gr-barras-meta__barra.es-bien, .gr-leyenda-sem .es-bien::before { background: var(--sem-bien-relleno); }
+.gr-meta.es-atencion .gr-meta__barra, .gr-barras-meta__barra.es-atencion, .gr-leyenda-sem .es-atencion::before { background: var(--sem-atencion-relleno); }
+.gr-meta.es-critico .gr-meta__barra, .gr-barras-meta__barra.es-critico, .gr-leyenda-sem .es-critico::before { background: var(--sem-critico-relleno); }
+.gr-meta.es-bien .gr-meta__cifra strong, .gr-barras-meta__valor.es-bien { color: var(--sem-bien); }
+.gr-meta.es-atencion .gr-meta__cifra strong, .gr-barras-meta__valor.es-atencion { color: var(--sem-atencion); }
+.gr-meta.es-critico .gr-meta__cifra strong, .gr-barras-meta__valor.es-critico { color: var(--sem-critico); }
+.gr-pendiente.es-bien .gr-pendiente__cuerpo strong { color: var(--sem-bien); }
+.gr-pendiente.es-atencion .gr-pendiente__cuerpo strong { color: var(--sem-atencion); }
+.gr-pendiente.es-critico .gr-pendiente__cuerpo strong { color: var(--sem-critico); }
+.gr-barras-meta__valor { font-weight: 700; }
+
+/* Leyenda del semáforo */
+.gr-leyenda-sem { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0; padding: 0; color: #4b5563; font-size: 12.5px; list-style: none; }
+.gr-leyenda-sem li { display: inline-flex; align-items: center; gap: 6px; }
+.gr-leyenda-sem li::before { content: ''; width: 10px; height: 10px; border-radius: 50%; }
+.gr-columnas__mes.es-actual .gr-columnas__barra { background: #334155; }
+.gr-columnas__mes.es-activo .gr-columnas__barra { background: #1f2937; }
+.gr-columnas__variacion { color: #6b7280; font-size: 12.5px; }
+.gr-top tbody tr:first-child .gr-top__puesto { color: #6b7280; }
+.gr-top .pp-avatar { background: #f3f4f6; color: #374151; }
+
+/* Columnas con semáforo: cada mes frente al promedio de los 6 meses. */
+.gr-columnas__barra.es-bien { background: var(--sem-bien-relleno) !important; }
+.gr-columnas__barra.es-atencion { background: var(--sem-atencion-relleno) !important; }
+.gr-columnas__barra.es-critico { background: var(--sem-critico-relleno) !important; }
+.gr-columnas__mes.es-activo .gr-columnas__barra { filter: brightness(0.85); }
+/* El mes elegido se distingue por su nombre en negrita. */
+.gr-columnas__mes.es-actual .gr-columnas__eje { color: #111827; font-weight: 700; }
+
+/* Tonos suaves para las barras: mismo significado (bueno / intermedio / riesgo) sin cansar la vista. */
+:root {
+  --sem-bien-relleno: #8cc7a4;      /* verde salvia */
+  --sem-atencion-relleno: #ecd08a;  /* mostaza suave */
+  --sem-critico-relleno: #e9a19a;   /* coral suave */
+}
+
+/* Indicadores fijos de RR. HH.: solo título y número (sin barra ni texto de apoyo). */
+.gr-fila.es-fija small,
+.gr-fila.es-fija .gr-meta__pista { display: none; }
+
+/* Colores definidos y claros (ni apagados ni chillones). */
+:root {
+  --sem-bien-relleno: #2fb574;      /* verde */
+  --sem-atencion-relleno: #f4b63f;  /* ámbar */
+  --sem-critico-relleno: #ef5a52;   /* rojo coral */
+}
+
+/* Nombres de los meses dentro de la tarjeta, bajo cada barra (antes quedaban cortados). */
+.gr-columnas__area { height: 190px; border-bottom: 0; }
+.gr-columnas__mes { padding-bottom: 0; }
+.gr-columnas__barra { width: 56%; max-width: 64px; }
+.gr-columnas__eje { position: static; margin-top: 6px; padding-top: 6px; width: 100%; border-top: 1px solid #d1d5db; text-align: center; }
+
+/* Las áreas se reparten en todo el alto de la tarjeta (misma altura que el gráfico vecino). */
+.gr-graficos > .gr-tarjeta { height: 100%; }
+.gr-graficos .gr-barras-meta { flex: 1; justify-content: space-evenly; gap: 14px; }
+.gr-graficos .gr-barras-meta__pista { height: 16px; border-radius: 6px; }
+.gr-graficos .gr-barras-meta__barra { border-radius: 6px; }
+.gr-graficos .gr-barras-meta__linea { top: -4px; bottom: -4px; }
+.gr-graficos .gr-barras-meta__nombre, .gr-graficos .gr-barras-meta__valor { font-size: 13.5px; }
+
+/* Columnas: la barra crece dentro de su zona y el mes queda debajo, sin cruzarse con la línea. */
+.gr-columnas__area { height: 210px; }
+.gr-columnas__mes { justify-content: stretch; }
+.gr-columnas__zona { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; width: 100%; min-height: 0; border-bottom: 1px solid #d1d5db; }
+.gr-columnas__eje { margin-top: 0; padding-top: 8px; border-top: 0; }
+
+/* Unidad junto al número del indicador: "9 trámites", "5 de 9 enviadas", "43 días". */
+.gr-unidad { margin-left: 2px; color: #6b7280; font-size: 15px; font-weight: 500; }
