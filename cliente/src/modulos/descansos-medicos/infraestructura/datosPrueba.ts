@@ -42,7 +42,7 @@ export const TRABAJADORES: Trabajador[] = Array.from({ length: 30 }, () => ({
   area: elegir(AREAS),
 }));
 
-/** Ficha del usuario de prueba "jose.quispe" (rol trabajador); se vincula por DNI. */
+/** Ficha del usuario de prueba "jose" (rol trabajador); se vincula por DNI. */
 export const TRABAJADOR_DEMO: Trabajador = {
   dni: '45871236',
   nombre: 'QUISPE ROJAS, JOSÉ',

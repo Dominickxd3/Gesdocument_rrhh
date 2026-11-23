@@ -310,3 +310,14 @@ span.doc-firma-trabajador svg { display: block; width: 100%; height: auto; }
 }
 /* En el mes actual no se puede avanzar al mes siguiente (no hay fechas futuras). */
 .filtro-fechas__panel.es-mes-actual .p-datepicker-next { visibility: hidden; pointer-events: none; }
+
+/* Tabla "Por atender" del trabajador. */
+.inicio__tramite { display: inline-flex; align-items: center; gap: 10px; }
+.inicio__tramite .pi { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: #f3f4f6; color: #374151; font-size: 13px; }
+.gr-fila.es-fija .gr-pendiente__cuerpo strong { min-height: 34px; }
+@media (max-width: 640px) {
+  /* "Por atender" del trabajador: trámite a todo el ancho y la cantidad a la derecha. */
+  .gr-top.es-tramites tbody tr { grid-template-columns: 1fr auto; grid-template-areas: none; }
+  .gr-top.es-tramites td:first-child { grid-column: 1; }
+  .gr-top.es-tramites .gr-top__num { grid-column: 2; grid-area: auto; }
+}

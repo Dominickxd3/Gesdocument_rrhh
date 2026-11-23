@@ -49,13 +49,13 @@ export const usuariosPrueba: UsuarioPrueba[] = [
   },
   {
     id: '3',
-    usuario: 'jose.quispe',
+    usuario: 'jose',
     nombre: 'José Quispe Rojas',
     correo: 'jose.quispe@grupopecuario.com',
     cargo: 'Operario de producción',
     rol: 'trabajador',
     dni: '45871236',
-    clave: 'Mockup2026',
+    clave: 'jose123',
   },
   {
     id: '4',

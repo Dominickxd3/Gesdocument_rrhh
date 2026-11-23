@@ -171,7 +171,7 @@ export function generarBoletas(periodo: Periodo): Boleta[] {
 
 /** Colaboradores de los usuarios de prueba (se vinculan por DNI con su cuenta de la plataforma). */
 const CUENTAS_PRUEBA = [
-  { dni: '45871236', trabajador: 'QUISPE ROJAS JOSÉ', usuario: 'jose.quispe', area: 'COM PRODUCCIÓN', cargo: 'Operario', ingreso: '15/03/2021' },
+  { dni: '45871236', trabajador: 'QUISPE ROJAS JOSÉ', usuario: 'jose', area: 'COM PRODUCCIÓN', cargo: 'Operario', ingreso: '15/03/2021' },
   { dni: '46213578', trabajador: 'VIGO SALAS PEDRO', usuario: 'seguridad', area: 'ADM GESTIÓN HUMANA', cargo: 'Prevencionista de Seguridad', ingreso: '01/08/2019' },
 ];
 

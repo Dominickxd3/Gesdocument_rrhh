@@ -208,13 +208,13 @@ export interface FilaPorcentaje {
 /** Colores para distinguir elementos (áreas, meses). Orden fijo; cada elemento conserva su color. */
 export const PALETA = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#6250d6', '#0f8b8d', '#a0522d'];
 
-export function BarrasMeta({ filas, meta, unidad, ordenado = false, colorDe }: { filas: FilaPorcentaje[]; meta: number; unidad: string; /** Respeta el orden recibido. */ ordenado?: boolean; /** Color propio de cada fila (si no, el del semáforo). */ colorDe?: (etiqueta: string) => string }) {
+export function BarrasMeta({ filas, meta, unidad, ordenado = false, colorDe, estadoDe }: { filas: FilaPorcentaje[]; meta: number; unidad: string; /** Respeta el orden recibido. */ ordenado?: boolean; /** Color propio de cada fila (si no, el del semáforo). */ colorDe?: (etiqueta: string) => string; /** Regla propia del semáforo según el porcentaje. */ estadoDe?: (pct: number) => Semaforo }) {
   const ordenadas = ordenado ? filas : [...filas].sort((a, b) => pctDe(a.valor, a.total) - pctDe(b.valor, b.total) || a.etiqueta.localeCompare(b.etiqueta, 'es'));
   return (
     <ul className="gr-barras-meta">
       {ordenadas.map((f) => {
         const pct = pctDe(f.valor, f.total);
-        const estado = estadoMeta(pct, meta);
+        const estado = estadoDe ? estadoDe(pct) : estadoMeta(pct, meta);
         return (
           <li key={f.etiqueta} title={`${f.etiqueta}: ${f.valor} de ${f.total} ${unidad} (${pct} %)`}>
             <span className="gr-barras-meta__nombre">{f.etiqueta}</span>

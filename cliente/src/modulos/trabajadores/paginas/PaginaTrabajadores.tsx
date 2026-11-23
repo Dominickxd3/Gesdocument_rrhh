@@ -14,7 +14,7 @@ import { fechaLarga, momento } from '@/compartido/almacen/crearAlmacen';
 import '@/compartido/estilos/listados';
 import { almacenTrabajadores, editarTrabajador, sincronizarConErp, useTrabajadores } from '../aplicacion/almacenTrabajadores';
 import { AREAS, JEFES } from '../infraestructura/datosTrabajadores';
-import { TEXTO_MODALIDAD, nombreLegible, type Trabajador } from '../dominio/trabajador';
+import { MODALIDAD_CORTA, nombreLegible, type Trabajador } from '../dominio/trabajador';
 
 /** Trabajadores (RF01, RF02, RF03): lista sincronizada con el ERP, ficha y edición de contacto y jefatura. */
 export function PaginaTrabajadores() {
@@ -159,7 +159,7 @@ function VentanaFicha({ trabajador: t, alCerrar, alEditar }: { trabajador: Traba
           <section>
             <h3 className="pp-panel__subtitulo">Contrato vigente</h3>
             <dl className="doc-contrato">
-              <div className="ancho-completo"><dt>Modalidad</dt><dd>{TEXTO_MODALIDAD[t.contrato.modalidad].replace('Contrato de Trabajo a ', '')}</dd></div>
+              <div className="ancho-completo"><dt>Modalidad</dt><dd>{MODALIDAD_CORTA[t.contrato.modalidad]}</dd></div>
               <div><dt>Suscrito el</dt><dd>{fechaLarga(t.contrato.fecha)}</dd></div>
               <div><dt>Cargo del contrato</dt><dd>{t.contrato.cargo}</dd></div>
               <div><dt>Remuneración</dt><dd>S/ {t.contrato.remuneracion.toLocaleString('en-US', { minimumFractionDigits: 2 })}</dd></div>

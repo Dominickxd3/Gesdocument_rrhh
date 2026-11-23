@@ -7,12 +7,8 @@ import { useContador } from '@/compartido/navegacion/contadores';
 import { aDiaLocal, diaLocalDe, hoyLocal } from '@/compartido/formato/fechas';
 import {
   BarrasMeta,
-  COLOR,
   ColumnasMes,
-  Dona,
-  PALETA,
   Pestanas,
-  Seccion,
   TarjetaGrafico,
   TarjetaPendiente,
   type FilaPorcentaje,
@@ -20,11 +16,12 @@ import {
 } from '@/compartido/graficos/Graficos';
 import { pendientesDe } from '@/aplicacion/pendientes';
 import { useDocumentos } from '@/modulos/documentos/aplicacion/almacenDocumentos';
-import { habilitadoParaTrabajador } from '@/modulos/documentos/dominio/documento';
+import { habilitadoParaTrabajador, ultimoEvento } from '@/modulos/documentos/dominio/documento';
 import { useIncidencias } from '@/modulos/incidencias/aplicacion/almacenIncidencias';
 import { useListaDescansos } from '@/modulos/descansos-medicos/aplicacion/almacenDescansos';
 import type { Descanso } from '@/modulos/descansos-medicos/dominio/descanso';
 import { usePapeletasCompartidas } from '@/modulos/papeletas-permiso/aplicacion/almacenPapeletas';
+import { faltaFirmaColaborador } from '@/modulos/papeletas-permiso/dominio/papeleta';
 import { repositorioBoletas } from '@/modulos/boletas-pago/aplicacion/repositorioBoletas';
 import type { Boleta } from '@/modulos/boletas-pago/dominio/boleta';
 import { CeldaPersona } from '@/compartido/componentes/TablaListado';
@@ -142,6 +139,47 @@ const periodoElegido = { anio: new Date().getFullYear(), mes: new Date().getMont
 
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'setiembre', 'octubre', 'noviembre', 'diciembre'];
 
+/** Periodo (mes y año) del Inicio, compartido por todos los roles. */
+function usePeriodo() {
+  const hoy = new Date();
+  const [anio, setAnio] = useState(periodoElegido.anio);
+  const [mes, setMes] = useState(periodoElegido.mes);
+  periodoElegido.anio = anio;
+  periodoElegido.mes = mes;
+  const clave = `${anio}-${String(mes).padStart(2, '0')}`;
+  // No se puede elegir un mes que aún no llega.
+  const mesesDisponibles = MESES.map((m, i) => ({ label: mayuscula(m), value: i + 1 })).filter((m) => anio < hoy.getFullYear() || m.value <= hoy.getMonth() + 1);
+  const anios = [hoy.getFullYear() - 1, hoy.getFullYear()].map((a) => ({ label: String(a), value: a }));
+  const filtro = (
+    <div className="inicio__filtro">
+      <span>Periodo</span>
+      <Dropdown value={mes} options={mesesDisponibles} onChange={(e) => setMes(e.value)} aria-label="Mes" className="inicio__mes" />
+      <Dropdown
+        value={anio}
+        options={anios}
+        onChange={(e) => {
+          setAnio(e.value);
+          if (e.value === hoy.getFullYear() && mes > hoy.getMonth() + 1) setMes(hoy.getMonth() + 1);
+        }}
+        aria-label="Año"
+        className="inicio__anio"
+      />
+    </div>
+  );
+  return { anio, mes, clave, nombreMes: MESES[mes - 1], esMesActual: anio === hoy.getFullYear() && mes === hoy.getMonth() + 1, filtro };
+}
+
+/** Semáforo de los meses: el menor en rojo, el mayor en verde y los del medio en amarillo. */
+function conSemaforo(lista: Mes[]): Mes[] {
+  const valores = lista.map((m) => m.valor);
+  const menor = Math.min(...valores);
+  const mayor = Math.max(...valores);
+  return lista.map((m) => ({
+    ...m,
+    color: menor === mayor ? 'var(--sem-atencion-relleno)' : m.valor === menor ? 'var(--sem-critico-relleno)' : m.valor === mayor ? 'var(--sem-bien-relleno)' : 'var(--sem-atencion-relleno)',
+  }));
+}
+
 function TableroGestor() {
   const navegar = useNavigate();
   const papeletas = usePapeletasCompartidas();
@@ -149,21 +187,11 @@ function TableroGestor() {
   const incidencias = useIncidencias();
   const descansos = useListaDescansos();
   const trabajadores = useTrabajadores();
-  const hoy = new Date();
-  const [anio, setAnio] = useState(periodoElegido.anio);
-  const [mes, setMes] = useState(periodoElegido.mes);
-  periodoElegido.anio = anio;
-  periodoElegido.mes = mes;
+  const { anio, mes, clave, nombreMes, filtro } = usePeriodo();
   const [tendencia, setTendencia] = useState<'papeletas' | 'descansos'>('papeletas');
   const [top, setTop] = useState<Top>('firmas');
   const boletas = useBoletasDelMes(anio, mes);
-
-  const clave = `${anio}-${String(mes).padStart(2, '0')}`;
-  const nombreMes = MESES[mes - 1];
   const delMes = (fecha: string) => diaLocalDe(fecha).startsWith(clave);
-  // No se puede elegir un mes que aún no llega.
-  const mesesDisponibles = MESES.map((m, i) => ({ label: mayuscula(m), value: i + 1 })).filter((m) => anio < hoy.getFullYear() || m.value <= hoy.getMonth() + 1);
-  const anios = [hoy.getFullYear() - 1, hoy.getFullYear()].map((a) => ({ label: String(a), value: a }));
 
   /* --- KPI 1: pendientes del mes que ya pasaron su plazo --- */
   const vencidos = [
@@ -196,18 +224,14 @@ function TableroGestor() {
     if (b.firma === 'firmada') fila.valor += 1;
     porArea.set(area, fila);
   });
-  // Cada área conserva su color en cualquier mes (orden alfabético de todas las áreas).
-  const todasLasAreas = [...new Set((boletas ?? []).map((b) => sinArea(b.area)))].sort((a, b) => a.localeCompare(b, 'es'));
-  const colorArea = (area: string) => PALETA[Math.max(0, todasLasAreas.indexOf(area)) % PALETA.length];
   // Solo las 5 áreas que más atención necesitan.
   const areasCriticas = [...porArea.values()].sort((a, b) => a.valor / a.total - b.valor / b.total || a.etiqueta.localeCompare(b.etiqueta, 'es')).slice(0, 5);
 
   /* --- KPI 3 y gráfico 2: tendencia de los 6 meses que terminan en el mes elegido --- */
   const meses = ultimosMeses(3, new Date(anio, mes - 1, 1));
   // Cada mes del año tiene su color.
-  const colorMes = (claveMes: string) => PALETA[(Number(claveMes.slice(5)) - 1) % PALETA.length];
-  const papeletasMes: Mes[] = meses.map((m) => ({ etiqueta: m.etiqueta, nombre: m.nombre, valor: papeletas.filter((p) => p.estado !== 'anulada' && p.fecha.startsWith(m.clave)).length, color: colorMes(m.clave) }));
-  const descansoMes: Mes[] = meses.map((m) => ({ etiqueta: m.etiqueta, nombre: m.nombre, valor: descansos.reduce((s, d) => s + diasEnMes(d, m.clave), 0), color: colorMes(m.clave) }));
+  const papeletasMes: Mes[] = meses.map((m) => ({ etiqueta: m.etiqueta, nombre: m.nombre, valor: papeletas.filter((p) => p.estado !== 'anulada' && p.fecha.startsWith(m.clave)).length }));
+  const descansoMes: Mes[] = meses.map((m) => ({ etiqueta: m.etiqueta, nombre: m.nombre, valor: descansos.reduce((s, d) => s + diasEnMes(d, m.clave), 0) }));
   const diasActual = descansoMes[descansoMes.length - 1].valor;
   const diasAnterior = descansoMes[descansoMes.length - 2].valor;
   const descansosDelMes = descansos.filter((d) => diasEnMes(d, clave) > 0).length;
@@ -251,20 +275,7 @@ function TableroGestor() {
 
   return (
     <>
-      <div className="inicio__filtro">
-        <span>Periodo</span>
-        <Dropdown value={mes} options={mesesDisponibles} onChange={(e) => setMes(e.value)} aria-label="Mes" className="inicio__mes" />
-        <Dropdown
-          value={anio}
-          options={anios}
-          onChange={(e) => {
-            setAnio(e.value);
-            if (e.value === hoy.getFullYear() && mes > hoy.getMonth() + 1) setMes(hoy.getMonth() + 1);
-          }}
-          aria-label="Año"
-          className="inicio__anio"
-        />
-      </div>
+      {filtro}
 
       {/* Indicadores fijos: solo el número, sin etiquetas ni colores que cambien con el periodo. */}
       <div className="gr-fila es-3 es-fija">
@@ -295,7 +306,7 @@ function TableroGestor() {
 
       <div className="gr-graficos">
         <TarjetaGrafico titulo="Áreas con menos boletas firmadas" pregunta={`${mayuscula(nombreMes)} · la línea marca la meta (${METAS.boletas} %)`} accion={{ etiqueta: 'Ver', alPresionar: () => navegar('/boletas-pago') }}>
-          {areasCriticas.length ? <BarrasMeta filas={areasCriticas} meta={METAS.boletas} unidad="boletas" ordenado colorDe={colorArea} /> : <p className="gr-vacio">{boletas ? `Aún no se envían boletas de ${nombreMes}.` : 'Cargando…'}</p>}
+          {areasCriticas.length ? <BarrasMeta filas={areasCriticas} meta={METAS.boletas} unidad="boletas" ordenado estadoDe={(pct) => (pct > 50 ? 'bien' : pct === 50 ? 'atencion' : 'critico')} /> : <p className="gr-vacio">{boletas ? `Aún no se envían boletas de ${nombreMes}.` : 'Cargando…'}</p>}
         </TarjetaGrafico>
 
         <TarjetaGrafico
@@ -311,7 +322,7 @@ function TableroGestor() {
             />
           }
         >
-          <ColumnasMes resumen={false} conUnidad={tendencia === 'descansos'} meses={tendencia === 'papeletas' ? papeletasMes : descansoMes} unidad={tendencia === 'papeletas' ? ['papeleta', 'papeletas'] : ['día', 'días']} />
+          <ColumnasMes resumen={false} conUnidad={tendencia === 'descansos'} meses={conSemaforo(tendencia === 'papeletas' ? papeletasMes : descansoMes)} unidad={tendencia === 'papeletas' ? ['papeleta', 'papeletas'] : ['día', 'días']} />
         </TarjetaGrafico>
       </div>
 
@@ -364,92 +375,152 @@ function TableroGestor() {
 }
 
 /* ---------- Trabajador y Seguridad ---------- */
+/**
+ * Mismo estilo que el Inicio de RR. HH.: filtro de periodo, indicadores fijos (solo número y unidad),
+ * dos gráficos de barras y una tabla con lo que tiene por atender. Solo sus propios datos.
+ */
 function TableroTrabajador({ usuario }: { usuario: UsuarioSesion }) {
   const navegar = useNavigate();
   const papeletas = usePapeletasCompartidas();
   const documentos = useDocumentos();
   const descansos = useListaDescansos();
-  const [boletas, setBoletas] = useState<{ firmadas: number; total: number } | null>(null);
+  const incidencias = useIncidencias();
+  const { anio, mes, clave, nombreMes, esMesActual, filtro } = usePeriodo();
+  const [misBoletas, setMisBoletas] = useState<{ anio: number; mes: number; firmada: boolean }[] | null>(null);
   const dni = usuario.dni;
+  const esSeguridad = usuario.rol === 'seguridad';
 
   useEffect(() => {
     if (!dni) return;
     let vigente = true;
     void repositorioBoletas.listarBoletasDe(dni).then((lista) => {
-      if (vigente) setBoletas({ firmadas: lista.filter((b) => b.boleta.firma === 'firmada').length, total: lista.length });
+      if (vigente) setMisBoletas(lista.map((b) => ({ anio: b.periodo.anio, mes: b.periodo.mes, firmada: b.boleta.firma === 'firmada' })));
     });
     return () => {
       vigente = false;
     };
   }, [dni]);
 
-  const pendientes = pendientesDe(usuario);
-  const anio = String(new Date().getFullYear());
-  const misPapeletas = papeletas.filter((p) => p.trabajador.dni === dni && p.estado !== 'anulada');
-  const misDocumentos = documentos.filter((d) => d.dni === dni && habilitadoParaTrabajador(d));
-  const misDescansos = descansos.filter((d) => d.trabajador.dni === dni);
-  const diasDescanso = ultimosMeses(12)
-    .filter((m) => m.clave.startsWith(anio))
-    .reduce((s, m) => s + misDescansos.reduce((t, d) => t + diasEnMes(d, m.clave), 0), 0);
-  const salidasHoy = usuario.rol === 'seguridad' ? papeletas.filter((p) => p.estado === 'aprobada' && p.fecha === hoyLocal() && !p.controlSalida).length : 0;
+  const delMes = (fecha: string) => diaLocalDe(fecha).startsWith(clave);
+  const finDelMes = `${clave}-${String(new Date(anio, mes, 0).getDate()).padStart(2, '0')}`;
+  const hastaElMes = (fecha: string) => diaLocalDe(fecha) <= finDelMes;
 
-  const papeletasMes: Mes[] = ultimosMeses().map((m) => {
-    const del = misPapeletas.filter((p) => p.fecha.startsWith(m.clave));
-    return { etiqueta: m.etiqueta, nombre: m.nombre, valor: del.length, detalle: del.length ? del.map((p) => p.motivo).join(' · ') : undefined };
-  });
+  /* --- Lo que tiene por atender del periodo (lo registrado ese mes que sigue pendiente) --- */
+  const misDocumentos = documentos.filter((d) => d.dni === dni && habilitadoParaTrabajador(d));
+  const enviadoEl = (d: (typeof misDocumentos)[number]) => ultimoEvento(d, 'enviado')?.fecha ?? d.historial[0].fecha;
+  const cantidades: Record<string, number> = {
+    '/mi-expediente/documentos': misDocumentos.filter((d) => d.estado === 'pendiente_firma' && delMes(enviadoEl(d))).length,
+    '/papeletas-permiso': papeletas.filter((p) => p.trabajador.dni === dni && faltaFirmaColaborador(p) && delMes(p.fecha)).length,
+    '/mi-expediente/descansos-medicos': descansos.filter((d) => d.trabajador.dni === dni && (d.estado === 'aviso' || d.estado === 'observado') && delMes(d.inicio)).length,
+    '/mi-expediente/memorandums': incidencias.filter((i) => i.dni === dni && i.estado === 'memo_emitido' && delMes(i.memorandum?.emitido ?? i.fecha)).length,
+  };
+  // Seguridad: hoy, las salidas por controlar; en meses anteriores, las salidas que controló.
+  const salidas = esSeguridad
+    ? esMesActual
+      ? papeletas.filter((p) => p.estado === 'aprobada' && p.fecha === hoyLocal() && !p.controlSalida).length
+      : papeletas.filter((p) => p.controlSalida && delMes(p.fecha)).length
+    : 0;
+  const pendientes = [
+    ...(esSeguridad && esMesActual ? [{ ruta: '/control-salidas', icono: 'pi pi-shield', titulo: 'Salidas por controlar hoy', detalle: 'Papeletas autorizadas para hoy', cantidad: salidas }] : []),
+    ...pendientesDe(usuario).map((p) => ({ ...p, cantidad: cantidades[p.ruta] ?? 0 })),
+  ];
+  const porAtender = pendientes.filter((p) => p.cantidad > 0);
+  const totalPendientes = porAtender.reduce((s, p) => s + p.cantidad, 0);
+
+  /* --- Firmas acumuladas del año hasta el mes elegido --- */
+  const boletasAnio = (misBoletas ?? []).filter((b) => b.anio === anio && b.mes <= mes);
+  const boletasFirmadas = boletasAnio.filter((b) => b.firmada).length;
+  const documentosHasta = misDocumentos.filter((d) => hastaElMes(enviadoEl(d)));
+  const firmas: FilaPorcentaje[] = [
+    { etiqueta: 'Boletas de pago', valor: boletasFirmadas, total: boletasAnio.length },
+    { etiqueta: 'Documentos', valor: documentosHasta.filter((d) => d.estado === 'firmado').length, total: documentosHasta.length },
+  ].filter((f) => f.total > 0);
+
+  /* --- Días de descanso del mes y papeletas de los 3 meses hasta el elegido --- */
+  const diasDescanso = descansos.filter((d) => d.trabajador.dni === dni).reduce((s, d) => s + diasEnMes(d, clave), 0);
+  const papeletasMes: Mes[] = conSemaforo(
+    ultimosMeses(3, new Date(anio, mes - 1, 1)).map((m) => ({
+      etiqueta: m.etiqueta,
+      nombre: m.nombre,
+      valor: papeletas.filter((p) => p.trabajador.dni === dni && p.estado !== 'anulada' && p.fecha.startsWith(m.clave)).length,
+    })),
+  );
+
+  const unidad = (n: number, uno: string, varios: string) => <span className="gr-unidad">{n === 1 ? uno : varios}</span>;
 
   return (
     <>
-      <Seccion titulo="Por atender" ayuda={pendientes.some((p) => p.cantidad) ? 'Toca una tarjeta para resolverlo.' : 'Estás al día.'}>
-        <div className="gr-fila">
-          {usuario.rol === 'seguridad' && (
-            <TarjetaPendiente titulo="Salidas por controlar hoy" icono="pi pi-shield" cantidad={salidasHoy} estado={salidasHoy ? 'atencion' : 'bien'} etiqueta={salidasHoy ? 'Por controlar' : 'Al día'} detalle={salidasHoy ? 'Papeletas autorizadas para hoy' : 'Nada pendiente'} alAbrir={() => navegar('/control-salidas')} />
-          )}
-          {pendientes.map((p) => (
-            <TarjetaPendiente key={p.ruta} titulo={p.titulo} icono={p.icono} cantidad={p.cantidad} estado={p.cantidad ? 'atencion' : 'bien'} etiqueta={p.cantidad ? 'Por atender' : 'Al día'} detalle={p.cantidad ? p.detalle : 'Nada pendiente'} alAbrir={() => navegar(p.ruta)} />
-          ))}
-        </div>
-      </Seccion>
+      {filtro}
+
+      {/* Indicadores fijos: solo el número, sin etiquetas ni colores que cambien. */}
+      <div className={`gr-fila es-fija${esSeguridad ? '' : ' es-3'}`}>
+        {esSeguridad && (
+          <TarjetaPendiente
+            titulo={esMesActual ? 'Salidas por controlar' : 'Salidas controladas'}
+            icono="pi pi-shield"
+            cantidad={<>{salidas} {esMesActual ? unidad(salidas, 'hoy', 'hoy') : unidad(salidas, 'salida', 'salidas')}</>}
+            estado="bien"
+            detalle=""
+            alAbrir={() => navegar('/control-salidas')}
+          />
+        )}
+        <TarjetaPendiente titulo="Por atender" icono="pi pi-inbox" cantidad={<>{totalPendientes} {unidad(totalPendientes, 'pendiente', 'pendientes')}</>} estado="bien" detalle="" alAbrir={() => navegar(porAtender[0]?.ruta ?? '/mi-expediente')} />
+        <TarjetaPendiente
+          titulo="Boletas firmadas"
+          icono="pi pi-wallet"
+          cantidad={misBoletas ? <>{boletasFirmadas} <span className="gr-unidad">de {boletasAnio.length}</span></> : '—'}
+          estado="bien"
+          detalle=""
+          alAbrir={() => navegar('/mi-expediente/boletas')}
+        />
+        <TarjetaPendiente titulo="Días de descanso médico" icono="pi pi-heart" cantidad={<>{diasDescanso} {unidad(diasDescanso, 'día', 'días')}</>} estado="bien" detalle="" alAbrir={() => navegar('/mi-expediente/descansos-medicos')} />
+      </div>
 
       <div className="gr-graficos">
-        <TarjetaGrafico titulo="Mis boletas de pago" pregunta="¿Tengo boletas sin firmar?" accion={{ etiqueta: 'Ver', alPresionar: () => navegar('/mi-expediente/boletas') }}>
-          <Dona
-            centro={`${boletas?.total ? Math.round((boletas.firmadas / boletas.total) * 100) : 0}%`}
-            subCentro="firmadas"
-            alAbrir={() => navegar('/mi-expediente/boletas')}
-            partes={[
-              { etiqueta: 'Firmadas', valor: boletas?.firmadas ?? 0, color: COLOR.bien },
-              { etiqueta: 'Por firmar', valor: (boletas?.total ?? 0) - (boletas?.firmadas ?? 0), color: COLOR.atencion },
-            ]}
-          />
+        <TarjetaGrafico titulo="Mis firmas" pregunta={`De enero a ${nombreMes} de ${anio}`} accion={{ etiqueta: 'Ver', alPresionar: () => navegar('/mi-expediente') }}>
+          {firmas.length ? (
+            <BarrasMeta filas={firmas} meta={100} unidad="firmados" ordenado estadoDe={(pct) => (pct > 50 ? 'bien' : pct === 50 ? 'atencion' : 'critico')} />
+          ) : (
+            <p className="gr-vacio">{misBoletas ? 'Aún no tienes boletas ni documentos para firmar.' : 'Cargando…'}</p>
+          )}
         </TarjetaGrafico>
 
-        <TarjetaGrafico titulo="Mis papeletas por mes" pregunta="Mis permisos de los últimos 6 meses" accion={{ etiqueta: 'Ver', alPresionar: () => navegar('/papeletas-permiso') }}>
-          <ColumnasMes meses={papeletasMes} unidad={['papeleta', 'papeletas']} />
+        <TarjetaGrafico titulo="Mis papeletas por mes" accion={{ etiqueta: 'Ver', alPresionar: () => navegar('/papeletas-permiso') }}>
+          <ColumnasMes resumen={false} meses={papeletasMes} unidad={['papeleta', 'papeletas']} />
         </TarjetaGrafico>
       </div>
 
-      <Seccion titulo={`Mi año ${anio}`}>
-        <dl className="gr-caja inicio__cifras">
-          <button type="button" onClick={() => navegar('/mi-expediente/descansos-medicos')}>
-            <dt>Días de descanso médico</dt>
-            <dd>{diasDescanso}</dd>
-            <small>Reconocidos por RR. HH.</small>
-          </button>
-          <button type="button" onClick={() => navegar('/mi-expediente/documentos')}>
-            <dt>Documentos firmados</dt>
-            <dd>
-              {misDocumentos.filter((d) => d.estado === 'firmado').length} <span>de {misDocumentos.length}</span>
-            </dd>
-            <small>Contratos, adendas y cargos</small>
-          </button>
-          <button type="button" onClick={() => navegar('/papeletas-permiso')}>
-            <dt>Papeletas aprobadas</dt>
-            <dd>{misPapeletas.filter((p) => p.estado === 'aprobada' && p.fecha.startsWith(anio)).length}</dd>
-            <small>En lo que va del año</small>
-          </button>
-        </dl>
-      </Seccion>
+      <TarjetaGrafico titulo="Por atender" pregunta={porAtender.length ? 'Toca una fila para resolverlo.' : undefined}>
+        {porAtender.length ? (
+          <table className="gr-top es-tramites">
+            <thead>
+              <tr>
+                <th scope="col">Trámite</th>
+                <th scope="col" className="gr-top__area">Qué hacer</th>
+                <th scope="col" className="gr-top__num">Cantidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              {porAtender.map((p) => (
+                <tr key={p.ruta} onClick={() => navegar(p.ruta)} tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && navegar(p.ruta)}>
+                  <td>
+                    <span className="inicio__tramite">
+                      <i className={p.icono} aria-hidden="true" />
+                      <strong>{p.titulo}</strong>
+                    </span>
+                  </td>
+                  <td className="gr-top__area">{p.detalle}</td>
+                  <td className="gr-top__num">
+                    <strong>{p.cantidad}</strong>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="gr-vacio">Estás al día: no tienes nada pendiente de {nombreMes}.</p>
+        )}
+      </TarjetaGrafico>
     </>
   );
 }

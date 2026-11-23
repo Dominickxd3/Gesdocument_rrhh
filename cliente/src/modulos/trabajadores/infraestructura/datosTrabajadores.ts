@@ -70,7 +70,7 @@ export function crearTrabajadores(): Trabajador[] {
     };
   }).map((t) => ({ ...t, ...datosContrato(t.fechaIngreso, t.cargo) }));
 
-  // Ficha del usuario de prueba "jose.quispe" (rol trabajador); se vincula por DNI.
+  // Ficha del usuario de prueba "jose" (rol trabajador); se vincula por DNI.
   lista.push({
     dni: '45871236',
     nombre: 'QUISPE ROJAS, JOSÉ',

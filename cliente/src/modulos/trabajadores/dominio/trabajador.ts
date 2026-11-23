@@ -27,6 +27,13 @@ export const TEXTO_MODALIDAD: Record<ModalidadContrato, string> = {
   indeterminado: 'Contrato de Trabajo a Plazo Indeterminado',
 };
 
+/** Nombre corto para mostrar en pantalla (el texto largo es el del documento legal). */
+export const MODALIDAD_CORTA: Record<ModalidadContrato, string> = {
+  incremento_actividad: 'Plazo fijo por incremento de actividad',
+  plazo_fijo: 'Plazo fijo',
+  indeterminado: 'Plazo indeterminado',
+};
+
 export interface ContratoVigente {
   modalidad: ModalidadContrato;
   /** Fecha en que se suscribió el contrato (AAAA-MM-DD). */

@@ -11,7 +11,7 @@ import { SelectorTrabajador } from '@/compartido/componentes/SelectorTrabajador'
 import { fechaLarga, hoyIso } from '@/compartido/almacen/crearAlmacen';
 import { montoSoles } from '@/compartido/formato/montos';
 import { useTrabajadores } from '@/modulos/trabajadores/aplicacion/almacenTrabajadores';
-import { TEXTO_MODALIDAD } from '@/modulos/trabajadores/dominio/trabajador';
+import { MODALIDAD_CORTA } from '@/modulos/trabajadores/dominio/trabajador';
 import { TIPOS_DOCUMENTO, type Documento, type TipoDocumento } from '../dominio/documento';
 import { CLAUSULAS_ESPECIALES, MOTIVOS_ADENDA, clausulasSugeridas, type ClausulaEspecial, type MotivoAdenda } from '../dominio/plantillaAdenda';
 import { datosAdenda, datosContrato } from '../aplicacion/almacenDocumentos';
@@ -182,7 +182,7 @@ export function VentanaNuevoDocumento({ visible, dniInicial, tipoInicial, alCerr
               <dl className="doc-contrato">
                 <div>
                   <dt>Contrato vigente</dt>
-                  <dd>{TEXTO_MODALIDAD[trabajador.contrato.modalidad].replace('Contrato de Trabajo a ', '')}</dd>
+                  <dd>{MODALIDAD_CORTA[trabajador.contrato.modalidad]}</dd>
                 </div>
                 <div>
                   <dt>Suscrito el</dt>

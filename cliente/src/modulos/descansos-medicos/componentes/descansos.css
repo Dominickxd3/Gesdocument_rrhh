@@ -198,3 +198,11 @@
 .dm-borradores li > .pi { color: #6b7280; }
 .dm-borradores li > div { display: flex; flex: 1; flex-direction: column; min-width: 0; }
 .dm-borradores small { color: #6b7280; }
+
+/* Periodo reconocido: las dos fechas se reparten el ancho y nunca empujan el panel hacia la derecha. */
+.dm-periodo-reconocido > div { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+.dm-periodo-reconocido .p-inputtext { width: 100%; min-width: 0; padding-inline: 10px; }
+@media (max-width: 640px) {
+  .dm-periodo-reconocido > div { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+  .dm-periodo-reconocido__dias { grid-column: 1 / -1; }
+}
