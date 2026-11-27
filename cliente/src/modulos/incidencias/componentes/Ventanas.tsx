@@ -13,7 +13,10 @@ import { BotonArchivo, archivoSubido } from '@/compartido/componentes/BotonArchi
 import { fechaLarga, hoyIso, momento } from '@/compartido/almacen/crearAlmacen';
 import { useTrabajadores } from '@/modulos/trabajadores/aplicacion/almacenTrabajadores';
 import { nombreLegible } from '@/modulos/trabajadores/dominio/trabajador';
-import { MEDIDAS, TEXTO_ACTUACION, infoEstado, textoMemorandum, type Incidencia } from '../dominio/incidencia';
+import { buscarTrabajador } from '@/modulos/trabajadores/aplicacion/almacenTrabajadores';
+import { TEXTO_ACTUACION, infoEstado, type Incidencia } from '../dominio/incidencia';
+import { MODELOS_IMPUTACION, buscarModelo, hechosDeModelo, type IdModelo } from '../dominio/modelosImputacion';
+import { HojaCartaImputacion } from './HojaCartaImputacion';
 
 /** Documento del memorándum (vista previa e impresión). */
 export function VistaMemorandum({
@@ -44,7 +47,7 @@ export function VistaMemorandum({
     <Dialog
       visible={visible && !!i?.memorandum}
       onHide={alCerrar}
-      header={i && `Memorándum · Incidencia N° ${i.numero}`}
+      header={i && (i.numero ? `Carta de imputación de cargos · Incidencia N° ${i.numero}` : 'Carta de imputación de cargos · vista previa del formato')}
       className="pp-ventana dm-ventana-documento"
       style={{ width: '820px' }}
       breakpoints={{ '860px': '100vw' }}
@@ -71,45 +74,26 @@ export function VistaMemorandum({
     >
       {i?.memorandum && (
         <div className="dm-visor" style={{ zoom }} ref={visor}>
-          <article className="doc-hoja">
-            <header>
-              <img src="/isotipo-empresa.png" alt="" />
-              <small>
-                GRUPO PECUARIO S.A.C.
-                <br />
-                Lima, {fechaLarga(i.memorandum.emitido)}
-              </small>
-            </header>
-            <h3>MEMORÁNDUM N° {String(i.numero).padStart(4, '0')}-GH</h3>
-            <p>
-              <strong>Para:</strong> {i.trabajador}
-              <br />
-              <strong>De:</strong> Gestión Humana
-              <br />
-              <strong>Asunto:</strong> {i.asunto}
-            </p>
-            {i.memorandum.texto.split('\n\n').map((p) => (
-              <p key={p}>{p}</p>
-            ))}
-            <div className="doc-hoja__firmas">
-              <div>
-                <span />
-                Jefatura de Gestión Humana
-              </div>
-              <div>
-                {firma?.firmaImagen ? (
-                  <img src={firma.firmaImagen} alt={`Firma de ${nombreLegible(i.trabajador)}`} className="doc-hoja__firma-imagen" />
-                ) : firma ? (
-                  <em className="doc-hoja__firmado">Recibido y firmado</em>
-                ) : firmando ? (
-                  <LienzoFirma control={control} />
-                ) : (
-                  <span />
-                )}
-                {nombreLegible(i.trabajador)}
-              </div>
-            </div>
-          </article>
+          <HojaCartaImputacion
+            modelo={i.memorandum.modelo}
+            trabajador={i.trabajador}
+            dni={i.dni}
+            area={buscarTrabajador(i.dni)?.area ?? '[Área del trabajador]'}
+            fecha={i.memorandum.emitido}
+            hechos={i.memorandum.texto}
+            plazo={i.memorandum.plazo}
+            firma={
+              firma?.firmaImagen ? (
+                <img src={firma.firmaImagen} alt={`Firma de ${nombreLegible(i.trabajador)}`} className="doc-firma-trabajador" />
+              ) : firma ? (
+                <em className="doc-hoja__firmado">Recibido y firmado</em>
+              ) : firmando ? (
+                <LienzoFirma control={control} />
+              ) : (
+                <small className="ing-firma__pendiente">Pendiente de firma digital</small>
+              )
+            }
+          />
         </div>
       )}
       {firmando && i?.memorandum && (
@@ -178,7 +162,7 @@ export function VentanaIncidencia({ incidencia: i, modo, alCerrar, ...acciones }
             <div>
               <strong>Memorándum emitido por {memo.usuario}</strong>
               <small>
-                {momento(memo.fecha)} · Medida: {i.memorandum?.medida}
+                {momento(memo.fecha)} · {i.memorandum && buscarModelo(i.memorandum.modelo).nombre}
               </small>
             </div>
           </div>
@@ -395,19 +379,27 @@ export function VentanaEmitirMemorandum({
 }: {
   incidencia: Incidencia | null;
   alCerrar: () => void;
-  alEmitir: (i: Incidencia, medida: string, texto: string) => void;
+  alEmitir: (i: Incidencia, modelo: IdModelo, texto: string, plazo: number) => void;
 }) {
-  const [medida, setMedida] = useState(MEDIDAS[0]);
+  const [modelo, setModelo] = useState<IdModelo>('funciones');
   const [texto, setTexto] = useState('');
+  const [plazo, setPlazo] = useState(6);
+  // Al abrir: el modelo que corresponde al asunto de la incidencia, si coincide con alguno.
   useEffect(() => {
-    if (i) setTexto(textoMemorandum(i.trabajador, i.dni, i.asunto, fechaLarga(i.fecha), medida));
-  }, [i, medida]);
+    if (i) setModelo(MODELOS_IMPUTACION.find((m) => m.nombre === i.asunto)?.id ?? 'funciones');
+  }, [i]);
+  useEffect(() => {
+    if (!i) return;
+    const m = buscarModelo(modelo);
+    setTexto(hechosDeModelo(m, fechaLarga(i.fecha)));
+    setPlazo(m.plazo);
+  }, [i, modelo]);
 
   return (
     <Dialog
       visible={!!i}
       onHide={alCerrar}
-      header="Emitir memorándum"
+      header="Emitir carta de imputación de cargos"
       className="pp-ventana"
       style={{ width: '640px' }}
       breakpoints={{ '680px': '100vw' }}
@@ -415,17 +407,22 @@ export function VentanaEmitirMemorandum({
       footer={
         <div className="pp-ventana__pie">
           <Button label="Cancelar" text onClick={alCerrar} />
-          <Button label="Emitir y enviar al trabajador" icon="pi pi-send" className="pp-boton-principal" disabled={!texto.trim()} onClick={() => i && alEmitir(i, medida, texto)} />
+          <Button label="Emitir y enviar al trabajador" icon="pi pi-send" className="pp-boton-principal" disabled={!texto.trim()} onClick={() => i && alEmitir(i, modelo, texto, plazo)} />
         </div>
       }
     >
       <div className="pp-formulario">
         <label className="pp-campo">
-          <span className="pp-campo__etiqueta">Medida</span>
-          <Dropdown value={medida} options={MEDIDAS} onChange={(e) => setMedida(e.value)} />
+          <span className="pp-campo__etiqueta">Modelo de carta de imputación</span>
+          <Dropdown value={modelo} options={MODELOS_IMPUTACION} optionLabel="nombre" optionValue="id" filter onChange={(e) => setModelo(e.value)} />
+          <small className="pp-campo__ayuda">{buscarModelo(modelo).asunto}. El fundamento del Reglamento Interno se completa solo.</small>
         </label>
         <label className="pp-campo">
-          <span className="pp-campo__etiqueta">Texto (generado desde la plantilla "Memorándum")</span>
+          <span className="pp-campo__etiqueta">Plazo de descargos (días calendario)</span>
+          <Dropdown value={plazo} options={[1, 3, 5, 6]} onChange={(e) => setPlazo(e.value)} />
+        </label>
+        <label className="pp-campo">
+          <span className="pp-campo__etiqueta">Hechos que se imputan</span>
           <InputTextarea value={texto} onChange={(e) => setTexto(e.target.value)} rows={9} autoResize />
           <small className="pp-campo__ayuda">Revisa y ajusta el texto antes de emitir. El trabajador lo verá en "Mis memorándums" para firmar la recepción.</small>
         </label>

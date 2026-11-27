@@ -5,7 +5,7 @@ import { Checkbox } from 'primereact/checkbox';
 import { Insignia } from '@/compartido/componentes/Insignia';
 import { BotonArchivo } from '@/compartido/componentes/BotonArchivo';
 import { momento } from '@/compartido/almacen/crearAlmacen';
-import { infoEstado, etiquetaTipo, ultimoEvento, type Documento, type EventoDocumento } from '../dominio/documento';
+import { infoEstado, etiquetaTipo, ultimoEvento, type CroquisFirmado, type Documento, type EventoDocumento } from '../dominio/documento';
 import { VistaDocumento } from './VistaDocumento';
 
 const ACCIONES: Record<EventoDocumento['accion'], { texto: string; icono: string }> = {
@@ -23,7 +23,7 @@ interface Propiedades {
   alCerrar: () => void;
   alEnviar?: (d: Documento) => void;
   alCorregir?: (d: Documento, archivo?: string) => void;
-  alFirmar?: (d: Documento, imagen: string) => void;
+  alFirmar?: (d: Documento, imagen: string, croquis?: CroquisFirmado) => void;
   alObservar?: (d: Documento) => void;
 }
 
@@ -57,7 +57,7 @@ export function VentanaDocumento({ documento: d, modo, alCerrar, ...acciones }: 
       <div className="pp-panel__contenido">
         <header className="pp-panel__encabezado">
           <div>
-            <span className="pp-panel__kicker">Documento N° {d.numero}</span>
+            <span className="pp-panel__kicker">Documento</span>
             <h2 className="tr-nombre">{etiquetaTipo(d.tipo)}</h2>
           </div>
           <Insignia tono={estado.tono}>{estado.etiqueta}</Insignia>
@@ -94,13 +94,15 @@ export function VentanaDocumento({ documento: d, modo, alCerrar, ...acciones }: 
             </div>
           )}
           <div>
-            <dt>Versión</dt>
-            <dd>v{d.version}</dd>
+            <dt>Enviado</dt>
+            <dd>{ultimoEvento(d, 'enviado') ? momento(ultimoEvento(d, 'enviado')!.fecha) : 'Aún no se envía'}</dd>
           </div>
-          <div>
-            <dt>Origen</dt>
-            <dd>{d.origen.tipo === 'plantilla' ? 'Generado desde plantilla' : d.origen.nombre}</dd>
-          </div>
+          {ultimoEvento(d, 'firmado') && (
+            <div>
+              <dt>Firmado</dt>
+              <dd>{momento(ultimoEvento(d, 'firmado')!.fecha)}</dd>
+            </div>
+          )}
         </dl>
 
         <Button label="Ver documento" icon="pi pi-eye" outlined className="pp-boton-secundario dm-boton-ancho" onClick={() => setViendo(true)} />
@@ -161,9 +163,9 @@ export function VentanaDocumento({ documento: d, modo, alCerrar, ...acciones }: 
         documento={d}
         visible={firmando}
         alCerrar={() => setFirmando(false)}
-        alFirmar={(imagen) => {
+        alFirmar={(imagen, croquis) => {
           setFirmando(false);
-          acciones.alFirmar?.(d, imagen);
+          acciones.alFirmar?.(d, imagen, croquis);
         }}
       />
     </Dialog>

@@ -13,6 +13,7 @@ import {
   type TipoDocumento,
 } from '../dominio/documento';
 import './expediente.css';
+import { DocumentosPersonales } from './DocumentosPersonales';
 
 export interface DatosFicha {
   nombre: string;
@@ -30,14 +31,18 @@ interface Propiedades {
   alAbrir: (documento: Documento) => void;
   /** Solo RR. HH.: preparar un documento requerido que falta. */
   alPreparar?: (tipo: TipoDocumento) => void;
+  /** Solo RR. HH.: preparar y enviar a firma todos los documentos de ingreso que faltan. */
+  alPrepararIngreso?: (faltan: TipoDocumento[]) => void;
 }
 
 const fechaDe = (d: Documento) => d.historial[d.historial.length - 1].fecha;
 
 /** Expediente digital de un trabajador (RF03, CUS40/CUS45): ficha, requeridos y documentos por categoría. */
-export function ExpedienteTrabajador({ ficha, documentos, modo, alAbrir, alPreparar }: Propiedades) {
+export function ExpedienteTrabajador({ ficha, documentos, modo, alAbrir, alPreparar, alPrepararIngreso }: Propiedades) {
   const resumen = resumirExpediente(documentos);
-  const avance = Math.round((resumen.requeridosCompletos / resumen.requeridosTotal) * 100);
+  // Todo lo requerido que falta (los 7 de ingreso, el contrato, el Reglamento y la DJ de domicilio).
+  const ingresoFaltante = TIPOS_REQUERIDOS.filter((t) => situacionRequisito(documentos, t).situacion === 'falta');
+  const avance = resumen.totalAFirmar ? Math.round((resumen.firmados / resumen.totalAFirmar) * 100) : 100;
 
   return (
     <div className="expediente">
@@ -51,12 +56,12 @@ export function ExpedienteTrabajador({ ficha, documentos, modo, alAbrir, alPrepa
           </p>
           {ficha.fechaIngreso && <p className="expediente__ingreso">Ingresó el {fechaLarga(ficha.fechaIngreso)}</p>}
         </div>
-        <div className="expediente__avance" aria-label={`${resumen.requeridosCompletos} de ${resumen.requeridosTotal} documentos requeridos firmados`}>
+        <div className="expediente__avance" aria-label={`${resumen.firmados} de ${resumen.totalAFirmar} documentos firmados`}>
           <div className="expediente__avance-cifra">
             <strong>
-              {resumen.requeridosCompletos}/{resumen.requeridosTotal}
+              {resumen.firmados}/{resumen.totalAFirmar}
             </strong>
-            <span>requeridos firmados</span>
+            <span>documentos firmados</span>
           </div>
           <div className="expediente__barra">
             <span style={{ width: `${avance}%` }} />
@@ -70,7 +75,18 @@ export function ExpedienteTrabajador({ ficha, documentos, modo, alAbrir, alPrepa
       </section>
 
       <section className="expediente__seccion">
-        <h3>Documentos requeridos</h3>
+        <div className="expediente__titulo-acciones">
+          <h3>Documentos requeridos</h3>
+          {modo === 'rrhh' && alPrepararIngreso && ingresoFaltante.length > 0 && (
+            <Button
+              label={ingresoFaltante.length === TIPOS_REQUERIDOS.length ? `Enviar expediente de ingreso (${ingresoFaltante.length})` : `Enviar documentos que faltan (${ingresoFaltante.length})`}
+              icon="pi pi-send"
+              size="small"
+              className="pp-boton-principal"
+              onClick={() => alPrepararIngreso(ingresoFaltante)}
+            />
+          )}
+        </div>
         <ul className="expediente__requeridos">
           {TIPOS_REQUERIDOS.map((tipo) => {
             const { situacion, documento } = situacionRequisito(documentos, tipo);
@@ -83,8 +99,8 @@ export function ExpedienteTrabajador({ ficha, documentos, modo, alAbrir, alPrepa
                 <div className="expediente__requerido-texto">
                   <strong>{etiquetaTipo(tipo)}</strong>
                   <span>
-                    {situacion === 'firmado' && documento && `Firmado · N° ${documento.numero} · ${fechaCorta(fechaDe(documento))}`}
-                    {situacion === 'en_curso' && documento && `${infoEstado(documento.estado).etiqueta} · N° ${documento.numero}`}
+                    {situacion === 'firmado' && documento && `Firmado · ${fechaCorta(fechaDe(documento))}`}
+                    {situacion === 'en_curso' && documento && `${infoEstado(documento.estado).etiqueta} · ${fechaCorta(fechaDe(documento))}`}
                     {situacion === 'falta' && (modo === 'rrhh' ? 'Falta en el expediente' : 'RR. HH. lo preparará')}
                   </span>
                 </div>
@@ -101,6 +117,8 @@ export function ExpedienteTrabajador({ ficha, documentos, modo, alAbrir, alPrepa
           })}
         </ul>
       </section>
+
+      <DocumentosPersonales dni={ficha.dni} modo={modo} />
 
       {CATEGORIAS_EXPEDIENTE.map((categoria) => {
         const deCategoria = documentos
@@ -123,7 +141,7 @@ export function ExpedienteTrabajador({ ficha, documentos, modo, alAbrir, alPrepa
                       <span className="expediente__documento-titulo">
                         <strong>{etiquetaTipo(d.tipo)}</strong>
                         <small>
-                          N° {d.numero} · versión {d.version} · {fechaCorta(fechaDe(d))}
+                          {fechaCorta(fechaDe(d))}
                         </small>
                       </span>
                       <Insignia tono={infoEstado(d.estado).tono}>{infoEstado(d.estado).etiqueta}</Insignia>

@@ -12,6 +12,9 @@ import { EMPRESA_INICIAL, generarBoletas } from './datosPrueba';
 /** En el mockup la configuración se guarda en este navegador; en producción irá a SQL Server. */
 const CLAVE_CONFIGURACION = 'gesdocument-rrhh:configuracion-boletas';
 
+/** Firma del Gerente General por defecto (imagen local en public/privado/, fuera del repositorio). */
+const FIRMA_POR_DEFECTO = import.meta.env.VITE_FIRMA_GERENTE_GENERAL || null;
+
 const DEMORA_MS = 350;
 const esperar = () => new Promise((resolver) => setTimeout(resolver, DEMORA_MS));
 
@@ -25,14 +28,15 @@ export class RepositorioBoletasPrueba implements RepositorioBoletas {
   constructor(private readonly hoy = new Date()) {}
 
   async obtenerConfiguracion(): Promise<ConfiguracionBoletas> {
-    const inicial: ConfiguracionBoletas = { empresa: { ...EMPRESA_INICIAL }, firmaEmpleador: null };
+    const inicial: ConfiguracionBoletas = { empresa: { ...EMPRESA_INICIAL }, firmaEmpleador: FIRMA_POR_DEFECTO };
     try {
       const guardada = localStorage.getItem(CLAVE_CONFIGURACION);
       if (!guardada) return inicial;
       const datos = JSON.parse(guardada) as Partial<ConfiguracionBoletas>;
       return {
         empresa: { ...inicial.empresa, ...datos.empresa },
-        firmaEmpleador: datos.firmaEmpleador ?? null,
+        // Si RR. HH. quitó la firma en Configuración, se respeta; si nunca la tocó, va la de por defecto.
+        firmaEmpleador: 'firmaEmpleador' in datos ? (datos.firmaEmpleador ?? null) : FIRMA_POR_DEFECTO,
       };
     } catch {
       return inicial;

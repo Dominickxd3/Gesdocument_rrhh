@@ -1,6 +1,7 @@
 /** Trabajadores ficticios para los prototipos. Nombres, DNI, correos y teléfonos son inventados. */
 import { crearAleatorio } from '@/compartido/almacen/crearAlmacen';
 import type { Trabajador } from '../dominio/trabajador';
+import { CUENTA_DORTIZ } from '@/modulos/autenticacion/infraestructura/cuentaDortiz';
 
 export const AREAS = [
   'ADM ADMINISTRACIÓN',
@@ -108,6 +109,21 @@ export function crearTrabajadores(): Trabajador[] {
     jefe: 'TORRES CANO, MARÍA',
     historialJefes: [{ jefe: 'TORRES CANO, MARÍA', desde: '2019-08-01' }],
     ...datosContrato('2019-08-01', 'Prevencionista de Seguridad'),
+  });
+
+  // Ficha del usuario de prueba "dortiz" (rol trabajador).
+  lista.push({
+    dni: CUENTA_DORTIZ.dni,
+    nombre: CUENTA_DORTIZ.nombreFicha,
+    area: CUENTA_DORTIZ.area,
+    cargo: CUENTA_DORTIZ.cargo,
+    correo: 'dortiz@correo.com',
+    telefono: '941 205 873',
+    sede: 'Lima – Canto Bello',
+    fechaIngreso: '2023-02-06',
+    jefe: 'PAREDES RÍOS, CARLOS',
+    historialJefes: [{ jefe: 'PAREDES RÍOS, CARLOS', desde: '2023-02-06' }],
+    ...datosContrato('2023-02-06', CUENTA_DORTIZ.cargo),
   });
 
   return lista.sort((a, b) => a.nombre.localeCompare(b.nombre));

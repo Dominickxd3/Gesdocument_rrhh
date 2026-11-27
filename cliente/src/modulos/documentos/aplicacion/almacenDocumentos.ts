@@ -3,17 +3,83 @@ import { almacenTrabajadores } from '@/modulos/trabajadores/aplicacion/almacenTr
 import { nombreLegible, type Trabajador } from '@/modulos/trabajadores/dominio/trabajador';
 import { clausulasSugeridas, esCargoVentas, type DatosAdenda } from '../dominio/plantillaAdenda';
 import { calcularHasta, esCargoConfianza, funcionesSugeridas, type DatosContrato } from '../dominio/plantillaContrato';
-import { TIPOS_DOCUMENTO, type Documento, type EstadoDocumento, type EventoDocumento } from '../dominio/documento';
+import { CUENTA_DORTIZ } from '@/modulos/autenticacion/infraestructura/cuentaDortiz';
+import { TIPOS_DOCUMENTO, TIPOS_REQUERIDOS, type CroquisFirmado, type Documento, type EstadoDocumento, type EventoDocumento, type TipoDocumento, type TipoIngreso } from '../dominio/documento';
 
 const RRHH = ['María Torres', 'Carlos Ramírez'];
 
 /** Documentos ficticios repartidos entre los trabajadores (incluye al usuario de prueba jose.quispe). */
 function crearDocumentos(): Documento[] {
   const { azar, elegir } = crearAleatorio(777);
-  const trabajadores = almacenTrabajadores.leer().lista;
+  const todos = almacenTrabajadores.leer().lista;
+  const dortiz = todos.find((t) => t.dni === CUENTA_DORTIZ.dni)!;
+  // La cuenta "dortiz" solo tiene su expediente de ingreso, sin documentos al azar.
+  const trabajadores = todos.filter((t) => t !== dortiz);
   const demo = trabajadores.find((t) => t.dni === '45871236')!;
   const estados: EstadoDocumento[] = ['pendiente_firma', 'firmado', 'firmado', 'observado', 'preparacion', 'firmado', 'pendiente_firma'];
 
+  return [...documentosDeIngreso(demo), ...ingresoPorFirmar(dortiz), ...documentosVarios(trabajadores, demo, azar, elegir, estados)];
+}
+
+/**
+ * Cuenta de prueba "dortiz": RR. HH. ya le envió todo el expediente de ingreso (contrato incluido)
+ * y está todo por firmar, croquis incluido.
+ */
+function ingresoPorFirmar(t: Trabajador): Documento[] {
+  return TIPOS_REQUERIDOS.map((tipo, i) => {
+    const numero = 601 + i;
+    const historial: EventoDocumento[] = [
+      { accion: 'creado', usuario: RRHH[0], fecha: haceDias(1, '08:30') },
+      { accion: 'enviado', usuario: RRHH[0], fecha: haceDias(1, '08:35') },
+    ];
+    return {
+      id: `doc-${numero}`,
+      numero,
+      dni: t.dni,
+      trabajador: t.nombre,
+      tipo,
+      version: 1,
+      origen: { tipo: 'plantilla' },
+      estado: 'pendiente_firma',
+      historial,
+      contrato: tipo === 'contrato' ? contratoEjemplo(t, haceDias(1).slice(0, 10)) : undefined,
+    };
+  });
+}
+
+/**
+ * Expediente de ingreso de ejemplo para el usuario de prueba "jose": la mayoría firmados
+ * y dos por firmar, para ver ambos casos.
+ */
+function documentosDeIngreso(t: Trabajador): Documento[] {
+  const casos: [TipoIngreso, EstadoDocumento][] = [
+    ['induccion', 'firmado'],
+    ['confidencialidad', 'firmado'],
+    ['etica', 'pendiente_firma'],
+    ['celulares', 'pendiente_firma'],
+    ['vestimenta', 'firmado'],
+    ['antecedentes', 'firmado'],
+    ['croquis', 'pendiente_firma'],
+  ];
+  return casos.map(([tipo, estado], i) => {
+    const numero = 501 + i;
+    const dias = 12 - i;
+    const historial: EventoDocumento[] = [
+      { accion: 'creado', usuario: RRHH[0], fecha: haceDias(dias, '08:40') },
+      { accion: 'enviado', usuario: RRHH[0], fecha: haceDias(dias, '08:45') },
+    ];
+    if (estado === 'firmado') historial.push({ accion: 'firmado', usuario: nombreLegible(t.nombre), fecha: haceDias(dias - 1, '10:20') });
+    return { id: `doc-${numero}`, numero, dni: t.dni, trabajador: t.nombre, tipo, version: 1, origen: { tipo: 'plantilla' }, estado, historial };
+  });
+}
+
+function documentosVarios(
+  trabajadores: Trabajador[],
+  demo: Trabajador,
+  azar: () => number,
+  elegir: <V>(lista: V[]) => V,
+  estados: EstadoDocumento[],
+): Documento[] {
   return Array.from({ length: 40 }, (_, i) => {
     const t = i < 3 ? demo : elegir(trabajadores);
     const estado: EstadoDocumento = i === 0 ? 'pendiente_firma' : i === 1 ? 'firmado' : i === 2 ? 'pendiente_firma' : elegir(estados);
@@ -57,7 +123,7 @@ function adendaEjemplo(t: Trabajador, fechaFirma: string, i: number): DatosAdend
   return datosAdenda(t, { cargoNuevo, remuneracionNueva: t.contrato.remuneracion + 200, especiales: clausulasSugeridas(cargoNuevo), fechaFirma });
 }
 
-function contratoEjemplo(t: Trabajador, desde: string, cargoForzado?: string): DatosContrato {
+export function contratoEjemplo(t: Trabajador, desde: string, cargoForzado?: string): DatosContrato {
   const cargo = cargoForzado ?? t.contrato.cargo;
   return datosContrato(t, {
     cargo,
@@ -119,5 +185,42 @@ export const corregirDocumento = (d: Documento, usuario: string, archivo?: strin
   }));
 
 /** CUS48: firma electrónica del trabajador. */
-export const firmarDocumento = (d: Documento, usuario: string, firmaImagen: string) =>
-  actualizar(d.id, { accion: 'firmado', usuario, firmaImagen }, () => ({ estado: 'firmado' }));
+export const firmarDocumento = (d: Documento, usuario: string, firmaImagen: string, croquis?: CroquisFirmado) =>
+  actualizar(d.id, { accion: 'firmado', usuario, firmaImagen, croquisImagen: croquis?.imagen, croquisReferencias: croquis?.referencias }, () => ({
+    estado: 'firmado',
+  }));
+
+/**
+ * Plantillas: documento de muestra para ver el formato tal como lo recibirá el trabajador,
+ * con datos de ejemplo en lugar de los de una persona real.
+ */
+export function documentoDeMuestra(tipo: TipoDocumento): Documento {
+  const hoy = ahoraIso().slice(0, 10);
+  const ejemplo: Trabajador = {
+    dni: '00000000',
+    nombre: 'APELLIDOS, NOMBRES',
+    area: 'ÁREA DEL TRABAJADOR',
+    cargo: 'CARGO DEL TRABAJADOR',
+    correo: '',
+    telefono: '',
+    sede: '',
+    fechaIngreso: hoy,
+    jefe: '',
+    historialJefes: [],
+    domicilio: '[Domicilio del trabajador]',
+    contrato: { modalidad: 'incremento_actividad', fecha: hoy, cargo: 'CARGO DEL TRABAJADOR', remuneracion: 1130, clausulaRemuneracion: 'sexta' },
+  };
+  return {
+    id: `muestra-${tipo}`,
+    numero: 0,
+    dni: ejemplo.dni,
+    trabajador: ejemplo.nombre,
+    tipo,
+    version: 1,
+    origen: { tipo: 'plantilla' },
+    estado: 'preparacion',
+    historial: [{ accion: 'creado', usuario: 'Plantilla', fecha: ahoraIso() }],
+    contrato: tipo === 'contrato' ? contratoEjemplo(ejemplo, hoy) : undefined,
+    adenda: tipo === 'adenda' ? adendaEjemplo(ejemplo, hoy, 0) : undefined,
+  };
+}

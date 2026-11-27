@@ -1,4 +1,5 @@
 import { aMomentoLocal, noFuturo } from '@/compartido/formato/fechas';
+import { CUENTA_DORTIZ } from '@/modulos/autenticacion/infraestructura/cuentaDortiz';
 /**
  * Generador de datos ficticios para el mockup. Los nombres, DNI y montos son inventados.
  * Usa una semilla por periodo para que cada mes muestre siempre los mismos datos.
@@ -173,6 +174,7 @@ export function generarBoletas(periodo: Periodo): Boleta[] {
 const CUENTAS_PRUEBA = [
   { dni: '45871236', trabajador: 'QUISPE ROJAS JOSÉ', usuario: 'jose', area: 'COM PRODUCCIÓN', cargo: 'Operario', ingreso: '15/03/2021' },
   { dni: '46213578', trabajador: 'VIGO SALAS PEDRO', usuario: 'seguridad', area: 'ADM GESTIÓN HUMANA', cargo: 'Prevencionista de Seguridad', ingreso: '01/08/2019' },
+  { dni: CUENTA_DORTIZ.dni, trabajador: CUENTA_DORTIZ.nombreBoleta, usuario: 'dortiz', area: CUENTA_DORTIZ.area, cargo: CUENTA_DORTIZ.cargo, ingreso: '06/02/2023' },
 ];
 
 /**

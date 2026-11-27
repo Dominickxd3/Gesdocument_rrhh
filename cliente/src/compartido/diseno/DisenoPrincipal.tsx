@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from 'primereact/sidebar';
 import { BarraLateral } from './barra-lateral/BarraLateral';
@@ -7,6 +7,7 @@ import { useConsultaMedios } from '@/compartido/ganchos/useConsultaMedios';
 import { usePreferenciaGuardada } from '@/compartido/ganchos/usePreferenciaGuardada';
 import { useSesion } from '@/compartido/sesion/ContextoSesion';
 import { PantallaCarga } from '@/compartido/componentes/PantallaCarga';
+import { useTransicionRuta } from '@/compartido/ganchos/useTransicionRuta';
 import './diseno.css';
 
 /**
@@ -26,6 +27,11 @@ export function DisenoPrincipal() {
   const { recienIngresado, terminarIngreso, usuario } = useSesion();
 
   useEffect(() => setPanelAbierto(false), [pathname, esMovil]);
+
+  // Transición entre módulos. En "Mi expediente" las pestañas animan solo su contenido.
+  const contenido = useRef<HTMLElement>(null);
+  const claveModulo = pathname.startsWith('/mi-expediente') ? '/mi-expediente' : pathname;
+  useTransicionRuta(contenido, claveModulo, { subirAlInicio: true });
 
   return (
     <div className="diseno-principal">
@@ -51,7 +57,7 @@ export function DisenoPrincipal() {
         </aside>
       )}
 
-      <main className="contenido-principal">
+      <main className="contenido-principal" ref={contenido}>
         <Outlet />
       </main>
 

@@ -168,3 +168,58 @@
   width: 100%;
   border-radius: 8px;
 }
+
+/* Ventana "¿Olvidaste tu contraseña?": contacto con Sistemas por WhatsApp. */
+.olvido { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 4px 4px 8px; text-align: center; }
+.olvido p { margin: 0; color: #334155; font-size: 14px; line-height: 1.5; }
+.olvido small { color: #64748b; font-size: 12.5px; }
+.olvido__icono { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: #dcfce7; color: #16a34a; font-size: 26px; }
+.olvido__icono .pi { font-size: 26px; }
+.olvido__numero { color: #0f172a; font-size: 22px; letter-spacing: 0.5px; }
+.olvido__boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px 16px; border-radius: 10px; background: #16a34a; color: #fff; font-weight: 600; text-decoration: none; }
+.olvido__boton:hover { background: #15803d; }
+
+/* ---------- Ilustración animada del inicio de sesión ---------- */
+.ilustracion-gestion-documental * { transform-box: fill-box; transform-origin: center; }
+
+/* Los documentos salen del archivador al cargar y luego se mecen suavemente. */
+.ilu-doc { animation: ilu-salir 1.1s cubic-bezier(0.22, 1, 0.36, 1) both, ilu-mecer 5s ease-in-out 1.2s infinite; }
+.ilu-doc--1 { animation-delay: 0.15s, 1.3s; }
+.ilu-doc--2 { animation-delay: 0.35s, 2.1s; }
+@keyframes ilu-salir { from { opacity: 0; transform: translateY(90px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes ilu-mecer { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+/* El corazón del descanso médico late. */
+.ilu-corazon { animation: ilu-latido 1.8s ease-in-out 1.4s infinite; }
+@keyframes ilu-latido { 0%, 60%, 100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1); } 45% { transform: scale(1.1); } }
+
+/* La etiqueta roja del archivador se dibuja. */
+.ilu-etiqueta { transform-origin: left center; animation: ilu-trazar 0.8s ease-out 0.9s both; }
+@keyframes ilu-trazar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Sello de aprobado: aparece con un pequeño salto, el check se dibuja y el borde gira. */
+.ilu-sello { animation: ilu-sellar 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 1.1s both; }
+@keyframes ilu-sellar { from { opacity: 0; transform: scale(0.3) rotate(-25deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+.ilu-sello__check { stroke-dasharray: 60; stroke-dashoffset: 60; animation: ilu-check 0.5s ease-out 1.6s forwards; }
+@keyframes ilu-check { to { stroke-dashoffset: 0; } }
+.ilu-sello__anillo { animation: ilu-girar 14s linear infinite; }
+@keyframes ilu-girar { to { transform: rotate(360deg); } }
+
+/* Fichas de los módulos: entran y flotan, cada una a su ritmo. */
+.ilu-ficha { animation: ilu-aparecer 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both, ilu-flotar 4.5s ease-in-out infinite; }
+@keyframes ilu-aparecer { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+@keyframes ilu-flotar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+/* Fondo y detalles. */
+.ilu-halo { animation: ilu-respirar 6s ease-in-out infinite; }
+.ilu-halo--2 { animation-delay: 3s; }
+@keyframes ilu-respirar { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+.ilu-brillo { animation: ilu-brillar 3.5s ease-in-out infinite; }
+@keyframes ilu-brillar { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+.ilu-onda { animation: ilu-ondear 4s ease-in-out infinite; }
+@keyframes ilu-ondear { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(10px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ilustracion-gestion-documental * { animation: none !important; }
+  .ilu-sello__check { stroke-dashoffset: 0; }
+}

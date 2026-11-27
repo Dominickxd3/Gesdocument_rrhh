@@ -223,9 +223,9 @@ function DocumentosRrhh() {
         visible={nuevo}
         alCerrar={() => setNuevo(false)}
         alCrear={(datos, enviar) => {
-          const numero = crearDocumento(datos, usuario.nombre, enviar);
+          crearDocumento(datos, usuario.nombre, enviar);
           setNuevo(false);
-          aviso.current?.show({ severity: 'success', summary: `Documento N° ${numero} ${enviar ? 'enviado para firma' : 'guardado en preparación'}`, life: 3000 });
+          aviso.current?.show({ severity: 'success', summary: `Documento ${enviar ? 'enviado para firma' : 'guardado en preparación'}`, life: 3000 });
         }}
       />
     </div>
@@ -272,8 +272,8 @@ function MiExpediente() {
         documento={observando ? null : detalle}
         modo="trabajador"
         alCerrar={() => setIdDetalle(null)}
-        alFirmar={(d, imagen) => {
-          firmarDocumento(d, usuario.nombre, imagen);
+        alFirmar={(d, imagen, croquis) => {
+          firmarDocumento(d, usuario.nombre, imagen, croquis);
           aviso.current?.show({ severity: 'success', summary: 'Documento firmado', life: 2500 });
         }}
         alObservar={(d) => setObservando(d)}

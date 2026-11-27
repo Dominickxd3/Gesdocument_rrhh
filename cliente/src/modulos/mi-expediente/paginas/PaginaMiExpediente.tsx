@@ -1,4 +1,6 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { useRef } from 'react';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { useTransicionRuta } from '@/compartido/ganchos/useTransicionRuta';
 import { useUsuarioActual } from '@/compartido/sesion/ContextoSesion';
 import { useContador } from '@/compartido/navegacion/contadores';
 import type { UsuarioSesion } from '@/compartido/sesion/tipos';
@@ -29,6 +31,8 @@ function Pestana({ ruta, etiqueta, icono, usuario }: (typeof SECCIONES)[number] 
  */
 export function PaginaMiExpediente() {
   const usuario = useUsuarioActual();
+  const contenido = useRef<HTMLDivElement>(null);
+  useTransicionRuta(contenido, useLocation().pathname, { distancia: 8 });
   return (
     <div className="mi-expediente">
       <header className="mi-expediente__encabezado">
@@ -42,7 +46,7 @@ export function PaginaMiExpediente() {
         ))}
       </nav>
 
-      <div className="mi-expediente__contenido">
+      <div className="mi-expediente__contenido" ref={contenido}>
         <Outlet />
       </div>
     </div>

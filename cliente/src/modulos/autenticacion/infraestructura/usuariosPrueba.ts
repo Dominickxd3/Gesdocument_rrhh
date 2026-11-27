@@ -1,4 +1,5 @@
 import type { Rol } from '@/compartido/sesion/tipos';
+import { CUENTA_DORTIZ } from './cuentaDortiz';
 
 /**
  * Usuarios de prueba para la presentación del mockup.
@@ -67,5 +68,15 @@ export const usuariosPrueba: UsuarioPrueba[] = [
     dni: '46213578',
     sede: 'Lima – Canto Bello',
     clave: 'seguridad123',
+  },
+  {
+    id: '5',
+    usuario: 'dortiz',
+    nombre: CUENTA_DORTIZ.nombre,
+    correo: 'dortiz@grupopecuario.com',
+    cargo: CUENTA_DORTIZ.cargo,
+    rol: 'trabajador',
+    dni: CUENTA_DORTIZ.dni,
+    clave: 'Seguridad720',
   },
 ];

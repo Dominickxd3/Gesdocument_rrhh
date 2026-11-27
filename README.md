@@ -55,7 +55,7 @@ Ubicada en `cliente/src/compartido/diseno/`.
 
 ## Roles y permisos (mockup)
 
-Usuarios de prueba (contraseña `Mockup2026`, salvo `admin` con `admin123` y `seguridad` con `seguridad123`): `admin`, `maria.torres` y `carlos.ramirez` (RR. HH.), `jose.quispe` (trabajador) y `seguridad` (Prevencionista de Seguridad, sede Lima – Canto Bello).
+Usuarios de prueba (contraseña `Mockup2026`, salvo `admin` con `admin123` y `seguridad` con `seguridad123`, `jose` con `jose123` y `dortiz` con `Seguridad720`): `admin`, `maria.torres` y `carlos.ramirez` (RR. HH.), `jose` y `dortiz` (trabajadores) y `seguridad` (Prevencionista de Seguridad, sede Lima – Canto Bello).
 
 | Rol | Ve |
 | --- | --- |

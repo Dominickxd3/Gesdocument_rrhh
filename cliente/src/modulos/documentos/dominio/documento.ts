@@ -18,14 +18,28 @@ export const ESTADOS_DOCUMENTO: { valor: EstadoDocumento; etiqueta: string; tono
 
 export const infoEstado = (e: EstadoDocumento) => ESTADOS_DOCUMENTO.find((x) => x.valor === e)!;
 
-export type TipoDocumento = 'contrato' | 'adenda' | 'constancia' | 'reglamento' | 'epp' | 'domicilio';
+/** Documentos que Gestión Humana entrega a todo trabajador al ingresar (expediente de ingreso). */
+export type TipoIngreso = 'induccion' | 'confidencialidad' | 'etica' | 'celulares' | 'vestimenta' | 'antecedentes' | 'croquis';
+
+export type TipoDocumento = 'contrato' | 'adenda' | 'constancia' | 'reglamento' | 'domicilio' | TipoIngreso;
+
+/** Orden en que se entregan y se muestran los documentos de ingreso. */
+export const TIPOS_INGRESO: TipoIngreso[] = ['induccion', 'confidencialidad', 'etica', 'celulares', 'vestimenta', 'antecedentes', 'croquis'];
+
+export const esDeIngreso = (t: TipoDocumento): t is TipoIngreso => (TIPOS_INGRESO as TipoDocumento[]).includes(t);
 
 export const TIPOS_DOCUMENTO: { valor: TipoDocumento; etiqueta: string }[] = [
-  { valor: 'contrato', etiqueta: 'Contrato por incremento de actividad' },
+  { valor: 'contrato', etiqueta: 'Contrato de trabajo' },
   { valor: 'adenda', etiqueta: 'Adenda al contrato de trabajo' },
+  { valor: 'induccion', etiqueta: 'Inducción al personal nuevo' },
+  { valor: 'confidencialidad', etiqueta: 'Acuerdo de confidencialidad' },
+  { valor: 'etica', etiqueta: 'Código de Ética' },
+  { valor: 'celulares', etiqueta: 'Política de uso de celulares' },
+  { valor: 'vestimenta', etiqueta: 'Política de vestimenta y aseo' },
+  { valor: 'antecedentes', etiqueta: 'DJ de no tener antecedentes policiales' },
+  { valor: 'croquis', etiqueta: 'Croquis de domicilio' },
   { valor: 'constancia', etiqueta: 'Constancia de trabajo' },
   { valor: 'reglamento', etiqueta: 'Cargo de Reglamento Interno' },
-  { valor: 'epp', etiqueta: 'Cargo de entrega de EPP' },
   { valor: 'domicilio', etiqueta: 'Declaración jurada de domicilio' },
 ];
 
@@ -36,14 +50,15 @@ export const etiquetaTipo = (t: TipoDocumento) => TIPOS_DOCUMENTO.find((x) => x.
  * y cuáles son obligatorios. Para cambiar el expediente basta con editar estas dos listas.
  */
 export const CATEGORIAS_EXPEDIENTE: { id: string; titulo: string; icono: string; tipos: TipoDocumento[] }[] = [
+  { id: 'ingreso', titulo: 'Ingreso a la empresa', icono: 'pi pi-sign-in', tipos: TIPOS_INGRESO },
   { id: 'contratacion', titulo: 'Contratación', icono: 'pi pi-file-edit', tipos: ['contrato', 'adenda'] },
-  { id: 'normas', titulo: 'Normas y seguridad', icono: 'pi pi-shield', tipos: ['reglamento', 'epp'] },
+  { id: 'normas', titulo: 'Normas y seguridad', icono: 'pi pi-shield', tipos: ['reglamento'] },
   { id: 'personales', titulo: 'Datos personales', icono: 'pi pi-id-card', tipos: ['domicilio'] },
   { id: 'constancias', titulo: 'Constancias', icono: 'pi pi-verified', tipos: ['constancia'] },
 ];
 
 /** Documentos que todo expediente debe tener firmados; los demás se generan cuando se necesitan. */
-export const TIPOS_REQUERIDOS: TipoDocumento[] = ['contrato', 'reglamento', 'epp', 'domicilio'];
+export const TIPOS_REQUERIDOS: TipoDocumento[] = [...TIPOS_INGRESO, 'contrato', 'reglamento', 'domicilio'];
 
 export type SituacionRequisito = 'firmado' | 'en_curso' | 'falta';
 
@@ -59,6 +74,10 @@ export function situacionRequisito(documentos: Documento[], tipo: TipoDocumento)
 export interface ResumenExpediente {
   requeridosCompletos: number;
   requeridosTotal: number;
+  /** Todos los documentos enviados al trabajador (requeridos y adicionales) que ya firmó. */
+  firmados: number;
+  /** Documentos enviados al trabajador más los requeridos que aún no se le preparan. */
+  totalAFirmar: number;
   pendientesFirma: number;
   observados: number;
   total: number;
@@ -70,6 +89,10 @@ export function resumirExpediente(documentos: Documento[]): ResumenExpediente {
   return {
     requeridosCompletos: TIPOS_REQUERIDOS.filter((t) => situacionRequisito(documentos, t).situacion === 'firmado').length,
     requeridosTotal: TIPOS_REQUERIDOS.length,
+    firmados: documentos.filter((d) => d.estado === 'firmado').length,
+    totalAFirmar:
+      documentos.filter((d) => d.estado !== 'preparacion').length +
+      TIPOS_REQUERIDOS.filter((t) => situacionRequisito(documentos, t).situacion === 'falta').length,
     pendientesFirma: documentos.filter((d) => d.estado === 'pendiente_firma').length,
     observados: documentos.filter((d) => d.estado === 'observado').length,
     total: documentos.length,
@@ -84,6 +107,16 @@ export interface EventoDocumento {
   nota?: string;
   /** Firma dibujada por el trabajador (PNG en data URL); solo en el evento "firmado". */
   firmaImagen?: string;
+  /** Croquis de domicilio dibujado por el trabajador al firmar (PNG, data URL). */
+  croquisImagen?: string;
+  /** Referencias del domicilio que escribió el trabajador en el croquis. */
+  croquisReferencias?: string;
+}
+
+/** Lo que el trabajador completa en el croquis antes de firmarlo. */
+export interface CroquisFirmado {
+  imagen: string;
+  referencias: string;
 }
 
 export interface Documento {

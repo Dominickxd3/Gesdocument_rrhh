@@ -140,8 +140,8 @@ function IncidenciasRrhh() {
       <VentanaEmitirMemorandum
         incidencia={dialogo === 'emitir' ? detalle : null}
         alCerrar={() => setDialogo(null)}
-        alEmitir={(i, medida, texto) => {
-          emitirMemorandum(i, medida, texto, usuario.nombre);
+        alEmitir={(i, modelo, texto, plazo) => {
+          emitirMemorandum(i, modelo, texto, plazo, usuario.nombre);
           setDialogo(null);
           avisar('Memorándum emitido', 'El trabajador debe firmar la recepción.');
         }}

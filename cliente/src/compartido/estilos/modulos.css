@@ -97,7 +97,9 @@
 .doc-firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 40px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; text-align: center; }
 .doc-firmas__parte { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .doc-firmas__espacio { display: flex; align-items: flex-end; justify-content: center; width: 100%; height: 86px; }
-.doc-firmas__espacio img { max-width: 210px; max-height: 84px; object-fit: contain; }
+.doc-firmas__espacio img { max-width: 210px; max-height: 84px; object-fit: contain; mix-blend-mode: multiply; }
+/* Firma con sello de la empresa: más grande para que el sello se lea. */
+.doc-firmas__espacio img.doc-firma-empresa { max-width: 240px; max-height: 130px; margin-bottom: -18px; }
 .doc-firmas__espacio small { color: #9ca3af; font-size: 10px; }
 .doc-firmas__linea { width: 90%; margin-bottom: 4px; border-top: 1px solid #111; }
 .doc-firmas strong { font-size: 12px; }
@@ -320,4 +322,17 @@ span.doc-firma-trabajador svg { display: block; width: 100%; height: auto; }
   .gr-top.es-tramites tbody tr { grid-template-columns: 1fr auto; grid-template-areas: none; }
   .gr-top.es-tramites td:first-child { grid-column: 1; }
   .gr-top.es-tramites .gr-top__num { grid-column: 2; grid-area: auto; }
+}
+
+/* Marca de agua GP de los modelos de Gestión Humana: grande, casi todo el ancho de la hoja (como en el Word). */
+.doc-marca-agua.es-propia { top: calc(50% - 290px); }
+.doc-marca-agua.es-propia img { width: 580px; max-width: 92%; }
+@media print {
+  .doc-marca-agua.es-propia img { width: 600px; }
+}
+
+/* Marca de agua GP más suave: se ve de fondo sin competir con el texto. */
+.doc-marca-agua.es-propia img { opacity: 0.4; }
+@media print {
+  .doc-marca-agua.es-propia img { opacity: 0.45; }
 }

@@ -10,6 +10,14 @@ import { TablaListado } from '@/compartido/componentes/TablaListado';
 import { BotonArchivo } from '@/compartido/componentes/BotonArchivo';
 import { ahoraIso, crearAlmacen, fechaCorta, haceDias, momento } from '@/compartido/almacen/crearAlmacen';
 import '@/compartido/estilos/listados';
+import type { TipoDocumento } from '@/modulos/documentos/dominio/documento';
+import { documentoDeMuestra } from '@/modulos/documentos/aplicacion/almacenDocumentos';
+import { VistaDocumento } from '@/modulos/documentos/componentes/VistaDocumento';
+import { VistaMemorandum } from '@/modulos/incidencias/componentes/Ventanas';
+import type { Incidencia } from '@/modulos/incidencias/dominio/incidencia';
+import { MODELOS_IMPUTACION, buscarModelo, hechosDeModelo, type IdModelo } from '@/modulos/incidencias/dominio/modelosImputacion';
+
+const esMemo = (f: string): f is `memo:${IdModelo}` => f.startsWith('memo:');
 
 /** Plantillas documentales (RF05, CUS41): Word con campos {{...}} que se llenan con la ficha del trabajador. */
 interface Plantilla {
@@ -17,29 +25,73 @@ interface Plantilla {
   nombre: string;
   tipo: string;
   campos: string[];
+  /** Documento que genera: permite ver el formato con datos de ejemplo. */
+  formato?: TipoDocumento | `memo:${IdModelo}`;
   versiones: { version: number; archivo: string; usuario: string; fecha: string }[];
 }
 
-const TIPOS = ['Contrato', 'Adenda', 'Constancia', 'Cargo de recepción', 'Declaración jurada', 'Memorándum'];
+const TIPOS = ['Ingreso', 'Contrato', 'Adenda', 'Constancia', 'Cargo de recepción', 'Declaración jurada', 'Memorándum'];
+
+/** Documentos que Gestión Humana entrega a todo trabajador al ingresar (modelos de la empresa). */
+const INGRESO: Omit<Plantilla, 'id' | 'versiones'>[] = [
+  { nombre: 'Inducción al personal nuevo (GC-RH-F009)', tipo: 'Ingreso', campos: ['{{nombre}}', '{{dni}}', '{{fecha_firma}}'] },
+  { nombre: 'Acuerdo de confidencialidad', tipo: 'Ingreso', campos: ['{{nombre}}', '{{dni}}', '{{fecha_firma}}'] },
+  { nombre: 'Código de Ética', tipo: 'Ingreso', campos: ['{{nombre}}', '{{dni}}', '{{fecha_firma}}'] },
+  { nombre: 'Política de uso de celulares personales', tipo: 'Ingreso', campos: ['{{nombre}}', '{{dni}}', '{{fecha_firma}}'] },
+  { nombre: 'Política de vestimenta y aseo', tipo: 'Ingreso', campos: ['{{nombre}}', '{{dni}}', '{{fecha_firma}}'] },
+  { nombre: 'DJ de no tener antecedentes policiales (GC-RH-F007)', tipo: 'Ingreso', campos: ['{{nombre}}', '{{dni}}', '{{domicilio}}', '{{fecha_firma}}'] },
+  { nombre: 'Croquis de domicilio (GC-RH-F006)', tipo: 'Ingreso', campos: ['{{domicilio}}', '{{fecha_firma}}'] },
+];
+const ARCHIVOS_INGRESO = ['INDUCCIÓN AL PERSONAL NUEVO.docx', 'ACUERDO DE CONFIDENCIALIDAD GP.docx', 'Código de Ética.docx', 'Politica de Celulares.docx', 'POLITICA DE VESTIMENTA y ASEO GP.docx', 'DECLARACION JURADA DE ANTECEDENTES POLICIALES.docx', 'CROQUIS DE DOMICILIO.docx'];
+const FORMATOS_INGRESO: TipoDocumento[] = ['induccion', 'confidencialidad', 'etica', 'celulares', 'vestimenta', 'antecedentes', 'croquis'];
 const CAMPOS_BASE = ['{{nombre}}', '{{dni}}', '{{cargo}}', '{{area}}', '{{fecha_ingreso}}'];
 
 const almacenPlantillas = crearAlmacen<Plantilla[]>(() => [
-  { id: 'pl-1', nombre: 'Contrato de trabajo a plazo fijo', tipo: 'Contrato', campos: [...CAMPOS_BASE, '{{fecha_fin}}', '{{sueldo}}'], versiones: [{ version: 1, archivo: 'contrato_plazo_fijo_v1.docx', usuario: 'Carlos Ramírez', fecha: haceDias(120) }, { version: 2, archivo: 'contrato_plazo_fijo_v2.docx', usuario: 'Carlos Ramírez', fecha: haceDias(30) }] },
+  ...INGRESO.map((p, i) => ({ ...p, id: `pl-ing-${i + 1}`, formato: FORMATOS_INGRESO[i], versiones: [{ version: 1, archivo: ARCHIVOS_INGRESO[i], usuario: 'María Torres', fecha: haceDias(3) }] })),
+  { id: 'pl-1', formato: 'contrato', nombre: 'Contrato de trabajo', tipo: 'Contrato', campos: ['{{nombre}}', '{{dni}}', '{{domicilio}}', '{{cargo}}', '{{fecha_inicio}}', '{{fecha_fin}}', '{{remuneracion}}', '{{horario}}', '{{funciones}}'], versiones: [{ version: 1, archivo: 'CONTRATO POR INCREMENTO DE ACTIVIDAD v1.docx', usuario: 'Carlos Ramírez', fecha: haceDias(120) }, { version: 2, archivo: 'CONTRATO POR INCREMENTO DE ACTIVIDAD v2.docx', usuario: 'Carlos Ramírez', fecha: haceDias(30) }] },
   {
     id: 'pl-2',
+    formato: 'adenda',
     nombre: 'Adenda al contrato de trabajo (cambio de cargo o remuneración)',
     tipo: 'Adenda',
     campos: ['{{nombre}}', '{{dni}}', '{{domicilio}}', '{{modalidad_contrato}}', '{{fecha_contrato}}', '{{cargo_anterior}}', '{{clausula_remuneracion}}', '{{remuneracion_anterior}}', '{{cargo_nuevo}}', '{{remuneracion_nueva}}', '{{clausulas_especiales}}', '{{fecha_firma}}'],
     versiones: [{ version: 1, archivo: 'ADENDA CONTRATO DE TRABAJO.docx', usuario: 'María Torres', fecha: haceDias(2) }],
   },
-  { id: 'pl-3', nombre: 'Constancia de trabajo', tipo: 'Constancia', campos: CAMPOS_BASE, versiones: [{ version: 1, archivo: 'constancia.docx', usuario: 'María Torres', fecha: haceDias(200) }] },
-  { id: 'pl-4', nombre: 'Cargo de Reglamento Interno', tipo: 'Cargo de recepción', campos: ['{{nombre}}', '{{dni}}'], versiones: [{ version: 1, archivo: 'cargo_rit.docx', usuario: 'María Torres', fecha: haceDias(90) }] },
-  { id: 'pl-5', nombre: 'Cargo de entrega de EPP', tipo: 'Cargo de recepción', campos: ['{{nombre}}', '{{dni}}', '{{equipos}}'], versiones: [{ version: 1, archivo: 'cargo_epp.docx', usuario: 'Carlos Ramírez', fecha: haceDias(45) }] },
-  { id: 'pl-6', nombre: 'Declaración jurada de domicilio', tipo: 'Declaración jurada', campos: ['{{nombre}}', '{{dni}}', '{{direccion}}'], versiones: [{ version: 1, archivo: 'dj_domicilio.docx', usuario: 'María Torres', fecha: haceDias(300) }] },
-  { id: 'pl-7', nombre: 'Memorándum', tipo: 'Memorándum', campos: ['{{nombre}}', '{{dni}}', '{{asunto}}', '{{fecha_hechos}}', '{{medida}}'], versiones: [{ version: 1, archivo: 'memorandum.docx', usuario: 'Carlos Ramírez', fecha: haceDias(150) }] },
+  { id: 'pl-3', formato: 'constancia', nombre: 'Constancia de trabajo', tipo: 'Constancia', campos: CAMPOS_BASE, versiones: [{ version: 1, archivo: 'constancia.docx', usuario: 'María Torres', fecha: haceDias(200) }] },
+  { id: 'pl-4', formato: 'reglamento', nombre: 'Cargo de Reglamento Interno', tipo: 'Cargo de recepción', campos: ['{{nombre}}', '{{dni}}'], versiones: [{ version: 1, archivo: 'cargo_rit.docx', usuario: 'María Torres', fecha: haceDias(90) }] },
+  { id: 'pl-6', formato: 'domicilio', nombre: 'Declaración jurada de domicilio', tipo: 'Declaración jurada', campos: ['{{nombre}}', '{{dni}}', '{{direccion}}'], versiones: [{ version: 1, archivo: 'dj_domicilio.docx', usuario: 'María Torres', fecha: haceDias(300) }] },
+  // Memorándums: una plantilla por modelo de carta de imputación de cargos, sin repetir.
+  ...MODELOS_IMPUTACION.map((m, i) => ({
+    id: `pl-memo-${m.id}`,
+    formato: `memo:${m.id}` as const,
+    nombre: `Carta de imputación · ${m.nombre}`,
+    tipo: 'Memorándum',
+    campos: ['{{nombre}}', '{{dni}}', '{{area}}', '{{fecha}}', '{{hechos}}', '{{plazo}}'],
+    versiones: [{ version: 1, archivo: 'CARTA DE IMPUTACIÓN DE CARGOS.docx', usuario: 'María Torres', fecha: haceDias(1 + (i % 3)) }],
+  })),
 ]);
 
 const ultima = (p: Plantilla) => p.versiones[p.versiones.length - 1];
+
+/** Carta de imputación de ejemplo para ver el formato de un modelo. */
+function memorandumDeMuestra(modelo: IdModelo): Incidencia {
+  const hoy = ahoraIso();
+  const m = buscarModelo(modelo);
+  return {
+    id: 'muestra-memorandum',
+    numero: 0,
+    dni: '00000000',
+    trabajador: 'APELLIDOS, NOMBRES',
+    fecha: hoy.slice(0, 10),
+    asunto: m.nombre,
+    descripcion: '',
+    reportadoPor: '',
+    evidencias: [],
+    estado: 'memo_emitido',
+    memorandum: { modelo, texto: hechosDeModelo(m, '[fecha de los hechos]'), plazo: m.plazo, emitido: hoy },
+    actuaciones: [],
+  };
+}
 
 export function PaginaPlantillas() {
   const usuario = useUsuarioActual();
@@ -47,7 +99,28 @@ export function PaginaPlantillas() {
   const aviso = useAviso();
   const [idDetalle, setIdDetalle] = useState<string | null>(null);
   const [nueva, setNueva] = useState(false);
+  const [formato, setFormato] = useState<Plantilla['formato'] | null>(null);
   const detalle = plantillas.find((p) => p.id === idDetalle) ?? null;
+
+  /** Botón "Ver formato": abre el documento tal como lo recibe el trabajador, con datos de ejemplo. */
+  const botonFormato = (p: Plantilla, conTexto = false) =>
+    p.formato ? (
+      <Button
+        label={conTexto ? 'Ver formato' : undefined}
+        icon="pi pi-eye"
+        text={!conTexto}
+        rounded={!conTexto}
+        outlined={conTexto}
+        className={conTexto ? 'pp-boton-secundario' : 'pp-boton-abrir'}
+        aria-label={`Ver formato de ${p.nombre}`}
+        tooltip={conTexto ? undefined : 'Ver formato'}
+        tooltipOptions={{ position: 'top' }}
+        onClick={(e) => {
+          e.stopPropagation();
+          setFormato(p.formato);
+        }}
+      />
+    ) : null;
 
   const subirVersion = (p: Plantilla, archivo: string) => {
     almacenPlantillas.escribir((lista) =>
@@ -71,6 +144,7 @@ export function PaginaPlantillas() {
         <Column header="Versión" body={(p: Plantilla) => `v${ultima(p).version}`} />
         <Column header="Campos" body={(p: Plantilla) => p.campos.length} />
         <Column header="Actualizada" body={(p: Plantilla) => fechaCorta(ultima(p).fecha)} className="tr-col-gris" />
+        <Column header="Formato" body={(p: Plantilla) => <div className="pp-acciones">{botonFormato(p)}</div>} className="pp-col-acciones" />
       </TablaListado>
 
       <Dialog visible={!!detalle} onHide={() => setIdDetalle(null)} showHeader={false} modal dismissableMask draggable={false} className="pp-panel" style={{ width: '540px' }} breakpoints={{ '640px': '94vw' }}>
@@ -108,6 +182,7 @@ export function PaginaPlantillas() {
               </ol>
             </section>
             <footer className="pp-panel__pie">
+              {botonFormato(detalle, true)}
               <div className="pp-panel__decision">
                 <Button label="Descargar" icon="pi pi-download" outlined className="pp-boton-secundario" onClick={() => aviso.current?.show({ severity: 'info', summary: 'Descarga simulada', detail: ultima(detalle).archivo, life: 2500 })} />
                 <BotonArchivo etiqueta="Subir nueva versión" aceptar=".docx" clase="pp-boton-principal" alElegir={(n) => subirVersion(detalle, n)} />
@@ -116,6 +191,10 @@ export function PaginaPlantillas() {
           </div>
         )}
       </Dialog>
+
+      {/* Vista previa del formato con datos de ejemplo (no de un trabajador real). */}
+      <VistaDocumento documento={formato && !esMemo(formato) ? documentoDeMuestra(formato) : null} visible={!!formato && !esMemo(formato)} esMuestra alCerrar={() => setFormato(null)} />
+      <VistaMemorandum incidencia={formato && esMemo(formato) ? memorandumDeMuestra(formato.slice(5) as IdModelo) : null} visible={!!formato && esMemo(formato)} alCerrar={() => setFormato(null)} />
 
       <VentanaNuevaPlantilla
         visible={nueva}

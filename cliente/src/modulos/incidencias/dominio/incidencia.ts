@@ -4,6 +4,7 @@
  * se cierra sin memorándum o se emite uno desde plantilla, que el trabajador firma como recibido.
  */
 import type { TonoInsignia } from '@/compartido/componentes/Insignia';
+import type { IdModelo } from './modelosImputacion';
 
 export type EstadoIncidencia = 'registrada' | 'en_investigacion' | 'cerrada' | 'memo_emitido' | 'memo_firmado';
 
@@ -17,7 +18,6 @@ export const ESTADOS_INCIDENCIA: { valor: EstadoIncidencia; etiqueta: string; to
 
 export const infoEstado = (e: EstadoIncidencia) => ESTADOS_INCIDENCIA.find((x) => x.valor === e)!;
 
-export const MEDIDAS = ['Llamada de atención escrita', 'Amonestación', 'Suspensión sin goce de haber (1 día)'];
 
 export interface Actuacion {
   tipo: 'registro' | 'explicacion' | 'actuacion' | 'conclusion' | 'cierre' | 'memo' | 'recepcion' | 'firma';
@@ -28,9 +28,13 @@ export interface Actuacion {
   firmaImagen?: string;
 }
 
+/** Carta de imputación de cargos emitida desde uno de los modelos de Gestión Humana. */
 export interface Memorandum {
-  medida: string;
+  modelo: IdModelo;
+  /** Hechos imputados (texto del modelo ajustado por RR. HH.). */
   texto: string;
+  /** Plazo de descargos en días calendario. */
+  plazo: number;
   emitido: string;
 }
 
@@ -62,7 +66,3 @@ export const TEXTO_ACTUACION: Record<Actuacion['tipo'], { texto: string; icono: 
 
 /** El trabajador solo ve memorándums ya emitidos (CUS36–CUS39). */
 export const visibleParaTrabajador = (i: Incidencia) => i.estado === 'memo_emitido' || i.estado === 'memo_firmado';
-
-export function textoMemorandum(trabajador: string, dni: string, asunto: string, fecha: string, medida: string) {
-  return `Por medio del presente se le comunica que, tras la revisión de los hechos ocurridos el ${fecha} referidos a "${asunto}", y habiéndose evaluado sus descargos, se ha determinado aplicar la siguiente medida: ${medida}.\n\nSe le exhorta a cumplir con las normas del Reglamento Interno de Trabajo. La reiteración de esta conducta podrá dar lugar a medidas de mayor gravedad.\n\nTrabajador: ${trabajador} · DNI ${dni}`;
-}

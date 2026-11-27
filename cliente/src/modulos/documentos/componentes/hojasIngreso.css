@@ -1,0 +1,179 @@
+/* Documentos de ingreso: formato de los modelos de Gestión Humana (Arial, hoja A4, marca de agua GP). */
+
+.ing-hoja {
+  display: flex;
+  flex-direction: column;
+  max-width: 680px;
+  min-height: 962px; /* proporción A4 en pantalla */
+  padding: 40px 52px 32px;
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: justify;
+}
+.ing-hoja__cuerpo { flex: 1; }
+.ing-hoja.es-grande { font-size: 15px; line-height: 1.55; }
+.ing-hoja.es-compacta { font-size: 12px; line-height: 1.45; }
+.ing-hoja p { margin: 0 0 10px; }
+.ing-hoja h3 { margin: 6px 0 18px; font-size: 15px; letter-spacing: 0; text-align: center; }
+.ing-hoja h4 { margin: 12px 0 6px; font-size: inherit; }
+.ing-hoja ul, .ing-hoja ol { margin: 0 0 10px; }
+
+/* Encabezado de los formatos (logo | título | código, fecha, versión, página) */
+.ing-formato { width: 100%; margin: 0 0 24px; border-collapse: collapse; font-size: 13px; line-height: 1.25; text-align: left; }
+.ing-formato td { padding: 2px 6px; border: 1px solid #000; }
+.ing-formato__logo { width: 104px; text-align: center; }
+.ing-formato__logo img { width: 70px; }
+.ing-formato__titulo { font-size: 15px; font-weight: 700; text-align: center; }
+.ing-formato__titulo .es-normal { font-size: 17px; font-weight: 400; }
+.ing-formato td:last-child { width: 150px; white-space: nowrap; }
+
+/* Logo arriba a la izquierda y pie con la dirección */
+.ing-logo { display: block; width: 86px; margin: -10px 0 18px; }
+.ing-pie { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 18px; font-family: 'Times New Roman', Times, serif; font-size: 10.5px; text-align: center; }
+.ing-pie span { width: 92%; border-top: 1px solid #000; }
+.ing-numero { display: block; margin-top: 10px; font-size: 12px; text-align: right; }
+
+/* Títulos */
+.ing-titulo-subrayado { text-decoration: underline; }
+.ing-titulo-doble { line-height: 1.7; }
+.ing-titulo-serif { font-family: Georgia, 'Times New Roman', serif; font-size: 15px !important; text-decoration: underline; }
+
+/* Código de Ética: secciones numeradas con sangría */
+.ing-seccion { margin: 14px 0 4px !important; }
+.ing-sangria { padding-left: 22px; }
+.ing-sangria-2 { padding-left: 58px; }
+.ing-sub { display: flex; gap: 14px; margin: 10px 0 2px; font-size: inherit; font-weight: 700; }
+.ing-sub span { min-width: 44px; }
+
+/* Viñetas */
+.ing-vinetas { padding-left: 64px; list-style: disc; }
+.ing-vinetas.es-pegada { padding-left: 34px; }
+.ing-vinetas li { margin-bottom: 1px; }
+.ing-cuadrados { padding-left: 18px; list-style: square; }
+.ing-rombos { margin: 2px 0 6px !important; padding-left: 28px; list-style: '❖  '; }
+.ing-numerada { padding-left: 44px; }
+.ing-numerada li { margin-bottom: 12px; padding-left: 14px; }
+.ing-numerada.es-pegada li { margin-bottom: 2px; padding-left: 4px; }
+.ing-literal { margin: 12px 0 8px 34px !important; }
+.ing-derecha { margin-top: 28px !important; text-align: right; }
+.ing-nota { margin-top: 24px !important; font-family: Calibri, Arial, sans-serif; }
+
+/* Datos que se completan con la ficha */
+.ing-dato { border-bottom: 1px dotted #000; font-weight: 700; }
+.ing-relleno { line-height: 2; }
+.ing-espacio { margin-top: 22px !important; }
+.ing-lugar { margin: 26px 0 0 40px !important; }
+.ing-campos { display: flex; flex-direction: column; gap: 6px; max-width: 440px; margin-top: 18px; }
+.ing-campo { flex: 1; min-height: 22px; border-bottom: 1px solid #000; }
+.ing-campo--ancho { display: block; margin: 0 0 6px 10px; }
+.ing-campo-fila { display: flex; align-items: flex-end; gap: 12px; }
+
+/* Firma, huella y bloques de firma */
+.ing-firma { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 260px; text-align: center; }
+.ing-firma.es-centrada { margin: 0 auto; }
+.ing-firma__espacio { display: flex; align-items: flex-end; justify-content: center; width: 100%; min-height: 70px; }
+.ing-firma__espacio img { max-width: 220px; max-height: 70px; object-fit: contain; }
+.ing-firma__linea { width: 100%; margin-bottom: 4px; border-top: 1px solid #000; }
+.ing-huella { flex: none; width: 96px; height: 116px; border: 1px solid #000; }
+.ing-huella-grupo { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ing-firma-huella { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-top: 12px; }
+.ing-huella-firma { display: flex; align-items: flex-end; gap: 48px; margin-top: 36px; padding-left: 30px; }
+.ing-firma-derecha { display: flex; justify-content: flex-end; margin-top: 40px; }
+.ing-recepcion { margin-top: 26px; padding-top: 14px; border-top: 1px solid #d1d5db; }
+.ing-recepcion p { text-align: left; }
+
+/* Política de celulares: datos, firma y huella */
+.ing-datos-huella { display: flex; align-items: flex-start; gap: 24px; }
+.ing-datos p { margin-bottom: 12px; }
+.ing-firma-en-linea { display: flex; align-items: flex-end; gap: 8px; }
+.ing-firma-en-linea .ing-firma { width: 220px; }
+
+/* Croquis: 12 cuadras (4 × 3) */
+.ing-cuadras { display: grid; grid-template-columns: repeat(4, 100px); justify-content: space-between; row-gap: 58px; margin: 70px 36px 60px; }
+.ing-cuadras span { width: 100px; height: 90px; border: 1px solid #000; }
+.ing-referencias { margin-top: 10px !important; }
+.ing-puntos { min-height: 20px; margin: 0 0 4px !important; border-bottom: 1px dotted #000; }
+
+@media print {
+  .ing-hoja { min-height: 0; padding: 0; }
+}
+
+@media (max-width: 640px) {
+  .ing-hoja { min-height: 0; padding: 22px 18px; }
+  .ing-sangria-2 { padding-left: 22px; }
+  .ing-vinetas { padding-left: 34px; }
+  .ing-cuadras { grid-template-columns: repeat(4, 1fr); column-gap: 12px; row-gap: 24px; margin: 24px 0; }
+  .ing-cuadras span { width: auto; height: 60px; }
+  .ing-formato td:last-child { width: auto; white-space: normal; }
+  .ing-huella-firma, .ing-firma-huella { gap: 16px; padding-left: 0; }
+  .ing-firma { width: 200px; }
+}
+
+/* Mientras el trabajador no firma: aviso tenue sobre la línea (no se imprime). */
+.ing-firma__pendiente { padding-bottom: 6px; color: #9ca3af; font-size: 11px; font-style: italic; }
+@media print { .ing-firma__pendiente { visibility: hidden; } }
+
+/* Sin huella: la firma digital queda sola y centrada en su bloque. */
+.ing-huella-firma { justify-content: center; padding-left: 0; }
+.ing-firma-huella { justify-content: flex-start; }
+
+/* Regla de firmas: si solo firma el colaborador, su firma va siempre al centro.
+   (Si también firma la empresa —contrato, adenda— la del colaborador va a la derecha.) */
+.ing-firma-huella, .ing-firma-derecha, .ing-huella-firma { justify-content: center; }
+.ing-firma-derecha { margin-top: 32px; }
+.ing-datos-huella + .ing-firma { margin-top: 12px; }
+
+/* Carta de imputación de cargos (memorándum) */
+.carta-imputacion { font-size: 13.5px; }
+.carta-imputacion__titulo { margin: 18px 0 22px !important; font-size: 17px !important; }
+.carta-imputacion__derecha { text-align: right; }
+.carta-imputacion__destinatario { margin-top: 26px !important; line-height: 1.35; text-align: left; }
+.carta-imputacion__firmas { margin-top: 24px; }
+
+/* Constancia de trabajo: título en cursiva y firma del Gerente General al centro. */
+.constancia { font-size: 14.5px; line-height: 1.55; }
+.constancia__titulo { margin: 40px 0 34px !important; font-size: 19px !important; font-style: italic; text-decoration: none !important; }
+.constancia__firma-unica { display: flex; justify-content: center; margin-top: 40px; }
+.constancia__firma-unica .doc-firmas__parte { width: 300px; font-size: 12px; text-align: center; }
+.ing-firma--celulares { margin-top: 24px !important; }
+
+/* Cargo de Reglamento Interno y DJ de domicilio */
+.ing-titulo-declaracion { margin: 26px 0 30px !important; }
+.ing-firma--declaracion { margin-top: 56px !important; }
+
+/* Reglamento Interno de Trabajo: portada, marco doble y texto a dos columnas (como el documento original). */
+.rit-hoja { max-width: 960px; min-height: 0; font-size: 12.5px; line-height: 1.45; }
+.rit-portada { min-height: 520px; justify-content: center; }
+.rit-portada__contenido { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 40px 0; text-align: center; }
+.rit-portada__contenido img { width: 220px; }
+.rit-portada__contenido h2 { margin: 0; font-family: 'Arial Black', Arial, sans-serif; font-size: 34px; line-height: 1.2; letter-spacing: 0.02em; }
+.rit-portada__contenido strong { font-family: 'Arial Black', Arial, sans-serif; font-size: 22px; }
+.rit-marco { padding: 22px 26px; border: 4px double #000; }
+.rit-titulo { margin: 0 0 12px !important; font-size: 13.5px !important; text-decoration: underline; }
+.rit-capitulos { margin: 0 0 8px !important; text-align: center; }
+.rit-indice { columns: 2; column-gap: 36px; margin: 0 0 22px !important; padding: 0; list-style: none; }
+.rit-indice li { display: flex; gap: 10px; margin-bottom: 6px; break-inside: avoid; }
+.rit-indice li span { min-width: 34px; }
+.rit-columnas { columns: 2; column-gap: 36px; }
+.rit-capitulo h4 { margin: 18px 0 10px !important; text-align: center; break-after: avoid; }
+.rit-capitulo p { margin: 0 0 9px; }
+.rit-subtitulo { margin: 10px 0 6px; font-size: inherit; }
+.rit-lista { margin: 0 0 9px !important; padding: 0; list-style: none; }
+.rit-lista li { display: flex; gap: 8px; margin-bottom: 3px; }
+.rit-lista li span { flex: none; min-width: 22px; }
+.ing-hoja.ing-hoja--cargo-rit { margin-top: 0; }
+
+@media (max-width: 760px) {
+  .rit-columnas, .rit-indice { columns: 1; }
+  .rit-marco { padding: 14px 12px; }
+  .rit-portada__contenido h2 { font-size: 26px; }
+}
+@media print {
+  .rit-marco { border-width: 4px; }
+}
+
+/* En pantalla se lee de corrido (una columna); al imprimir, dos columnas por hoja como el original. */
+.rit-columnas { columns: 1; max-width: 760px; margin: 0 auto; }
+@media print { .rit-columnas { columns: 2; max-width: none; } }

@@ -838,3 +838,6 @@
   .pp-copia__firmas { grid-template-columns: minmax(0, 1fr) !important; gap: 1.4em; }
   .pp-copia__firma { height: 4.5em; }
 }
+
+/* Panel sin botones al pie (p. ej. documento pendiente de firma): aire abajo para que no parezca cortado. */
+.pp-panel .pp-panel__contenido:not(:has(> .pp-panel__pie)) { padding-bottom: 24px; }

@@ -2,15 +2,20 @@ import { ahoraIso, crearAleatorio, crearAlmacen, fechaLarga, haceDias } from '@/
 import { almacenTrabajadores } from '@/modulos/trabajadores/aplicacion/almacenTrabajadores';
 import { nombreLegible } from '@/modulos/trabajadores/dominio/trabajador';
 import { JEFES } from '@/modulos/trabajadores/infraestructura/datosTrabajadores';
-import { MEDIDAS, textoMemorandum, type Actuacion, type EstadoIncidencia, type Incidencia } from '../dominio/incidencia';
+import { type Actuacion, type EstadoIncidencia, type Incidencia } from '../dominio/incidencia';
+import { MODELOS_IMPUTACION, buscarModelo, hechosDeModelo, type IdModelo } from '../dominio/modelosImputacion';
 
-const ASUNTOS: [string, string][] = [
-  ['Incumplimiento del procedimiento de despacho', 'Se despachó mercadería sin la guía de remisión firmada.'],
-  ['Tardanzas reiteradas', 'Registró cuatro tardanzas en la semana según las marcaciones.'],
-  ['Uso inadecuado de EPP', 'Se le encontró en la zona de producción sin casco ni guantes.'],
-  ['Abandono del puesto de trabajo', 'Se retiró de su puesto por más de una hora sin autorización.'],
-  ['Trato inadecuado a un compañero', 'Un compañero reportó una discusión en tono agresivo.'],
-];
+/** Lo que reporta el jefe en cada tipo de falta (una incidencia de ejemplo por modelo, sin repetir). */
+const DESCRIPCION: Partial<Record<IdModelo, string>> = {
+  tardanza: 'Registró su ingreso 15 minutos después de su horario sin aviso previo.',
+  falta_injustificada: 'No se presentó a laborar ni comunicó el motivo.',
+  abandono: 'Se retiró antes de su horario sin autorización.',
+  cobranza: 'No entregó en bóveda el efectivo de la cobranza del día.',
+  bpm: 'Se le encontró en sala de proceso sin toca ni mascarilla.',
+  alcohol: 'El alcoholímetro de vigilancia arrojó resultado positivo al ingreso.',
+  celular_proceso: 'Ingresó a la sala de proceso con su celular personal.',
+  convivencia: 'Un compañero reportó una discusión en tono agresivo.',
+};
 
 function crearIncidencias(): Incidencia[] {
   const { elegir } = crearAleatorio(919);
@@ -18,10 +23,12 @@ function crearIncidencias(): Incidencia[] {
   const demo = trabajadores.find((t) => t.dni === '45871236')!;
   const estados: EstadoIncidencia[] = ['registrada', 'en_investigacion', 'memo_emitido', 'cerrada', 'memo_firmado', 'en_investigacion', 'memo_firmado', 'cerrada'];
 
-  return Array.from({ length: 18 }, (_, i) => {
+  return Array.from({ length: MODELOS_IMPUTACION.length }, (_, i) => {
     const t = i === 2 ? demo : elegir(trabajadores);
     const estado = estados[i % estados.length];
-    const [asunto, descripcion] = elegir(ASUNTOS);
+    const modelo = MODELOS_IMPUTACION[i % MODELOS_IMPUTACION.length];
+    const asunto = modelo.nombre;
+    const descripcion = DESCRIPCION[modelo.id] ?? `Se reporta: ${modelo.nombre.toLowerCase()}.`;
     const dias = i * 2 + 1;
     const fecha = haceDias(dias, '10:00').slice(0, 10);
     const jefe = elegir(JEFES);
@@ -35,10 +42,9 @@ function crearIncidencias(): Incidencia[] {
       actuaciones.push({ tipo: 'cierre', usuario: 'Carlos Ramírez', fecha: haceDias(dias - 1, '16:00'), texto: 'Primera falta y explicación justificada; se cierra con orientación verbal.' });
     }
     if (estado === 'memo_emitido' || estado === 'memo_firmado') {
-      const medida = elegir(MEDIDAS);
-      memorandum = { medida, texto: textoMemorandum(t.nombre, t.dni, asunto, fechaLarga(fecha), medida), emitido: haceDias(dias - 1, '17:00') };
+      memorandum = { modelo: modelo.id, texto: hechosDeModelo(modelo, fechaLarga(fecha)), plazo: modelo.plazo, emitido: haceDias(dias - 1, '17:00') };
       actuaciones.push({ tipo: 'conclusion', usuario: 'Carlos Ramírez', fecha: haceDias(dias - 1, '16:30'), texto: 'Se confirma la falta según las evidencias.' });
-      actuaciones.push({ tipo: 'memo', usuario: 'Carlos Ramírez', fecha: memorandum.emitido, texto: medida });
+      actuaciones.push({ tipo: 'memo', usuario: 'Carlos Ramírez', fecha: memorandum.emitido, texto: modelo.asunto });
     }
     if (estado === 'memo_firmado') actuaciones.push({ tipo: 'firma', usuario: nombreLegible(t.nombre), fecha: haceDias(Math.max(0, dias - 2), '09:00') });
 
@@ -96,8 +102,8 @@ export const cerrarSinMemorandum = (i: Incidencia, conclusion: string, usuario: 
   actualizar(i.id, { tipo: 'cierre', usuario, texto: conclusion }, { estado: 'cerrada' });
 
 /** CUS34 + CUS35: generar desde plantilla, revisar y emitir el memorándum. */
-export const emitirMemorandum = (i: Incidencia, medida: string, texto: string, usuario: string) =>
-  actualizar(i.id, { tipo: 'memo', usuario, texto: medida }, { estado: 'memo_emitido', memorandum: { medida, texto, emitido: ahoraIso() } });
+export const emitirMemorandum = (i: Incidencia, modelo: IdModelo, texto: string, plazo: number, usuario: string) =>
+  actualizar(i.id, { tipo: 'memo', usuario, texto: buscarModelo(modelo).asunto }, { estado: 'memo_emitido', memorandum: { modelo, texto, plazo, emitido: ahoraIso() } });
 
 /** CUS36 + CUS37: el trabajador confirma la recepción y firma. */
 /** El trabajador dibuja su firma para dejar constancia de que recibió el memorándum. */

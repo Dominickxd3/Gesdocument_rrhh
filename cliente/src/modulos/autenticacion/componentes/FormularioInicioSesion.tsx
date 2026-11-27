@@ -7,6 +7,14 @@ import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
 import { Checkbox } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
+import { Dialog } from 'primereact/dialog';
+
+/** WhatsApp del área de Sistemas (en cliente/.env.local, no se sube al repositorio). */
+const WHATSAPP_SISTEMAS = import.meta.env.VITE_WHATSAPP_SISTEMAS || '+51 900 000 000';
+const enlaceWhatsapp = (usuario: string) =>
+  `https://wa.me/${WHATSAPP_SISTEMAS.replace(/\D/g, '')}?text=${encodeURIComponent(
+    `Hola, olvidé mi contraseña de Gestión Documental RR. HH.${usuario.trim() ? ` Mi usuario es: ${usuario.trim()}.` : ''}`,
+  )}`;
 
 interface ErroresFormulario {
   usuario?: string;
@@ -30,6 +38,7 @@ export function FormularioInicioSesion() {
   const [clave, setClave] = useState('');
   const [recordar, setRecordar] = useState(false);
   const [errores, setErrores] = useState<ErroresFormulario>({});
+  const [olvido, setOlvido] = useState(false);
 
   const alEnviar = async (evento: FormEvent) => {
     evento.preventDefault();
@@ -90,7 +99,14 @@ export function FormularioInicioSesion() {
           <Checkbox inputId="recordar" checked={recordar} onChange={(e) => setRecordar(!!e.checked)} />
           <span>Recordarme por 30 días</span>
         </label>
-        <a href="#" className="enlace-secundario" onClick={(e) => e.preventDefault()}>
+        <a
+          href="#"
+          className="enlace-secundario"
+          onClick={(e) => {
+            e.preventDefault();
+            setOlvido(true);
+          }}
+        >
           ¿Olvidaste tu contraseña?
         </a>
       </div>
@@ -105,6 +121,28 @@ export function FormularioInicioSesion() {
       <p className="formulario-inicio-sesion__ayuda">
         ¿No tienes acceso? Contacta con el área de Sistemas.
       </p>
+
+      <Dialog
+        visible={olvido}
+        onHide={() => setOlvido(false)}
+        header="¿Olvidaste tu contraseña?"
+        className="ventana-olvido"
+        style={{ width: '420px' }}
+        breakpoints={{ '480px': '94vw' }}
+        draggable={false}
+      >
+        <div className="olvido">
+          <span className="olvido__icono" aria-hidden="true">
+            <i className="pi pi-whatsapp" />
+          </span>
+          <p>Para recuperar tu contraseña, comunícate con el área de Sistemas por WhatsApp:</p>
+          <strong className="olvido__numero">{WHATSAPP_SISTEMAS}</strong>
+          <a className="olvido__boton" href={enlaceWhatsapp(usuario)} target="_blank" rel="noopener noreferrer">
+            <i className="pi pi-whatsapp" aria-hidden="true" /> Escribir por WhatsApp
+          </a>
+          <small>Ten a la mano tu usuario o tu DNI para que te ayuden más rápido.</small>
+        </div>
+      </Dialog>
     </form>
   );
 }
